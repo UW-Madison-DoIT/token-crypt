@@ -1,0 +1,58 @@
+Copyright 2012, Board of Regents of the University of Wisconsin System.
+This project includes software developed by the University of Wisconsin System.
+http://www.wisconsin.edu/
+
+Licensed under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License. You may obtain a copy of the License at:
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on
+an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied. See the License for the
+specific language governing permissions and limitations
+under the License.
+
+This project includes:
+  Bouncy Castle Provider under Bouncy Castle Licence
+  classworlds under BSD Style License
+  Common APIs for Token Crypto under Apache License Version 2.0
+  Commons CLI under The Apache Software License, Version 2.0
+  Default Plexus Container under Apache License, Version 2.0
+  Doxia Sink API under Apache License, Version 2.0
+  Hamcrest Core under BSD style
+  JSch under BSD
+  JTidy under Java HTML Tidy License
+  JUnit under Common Public License Version 1.0
+  Maven Artifact under The Apache Software License, Version 2.0
+  Maven Artifact Manager under The Apache Software License, Version 2.0
+  Maven Core under The Apache Software License, Version 2.0
+  Maven Error Diagnostics under The Apache Software License, Version 2.0
+  Maven Filtering under The Apache Software License, Version 2.0
+  Maven Local Settings Model under The Apache Software License, Version 2.0
+  Maven Model under The Apache Software License, Version 2.0
+  Maven Monitor under The Apache Software License, Version 2.0
+  Maven Plugin API under The Apache Software License, Version 2.0
+  Maven Plugin Descriptor Model under The Apache Software License, Version 2.0
+  Maven Plugin Parameter Documenter API under The Apache Software License, Version 2.0
+  Maven Plugin Registry Model under The Apache Software License, Version 2.0
+  Maven Profile Model under The Apache Software License, Version 2.0
+  Maven Project Builder under The Apache Software License, Version 2.0
+  Maven Reporting API under The Apache Software License, Version 2.0
+  Maven Repository Metadata Model under The Apache Software License, Version 2.0
+  Maven Resource Filtering Token Crypto Plugin under Apache License Version 2.0
+  Maven Wagon API under The Apache Software License, Version 2.0
+  Maven Wagon File Provider under The Apache Software License, Version 2.0
+  Maven Wagon HTTP Shared Library under The Apache Software License, Version 2.0
+  Maven Wagon Lightweight HTTP Provider under The Apache Software License, Version 2.0
+  Maven Wagon SSH Common Library under The Apache Software License, Version 2.0
+  Maven Wagon SSH External Provider under The Apache Software License, Version 2.0
+  Maven Wagon SSH Provider under The Apache Software License, Version 2.0
+  Plexus Common Utilities under The Apache Software License, Version 2.0
+  Plexus Default Interactivity Handler under Apache License, Version 2.0
+  Plexus Interpolation API under The Apache Software License, Version 2.0
+  plexus-build-api under Apache License, Version 2.0
+  XML Commons External Components XML APIs under The Apache Software License, Version 2.0
+
