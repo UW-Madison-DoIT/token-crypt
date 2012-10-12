@@ -1,0 +1,7 @@
+.project
+.classpath
+.settings/
+/tcrypt-cli/target/
+/tcrypt-common/target/
+/tcrypt-filtering-resources-plugin/target/
+
