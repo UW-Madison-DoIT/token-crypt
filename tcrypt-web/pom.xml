@@ -13,7 +13,7 @@
 
     <name>Web Application for Token Crypto</name>
     <description>Web Application for generating key pairs and encrypting tokens</description>
-    
+   
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
@@ -28,5 +28,17 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
+	  	 <dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>3.1.2.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>6.0.35</version>
+		</dependency>
+            
+            
     </dependencies>
 </project>
