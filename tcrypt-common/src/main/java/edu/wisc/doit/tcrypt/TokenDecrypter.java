@@ -69,7 +69,7 @@ public class TokenDecrypter extends TokenEncrypter {
     }
     
     public boolean isEncryptedToken(String ciphertext) {
-        return BASE64_PATTERN.matcher(ciphertext).matches() || TOKEN_PATTERN.matcher(ciphertext).matches();
+        return TOKEN_PATTERN.matcher(ciphertext).matches();
     }
 
     public String decrypt(String ciphertext) throws InvalidCipherTextException {
@@ -77,7 +77,7 @@ public class TokenDecrypter extends TokenEncrypter {
         if (tokenMatcher.matches()) {
             ciphertext = tokenMatcher.group(1);
         }
-        else if (!BASE64_PATTERN.matcher(ciphertext).matches()) {
+        else {
             throw new IllegalArgumentException("Specified ciphertext is not valid");
         }
         

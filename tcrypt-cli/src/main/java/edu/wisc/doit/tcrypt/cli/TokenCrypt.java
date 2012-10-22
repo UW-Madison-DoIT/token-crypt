@@ -68,8 +68,6 @@ public class TokenCrypt {
         keyOpt.setRequired(true);
         options.addOption(keyOpt);
         
-        options.addOption("w", "wrap", true, "Wrap the encrypted token in ENC(), defaults to true");
-        
 
         // create the parser
         final CommandLineParser parser = new GnuParser();
@@ -132,14 +130,12 @@ public class TokenCrypt {
     private static TokenHandler createTokenHandler(CommandLine line, final Reader keyReader) throws IOException {
         final TokenHandler tokenHandler;
         if (line.hasOption("e")) {
-            final boolean wrap = !line.hasOption("w") || Boolean.parseBoolean(line.getOptionValue("w"));
-            
             final TokenEncrypter tokenEncrypter = new TokenEncrypter(keyReader);
             
             tokenHandler = new TokenHandler() {
                 @Override
                 public String handleToken(String token) throws InvalidCipherTextException {
-                    return tokenEncrypter.encrypt(token, wrap);
+                    return tokenEncrypter.encrypt(token);
                 }
             };
         }

@@ -77,10 +77,6 @@ public class TokenEncrypter {
     }
     
     public String encrypt(String token) throws InvalidCipherTextException {
-        return encrypt(token, true);
-    }
-    
-    public String encrypt(String token, boolean addAffixes) throws InvalidCipherTextException {
         //Convert the token into a byte[]
         final byte[] tokenBytes = token.getBytes(CHARSET);
         
@@ -113,10 +109,6 @@ public class TokenEncrypter {
         
         //Encode the encrypted data and convert it into a string
         final String encryptedToken = new String(Base64.encode(encryptedTokenWithHash), CHARSET);
-        if (!addAffixes) {
-            return encryptedToken;
-        }
-        
         return TOKEN_PREFIX + encryptedToken + TOKEN_SUFFIX;
     }
 

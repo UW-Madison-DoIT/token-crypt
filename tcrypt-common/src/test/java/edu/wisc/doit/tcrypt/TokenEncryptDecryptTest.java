@@ -79,12 +79,6 @@ public class TokenEncryptDecryptTest {
 
         encryptedToken = tokenDecrypter.encrypt(token);
         testDecrypt(token, encryptedToken);
-        
-        encryptedToken = tokenEncrypter.encrypt(token, false);
-        testDecrypt(token, encryptedToken);
-
-        encryptedToken = tokenDecrypter.encrypt(token, false);
-        testDecrypt(token, encryptedToken);
     }
 
     protected void testDecrypt(final String token, final String encryptedToken) throws InvalidCipherTextException {
