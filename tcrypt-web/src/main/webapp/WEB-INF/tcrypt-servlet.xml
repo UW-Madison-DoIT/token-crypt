@@ -8,5 +8,6 @@
   <!-- the application context definition for the tcrypt DispatcherServlet -->
 
   <bean name="/" class="edu.wisc.doit.tcrypt.HomeController"/>
-
+  <bean name="/create" class="edu.wisc.doit.tcrypt.HomeController"/>
+  
 </beans>
