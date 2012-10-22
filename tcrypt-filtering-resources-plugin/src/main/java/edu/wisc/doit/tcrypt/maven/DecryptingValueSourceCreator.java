@@ -28,6 +28,7 @@ import org.apache.maven.shared.filtering.MavenResourcesExecution;
 import org.codehaus.plexus.interpolation.ValueSource;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
+import edu.wisc.doit.tcrypt.BouncyCastleTokenDecrypter;
 import edu.wisc.doit.tcrypt.TokenDecrypter;
 
 /**
@@ -64,7 +65,7 @@ public class DecryptingValueSourceCreator extends AbstractLogEnabled implements 
 
     protected TokenDecrypter createTokenDecrypter(final String keyFile) {
         try {
-            return new TokenDecrypter(new FileReader(keyFile));
+            return new BouncyCastleTokenDecrypter(new FileReader(keyFile));
         }
         catch (FileNotFoundException e) {
             throw new RuntimeException("Failed to find private key file: " + keyFile, e);

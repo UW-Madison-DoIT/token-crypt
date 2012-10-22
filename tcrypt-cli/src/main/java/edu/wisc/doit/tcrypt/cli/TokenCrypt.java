@@ -38,6 +38,8 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
+import edu.wisc.doit.tcrypt.BouncyCastleTokenDecrypter;
+import edu.wisc.doit.tcrypt.BouncyCastleTokenEncrypter;
 import edu.wisc.doit.tcrypt.TokenDecrypter;
 import edu.wisc.doit.tcrypt.TokenEncrypter;
 
@@ -130,7 +132,7 @@ public class TokenCrypt {
     private static TokenHandler createTokenHandler(CommandLine line, final Reader keyReader) throws IOException {
         final TokenHandler tokenHandler;
         if (line.hasOption("e")) {
-            final TokenEncrypter tokenEncrypter = new TokenEncrypter(keyReader);
+            final TokenEncrypter tokenEncrypter = new BouncyCastleTokenEncrypter(keyReader);
             
             tokenHandler = new TokenHandler() {
                 @Override
@@ -140,7 +142,7 @@ public class TokenCrypt {
             };
         }
         else {
-            final TokenDecrypter tokenDecrypter = new TokenDecrypter(keyReader);
+            final TokenDecrypter tokenDecrypter = new BouncyCastleTokenDecrypter(keyReader);
             
             if (line.hasOption("c")) {
                 tokenHandler = new TokenHandler() {
