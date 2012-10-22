@@ -17,9 +17,9 @@
     <description>Projects for managing encrypted tokens</description>
 
     <scm>
-        <connection>scm:svn:http://code.doit.wisc.edu/svn/doit-shared-tools/tcrypt-parent/trunk</connection>
-        <developerConnection>scm:svn:https://code.doit.wisc.edu/svn/doit-shared-tools/tcrypt-parent/trunk</developerConnection>
-        <url>http://code.doit.wisc.edu/svn/doit-shared-tools/tcrypt-parent/trunk</url>
+        <connection>scm:git:git://github.com/UW-Madison-DoIT/token-crypt.git</connection>
+        <developerConnection>scm:git:git@github.com:UW-Madison-DoIT/token-crypt.git</developerConnection>
+        <url>https://github.com/UW-Madison-DoIT/token-crypt</url>
     </scm>
     
     <properties>
