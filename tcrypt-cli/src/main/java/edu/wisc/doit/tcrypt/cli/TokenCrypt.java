@@ -38,6 +38,8 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
+import edu.wisc.doit.tcrypt.BouncyCastleTokenDecrypter;
+import edu.wisc.doit.tcrypt.BouncyCastleTokenEncrypter;
 import edu.wisc.doit.tcrypt.TokenDecrypter;
 import edu.wisc.doit.tcrypt.TokenEncrypter;
 
@@ -67,8 +69,6 @@ public class TokenCrypt {
         final Option keyOpt = new Option("k", "keyFile", true, "Key file to use. Must be a private key for decryption and a public key for encryption");
         keyOpt.setRequired(true);
         options.addOption(keyOpt);
-        
-        options.addOption("w", "wrap", true, "Wrap the encrypted token in ENC(), defaults to true");
         
 
         // create the parser
@@ -132,19 +132,17 @@ public class TokenCrypt {
     private static TokenHandler createTokenHandler(CommandLine line, final Reader keyReader) throws IOException {
         final TokenHandler tokenHandler;
         if (line.hasOption("e")) {
-            final boolean wrap = !line.hasOption("w") || Boolean.parseBoolean(line.getOptionValue("w"));
-            
-            final TokenEncrypter tokenEncrypter = new TokenEncrypter(keyReader);
+            final TokenEncrypter tokenEncrypter = new BouncyCastleTokenEncrypter(keyReader);
             
             tokenHandler = new TokenHandler() {
                 @Override
                 public String handleToken(String token) throws InvalidCipherTextException {
-                    return tokenEncrypter.encrypt(token, wrap);
+                    return tokenEncrypter.encrypt(token);
                 }
             };
         }
         else {
-            final TokenDecrypter tokenDecrypter = new TokenDecrypter(keyReader);
+            final TokenDecrypter tokenDecrypter = new BouncyCastleTokenDecrypter(keyReader);
             
             if (line.hasOption("c")) {
                 tokenHandler = new TokenHandler() {

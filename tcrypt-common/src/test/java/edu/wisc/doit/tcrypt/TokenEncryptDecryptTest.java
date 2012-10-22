@@ -35,12 +35,12 @@ import org.junit.Test;
  */
 public class TokenEncryptDecryptTest {
     private TokenEncrypter tokenEncrypter;
-    private TokenDecrypter tokenDecrypter;
+    private BouncyCastleTokenDecrypter tokenDecrypter;
     
     @Before
     public void setup() throws IOException {
-        tokenEncrypter = new TokenEncrypter(new InputStreamReader(this.getClass().getResourceAsStream("/my.wisc.edu-public.pem")));
-        tokenDecrypter = new TokenDecrypter(new InputStreamReader(this.getClass().getResourceAsStream("/my.wisc.edu-private.pem")));
+        tokenEncrypter = new BouncyCastleTokenEncrypter(new InputStreamReader(this.getClass().getResourceAsStream("/my.wisc.edu-public.pem")));
+        tokenDecrypter = new BouncyCastleTokenDecrypter(new InputStreamReader(this.getClass().getResourceAsStream("/my.wisc.edu-private.pem")));
     }
 
     @Test
@@ -50,12 +50,12 @@ public class TokenEncryptDecryptTest {
     
     @Test
     public void testEncryptDecryptSeparatorOnly() throws InvalidCipherTextException {
-        testTokenRoundTrip(Character.toString(TokenEncrypter.SEPARATOR));
+        testTokenRoundTrip(Character.toString(BouncyCastleTokenEncrypter.SEPARATOR));
     }
 
     @Test
     public void testEncryptDecryptSeparatorIn() throws InvalidCipherTextException {
-        testTokenRoundTrip("foo" + Character.toString(TokenEncrypter.SEPARATOR) + "bar");
+        testTokenRoundTrip("foo" + Character.toString(BouncyCastleTokenEncrypter.SEPARATOR) + "bar");
     }
     
     @Test
@@ -78,12 +78,6 @@ public class TokenEncryptDecryptTest {
         testDecrypt(token, encryptedToken);
 
         encryptedToken = tokenDecrypter.encrypt(token);
-        testDecrypt(token, encryptedToken);
-        
-        encryptedToken = tokenEncrypter.encrypt(token, false);
-        testDecrypt(token, encryptedToken);
-
-        encryptedToken = tokenDecrypter.encrypt(token, false);
         testDecrypt(token, encryptedToken);
     }
 

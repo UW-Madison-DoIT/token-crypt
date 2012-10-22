@@ -25,10 +25,11 @@ import java.util.List;
 import org.codehaus.plexus.interpolation.ValueSource;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
+import edu.wisc.doit.tcrypt.BouncyCastleTokenDecrypter;
 import edu.wisc.doit.tcrypt.TokenDecrypter;
 
 /**
- * Uses a {@link TokenDecrypter} to decrypt password tokens when filtering resources
+ * Uses a {@link BouncyCastleTokenDecrypter} to decrypt password tokens when filtering resources
  * 
  * @author Eric Dalquist
  * @version $Revision: 196 $

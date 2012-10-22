@@ -10,16 +10,16 @@
 	<modelVersion>4.0.0</modelVersion>
     <groupId>edu.wisc.doit.tcrypt</groupId>    
 	<artifactId>tcrypt-parent</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Token Crypto Parent</name>
     <description>Projects for managing encrypted tokens</description>
 
     <scm>
-        <connection>scm:svn:http://code.doit.wisc.edu/svn/doit-shared-tools/tcrypt-parent/trunk</connection>
-        <developerConnection>scm:svn:https://code.doit.wisc.edu/svn/doit-shared-tools/tcrypt-parent/trunk</developerConnection>
-        <url>http://code.doit.wisc.edu/svn/doit-shared-tools/tcrypt-parent/trunk</url>
+        <connection>scm:git:git://github.com/UW-Madison-DoIT/token-crypt.git</connection>
+        <developerConnection>scm:git:git@github.com:UW-Madison-DoIT/token-crypt.git</developerConnection>
+        <url>https://github.com/UW-Madison-DoIT/token-crypt</url>
     </scm>
     
     <properties>
