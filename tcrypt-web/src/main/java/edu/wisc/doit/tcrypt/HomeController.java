@@ -22,8 +22,6 @@ package edu.wisc.doit.tcrypt;
 import java.io.File;
 import java.io.FileWriter;
 import java.security.KeyPair;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.bouncycastle.openssl.PEMWriter;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,11 +32,19 @@ import org.springframework.web.servlet.ModelAndView;
 public class HomeController {
 
 	// Inject this later
-	private final TokenKeyPairGenerator bouncyCastleKeyPairGenerator = new BouncyCastleKeyPairGenerator();
+	private final TokenKeyPairGenerator bouncyCastleKeyPairGenerator;
+	private final TcryptHelper tcryptHelper;
+	private AuthenticationState remoteUser;
+	
+	public HomeController() {
+		tcryptHelper = new TcryptHelper();
+		bouncyCastleKeyPairGenerator = new BouncyCastleKeyPairGenerator();
+		remoteUser = new AuthenticationState();
+	}
 
 	@RequestMapping("/")
 	public ModelAndView handleRequest() throws Exception {
-
+		
 		return new ModelAndView("tcryptCreateKey");
 	}
 
@@ -47,34 +53,40 @@ public class HomeController {
 			@RequestParam("serviceName") String serviceName,
 			@RequestParam("keyLength") int keyLength) throws Exception {
 
-		// Get it from the login session
-		String remoteUser = "bbadger";
-
-		final Date generationTimestamp = new Date();
-		final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-				"yyyyMMdd_HHmmss");
-		final String keyFilePrefix = serviceName + "_" + remoteUser + "_"
-				+ simpleDateFormat.format(generationTimestamp) + "-";
-
 		KeyPair generateKeyPair = bouncyCastleKeyPairGenerator.generateKeyPair();
-
-		//configure directory via properties [Directory Not Configured]
-		final File privateKeyFile = new File("", keyFilePrefix + "private.pem");
-		final PEMWriter privatePemWriter = new PEMWriter(new FileWriter(privateKeyFile));
-		privatePemWriter.writeObject(generateKeyPair.getPrivate());
-		privatePemWriter.flush();
-		privatePemWriter.close();
-		
-		//configure directory via properties [Directory Not Configured]
-		final File publicKeyFile = new File("", keyFilePrefix + "public.pem");
-        final PEMWriter publicPemWriter = new PEMWriter(new FileWriter(publicKeyFile));
-        publicPemWriter.writeObject(generateKeyPair.getPublic());
-        publicPemWriter.flush();
-        publicPemWriter.close();
-
 		ModelAndView modelAndView = new ModelAndView("tcryptCreatedKey");
-		modelAndView.addObject("privateKey", privateKeyFile);
-		modelAndView.addObject("publicKey", publicKeyFile);
+		
+		final File privateKeyFile = new File(tcryptHelper.getFileLocationToSaveOnServer(serviceName, remoteUser.getCurrentUserName(), Constants.PRIVATE_SUFFIX));
+		FileWriter privateKeyFileWriter = new FileWriter(privateKeyFile);
+		
+		final File publicKeyFile = new File(tcryptHelper.getFileLocationToSaveOnServer(serviceName, remoteUser.getCurrentUserName(), Constants.PUBLIC_SUFFIX));
+		FileWriter publicKeyFileWriter = new FileWriter(publicKeyFile);
+		
+		try {
+			final PEMWriter privatePemWriter = new PEMWriter(privateKeyFileWriter);
+			privatePemWriter.writeObject(generateKeyPair.getPrivate());
+			privatePemWriter.flush();
+			privatePemWriter.close();
+			
+			final PEMWriter publicPemWriter = new PEMWriter(publicKeyFileWriter);
+	        publicPemWriter.writeObject(generateKeyPair.getPublic());
+	        publicPemWriter.flush();
+	        publicPemWriter.close();
+		}
+		
+		catch(Exception e){
+			modelAndView.addObject("error", Constants.KEY_NOT_CREATED);
+			return modelAndView;
+		}
+		
+		finally {
+			publicKeyFile.setReadOnly(); // changing permissions to readonly
+			privateKeyFile.setReadOnly(); // changing permissions to readonly
+			publicKeyFileWriter.close();
+			privateKeyFileWriter.close();
+		}
+		
+		modelAndView.addObject("serviceName", serviceName);
 		return modelAndView;
 	}
 }

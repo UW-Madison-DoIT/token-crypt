@@ -9,16 +9,18 @@
 </head>
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
 <script type="text/javascript">
-function submit(element) {
-	$('#filePath').val(element.id);
+function submitForm(element) {
+	$('#serviceName').val(element.id);
+	$('#keyType').val(element.name);
 	document.forms[0].submit();
 }
 </script>
 <body>
 <form action="/download" method="post" name="downloadKey">
-	<a id="${privateKey}" href="#" onclick="submit(this)">Private Key</a> <br/>
-	<a id="${publicKey}" href="#" onclick="submit(this)">Public Key</a>
-	<input type="hidden" name ="filePath" id="filePath"/>
+	<a id="${serviceName}" name="private" href="javascript:void(0);" onclick="submitForm(this); return false;">Private Key</a> <br/>
+	<a id="${serviceName}" name="public" href="javascript:void(0);" onclick="submitForm(this); return false;">Public Key</a>
+	<input type="hidden" name ="serviceName" id="serviceName"/>
+	<input type="hidden" name="keyType" id="keyType"/>
 </form>
 </body>
 </html>
