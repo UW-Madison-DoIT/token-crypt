@@ -1,0 +1,6 @@
+1. Service Creation Notification Email?
+2. Need templates before starting UI work
+3. Login? 
+4. Should I write test cases extensively using mocks etc?
+5. How much error handling to do? Redirect to a generic page in case of exceptions and log the stacktrace?
+

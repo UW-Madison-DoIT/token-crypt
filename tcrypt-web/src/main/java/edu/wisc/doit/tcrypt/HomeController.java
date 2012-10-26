@@ -19,74 +19,39 @@
  */
 package edu.wisc.doit.tcrypt;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.security.KeyPair;
+import java.util.Iterator;
+import java.util.Set;
 
-import org.bouncycastle.openssl.PEMWriter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 @org.springframework.stereotype.Controller
 public class HomeController {
 
-	// Inject this later
-	private final TokenKeyPairGenerator bouncyCastleKeyPairGenerator;
-	private final TcryptHelper tcryptHelper;
-	private AuthenticationState remoteUser;
-	
-	public HomeController() {
-		tcryptHelper = new TcryptHelper();
-		bouncyCastleKeyPairGenerator = new BouncyCastleKeyPairGenerator();
-		remoteUser = new AuthenticationState();
+	private IKeysKeeper keysKeeper;
+
+	@Autowired
+	public HomeController(IKeysKeeper keysKeeper){
+		this.keysKeeper = keysKeeper;
 	}
 
 	@RequestMapping("/")
 	public ModelAndView handleRequest() throws Exception {
+		ModelAndView modelAndView = new ModelAndView("tcryptCreateKey");
+		Set<String> serviceNames = keysKeeper.getListOfServiceNames();
 		
-		return new ModelAndView("tcryptCreateKey");
-	}
-
-	@RequestMapping("/create")
-	public ModelAndView createServiceKey(
-			@RequestParam("serviceName") String serviceName,
-			@RequestParam("keyLength") int keyLength) throws Exception {
-
-		KeyPair generateKeyPair = bouncyCastleKeyPairGenerator.generateKeyPair();
-		ModelAndView modelAndView = new ModelAndView("tcryptCreatedKey");
-		
-		final File privateKeyFile = new File(tcryptHelper.getFileLocationToSaveOnServer(serviceName, remoteUser.getCurrentUserName(), Constants.PRIVATE_SUFFIX));
-		FileWriter privateKeyFileWriter = new FileWriter(privateKeyFile);
-		
-		final File publicKeyFile = new File(tcryptHelper.getFileLocationToSaveOnServer(serviceName, remoteUser.getCurrentUserName(), Constants.PUBLIC_SUFFIX));
-		FileWriter publicKeyFileWriter = new FileWriter(publicKeyFile);
-		
-		try {
-			final PEMWriter privatePemWriter = new PEMWriter(privateKeyFileWriter);
-			privatePemWriter.writeObject(generateKeyPair.getPrivate());
-			privatePemWriter.flush();
-			privatePemWriter.close();
-			
-			final PEMWriter publicPemWriter = new PEMWriter(publicKeyFileWriter);
-	        publicPemWriter.writeObject(generateKeyPair.getPublic());
-	        publicPemWriter.flush();
-	        publicPemWriter.close();
-		}
-		
-		catch(Exception e){
-			modelAndView.addObject("error", Constants.KEY_NOT_CREATED);
-			return modelAndView;
-		}
-		
-		finally {
-			publicKeyFile.setReadOnly(); // changing permissions to readonly
-			privateKeyFile.setReadOnly(); // changing permissions to readonly
-			publicKeyFileWriter.close();
-			privateKeyFileWriter.close();
-		}
-		
-		modelAndView.addObject("serviceName", serviceName);
+		modelAndView.addObject("serviceNames", formatForJavaScript(serviceNames));
 		return modelAndView;
+	}
+	
+
+	private String formatForJavaScript(Set<String> serviceNames) {
+		Iterator<String> iterator = serviceNames.iterator();
+		String commaSeparated = "[ '" + iterator.next() + "'";
+		for (; iterator.hasNext();) 
+			commaSeparated =  commaSeparated + ", '" + iterator.next() + "'";
+		commaSeparated = commaSeparated+ "]";
+		return commaSeparated;
 	}
 }
