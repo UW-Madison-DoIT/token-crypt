@@ -3,4 +3,7 @@
 3. Login? 
 4. Should I write test cases extensively using mocks etc?
 5. How much error handling to do? Redirect to a generic page in case of exceptions and log the stacktrace?
-
+6. User shouldn't have to pick the input box they selected, JS + server side should manage that??
+7. //perform in the background??
+	@Override
+	public Set<String> getListOfServiceNames()

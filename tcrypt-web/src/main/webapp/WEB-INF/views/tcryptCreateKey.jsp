@@ -24,13 +24,15 @@
 <body>
 	
 	<form name="createServiceKey" action="create" method="post" autocomplete="off">
-			Service Name : <input type="text" name="serviceName"/>
+			Service Name : <input type="text" name="createServiceName"/>
 			KeyLength : <Select name="keyLength"><option value="2048">2048</option></Select>
 			<input type="submit" name="create" value="Create Service Key">
 	</form>
 	
 	<form name="encryptToken" action="encrypt" method="post" autocomplete="off">
-			Service Name : <input type="text" name="serviceNames" id="serviceNames"/>
+			Service Name : <input type="text" name="encryptServiceName" id="serviceNames"/> <br/>
+			Text : <textarea rows="20" cols="20" id="text" name="text"></textarea> <br/>
+			<input type="submit" name="encrypt" value="Encrypt">
 	</form>
 </body>
 </html>

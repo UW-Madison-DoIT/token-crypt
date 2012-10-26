@@ -27,9 +27,14 @@ public class CreateController {
 		this.authenticationState = authenticationState;
 	}
 	
+	@RequestMapping(value = "/create", method = RequestMethod.GET)
+	public ModelAndView createServiceKey() {
+		return new ModelAndView("tcryptCreatedKey");
+	}
+	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ModelAndView createServiceKey(
-			@RequestParam("serviceName") String serviceName,
+			@RequestParam("createServiceName") String serviceName,
 			@RequestParam("keyLength") int keyLength) throws Exception {
 
 		KeyPair generateKeyPair = bouncyCastleKeyPairGenerator.generateKeyPair();
