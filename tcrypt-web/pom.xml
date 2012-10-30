@@ -13,7 +13,6 @@
 
     <name>Web Application for Token Crypto</name>
     <description>Web Application for generating key pairs and encrypting tokens</description>
-
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
@@ -47,6 +46,34 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
-        </dependency>   
+        </dependency>  
+        <dependency>
+		    <groupId>org.codehaus.mojo</groupId>
+		    <artifactId>properties-maven-plugin</artifactId>
+		    <version>1.0-alpha-1</version>
+		</dependency>
     </dependencies>
+    	
+        <build>    
+		    <plugins>
+		      <plugin>
+		        <groupId>org.codehaus.mojo</groupId>
+		        <artifactId>properties-maven-plugin</artifactId>
+		        <version>1.0-alpha-1</version>
+		        <executions>
+		          <execution>
+		            <phase>pre-clean</phase>
+		            <goals>
+		              <goal>read-project-properties</goal>
+		            </goals>
+		            <configuration>
+		              <files>
+		                <file>${basedir}/project.properties</file>
+		              </files>
+		            </configuration>
+		          </execution>
+		        </executions>
+		      </plugin>
+		   </plugins>
+		 </build>
 </project>

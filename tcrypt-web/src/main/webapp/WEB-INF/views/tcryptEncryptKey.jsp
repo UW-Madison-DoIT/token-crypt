@@ -8,14 +8,22 @@
 <title>Credential Encryption</title>
 </head>
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
-
+<script type="text/javascript" src="<core:url value="js/jquery.zclip.min.js" />"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+    $('a#copy').zclip({
+        path:'<core:url value="js/ZeroClipboard.swf" />',
+        copy:$('#encrypted').val()
+    });
+});
+</script>
 <body>
 
 <a href="/"> Create A Service Key </a>
 
 <div>
 <h3> Service Name: ${serviceName} </h2> 
-<input type="text" width="150" value="${ encryptedText }"/></div>
-
+<input type="text" width="150" id="encrypted" value="${ encryptedText }"/></div>
+<a href="javascript:void(0);" id="copy">Copy to Clipboard</a>
 </body>
 </html>
