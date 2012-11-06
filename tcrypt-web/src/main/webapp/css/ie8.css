@@ -1,0 +1,20 @@
+body .horizontal-menu {
+		background: transparent url(../images/navBgShadow.png) repeat-x;
+	z-index: 5000000000;
+}
+
+.horizontal-menu {
+	height: 33px;
+}
+
+.submenu {
+	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(color=#3C3C3C,direction=125,strength=4,positive=0)"!important;
+}
+
+.submenu * {
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)"!important;
+}
+
+#shell {
+	margin-top: -8px;
+}

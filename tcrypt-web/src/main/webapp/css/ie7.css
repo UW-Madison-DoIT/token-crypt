@@ -1,0 +1,51 @@
+body {position: relative;}
+
+#globalnav li, .main-menu > li, #sidebar, #content
+{display: inline;}
+
+
+#uwhome, #globalnav {top: -18px;}
+
+.main-menu {
+	position: relative;
+	width: 100%;
+	height: 33px;
+	background-color: transparent;
+	background-repeat: repeat-x;
+	background-image: url(../images/navBgShadow.png);
+	color: #333;
+	z-index: 5000000000;
+}
+
+.main-menu > li {
+	border-bottom: #ccc;
+}
+
+.main-menu > li > h2, .main-menu > li > h2 > a {
+	width: 100%;
+	text-align: center;
+}
+
+.main-menu li:hover {
+	/* fixes IE7 'sticky bug' */
+	  visibility: inherit;
+}
+ul.submenu {
+	border-right: 1px solid #ccc;
+}
+
+.submenu > li {list-style: none; width: 99%}
+
+.submenu > li a {width: 100%;}
+
+
+/* equal height columns using faux columns */
+#shell {
+	z-index: 1000;
+	margin-top: -8px;
+	height: 1%;
+	background-image: url(../images/shell_bg.png);
+	background-repeat: repeat-y;
+}
+
+#content {padding-top: 40px;}

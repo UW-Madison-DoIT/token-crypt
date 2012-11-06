@@ -1,0 +1,186 @@
+body {position: relative;}
+
+#globalnav li, .main-menu li, #sidebar, #content, #breadcrumbs li
+{display: inline;}
+
+.main-menu a {
+height: auto;
+}
+
+/*#nav1 li, #nav1 li a {*/
+/*	float: left;*/
+/*}*/
+
+#uwhome, #globalnav {top: -18px;}
+
+/*#nav2_col {*/
+/*	width: 223px;*/
+/*}*/
+
+#breadcrumbs li {margin-left: 10px}
+
+.main-menu {
+	position: relative;
+	width: 960px;
+	/*height: 33px;*/
+	background-color: transparent;
+	/*background-repeat: repeat-x;*/
+	/*background-image: url(/images/navBgShadow.png);*/
+	color: #b70101;
+	z-index: 5000000000;
+}
+
+#shell {
+	margin-left: -1px;
+	padding-right: 1px;
+}
+
+
+
+.main-menu li{
+	border-bottom: #ccc;
+}
+
+.main-menu a.sf-with-ul {
+	min-width: 1px;
+}
+
+/*.submenu {*/
+/*	border-right: 1px solid #ccc;*/
+/*}*/
+/**/
+/*.submenu li {*/
+/*	display: list-item;*/
+/*}*/
+
+
+/* equal height columns using faux columns */
+#shell {
+	z-index: 1000;
+	height: 1%;
+	background-image: url(../images/shell_bg.png);
+	background-repeat: repeat-y;
+}
+
+
+
+/*use floats instead of inline to facilite setting widths for horizontal menu items */
+.main-menu li, .main-menu li a {
+	float: left;
+	margin-left: 0;
+	margin-right: 0;
+	background-image: none;
+	width: 16%;
+}
+
+.main-menu li {
+	position: relative;
+	font-size: 0.875em;
+	height: 100%;
+	border-right: 1px solid #fff;
+}
+
+/*.main-menu .submenu li {*/
+/*	float: none;*/
+/*	display: block;*/
+/*	margin: 0 10px .75em 15px;*/
+/*	line-height: 1.2;*/
+/*	border: 0;*/
+/**/
+/*}*/
+
+
+/*.sf-sub-indicator {*/
+/*	top: 9px;*/
+/*}*/
+
+.main-menu li h2, .main-menu li h2 a {
+	height: 100%;
+	width: 100%;
+	background-color: transparent;
+	position: relative;
+	line-height: 24px;
+	text-align: center;
+}
+
+.main-menu li {
+	/*width: 75%;*/
+	margin: 0 10px;
+	list-style: none;
+}
+/*.main-menu .submenu li a {*/
+/*	display: block;*/
+/*	width: 75%;*/
+/*	margin: 0 10px;*/
+/*}*/
+
+.main-menu h2  a:hover {
+	text-decoration: none;
+}
+
+.main-menu  li:hover, .main-menu li.sfHover,
+.main-menu  a:focus, .main-menu  a:hover, .main-menu  a:active {
+	background-color: /*#e7d9c1*/transparent;
+	text-decoration: underline!important;
+}
+
+
+.main-menu li:hover ul,
+.main-menu .sfHover ul {
+	left:			0;
+	top:			21px; /* match top ul list item height */
+	z-index:		99;
+
+}
+
+.main-menu li .submenu {
+	/*position: absolute;*/
+	display: none!important;
+}
+
+#content {padding-top: 30px;}
+
+#content h1, #content h2, #content h3, #content h4 {
+	margin: 1em 0 .25em;
+	font-weight: bold;
+}
+
+#content h1 {
+	font-size: 1em;
+}
+
+#content h2 {
+	font-size: 0.875em;
+}
+
+#content h3 {
+	font-size: 0.8125em;
+}
+
+#content p {
+	margin: 1em 0;
+}
+
+#content h1 + p, #content h2 + p, #content h3 + p, #content .left + p, #content .right + p{
+	margin-top: .25em;
+}
+
+#content p, #content ul li, #content ol li {
+	font-size: 0.8125em;
+}
+
+#content ul {
+	margin: 1em 0 1em 20px;
+}
+
+#content ol {
+	margin: 1em 0 1em 24px;
+}
+
+.photo img { border: 2px solid #c9c498; }
+
+.photo p {
+	font-size: 0.75em;
+	color: #7f7c5e;
+	line-height: 1.25;
+}
