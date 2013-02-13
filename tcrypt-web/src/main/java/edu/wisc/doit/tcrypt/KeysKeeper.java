@@ -3,19 +3,25 @@ package edu.wisc.doit.tcrypt;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 
 public class KeysKeeper implements IKeysKeeper {
 
-	//[Directory name from properties file]
-	private String directoryname = "C:\\Users\\sridharan5\\Downloads\\apache-tomcat-6.0.35-windows-x64\\apache-tomcat-6.0.35\\webapps\\keys\\";
+	private String directoryname;
 
-	@Override
+    /**
+     * Constructor
+     * @param directoryname Location of keys directory
+     */
+    public KeysKeeper(String directoryname)
+    {
+        this.directoryname = directoryname;
+    }
+
+    @Override
 	public String getKeyLocationToSaveOnServer(String serviceName, String remoteUser, String keyType) throws IOException {
 		
 		final Date generationTimestamp = new Date();
@@ -50,10 +56,12 @@ public class KeysKeeper implements IKeysKeeper {
 	public Set<String> getListOfServiceNames(){
 		String[] fileNames = finder(directoryname,"","");
 		Set<String> serviceNames = new HashSet<String>();
-		
-		for (String string : fileNames) 
-			serviceNames.add(string.split("_")[0]);
-		
+
+        if (fileNames != null)
+        {
+            for (String string : fileNames)
+                serviceNames.add(string.split("_")[0]);
+        }
 		return serviceNames;
 	}
 	

@@ -19,12 +19,11 @@
  */
 package edu.wisc.doit.tcrypt;
 
-import java.util.Iterator;
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import java.util.Iterator;
+import java.util.Set;
 
 @org.springframework.stereotype.Controller
 public class HomeController {
@@ -40,8 +39,12 @@ public class HomeController {
 	public ModelAndView handleRequest() throws Exception {
 		ModelAndView modelAndView = new ModelAndView("tcryptCreateKey");
 		Set<String> serviceNames = keysKeeper.getListOfServiceNames();
-		
-		modelAndView.addObject("serviceNames", formatForJavaScript(serviceNames));
+
+        if (!serviceNames.isEmpty())
+        {
+            modelAndView.addObject("serviceNames", formatForJavaScript(serviceNames));
+        }
+
 		return modelAndView;
 	}
 	

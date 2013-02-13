@@ -43,7 +43,9 @@
 	  <property name="suffix" value=".jsp"/>
   </bean>
   
-  <bean id="keysKeeper" class="edu.wisc.doit.tcrypt.KeysKeeper" />
+  <bean id="keysKeeper" class="edu.wisc.doit.tcrypt.KeysKeeper">
+    <constructor-arg value="WEB-INF/keys"/>
+  </bean>
   <bean id="bouncyCastleKeyPairGenerator" class="edu.wisc.doit.tcrypt.BouncyCastleKeyPairGenerator" />
   <bean id="authenticationState" class="edu.wisc.doit.tcrypt.AuthenticationState" />
 </beans>
