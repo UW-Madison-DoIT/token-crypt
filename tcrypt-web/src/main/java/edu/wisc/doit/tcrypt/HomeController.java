@@ -19,14 +19,19 @@
  */
 package edu.wisc.doit.tcrypt;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+
 import java.util.Iterator;
 import java.util.Set;
 
 @org.springframework.stereotype.Controller
 public class HomeController {
+
+    private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
 	private IKeysKeeper keysKeeper;
 
@@ -36,7 +41,9 @@ public class HomeController {
 	}
 
 	@RequestMapping("/")
-	public ModelAndView handleRequest() throws Exception {
+	public ModelAndView handleRequest() throws Exception
+    {
+	    logger.info("handleRequest() called...");
 		ModelAndView modelAndView = new ModelAndView("tcryptCreateKey");
 		Set<String> serviceNames = keysKeeper.getListOfServiceNames();
 
