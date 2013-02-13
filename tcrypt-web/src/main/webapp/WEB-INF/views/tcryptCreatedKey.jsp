@@ -19,7 +19,7 @@ function submitForm(element) {
 
 <a href="/"> Create A Service Key </a>
 
-<form action="/download" method="post" name="downloadKey">
+<form action="<%= request.getContextPath() %>/download" method="post" name="downloadKey">
 		<core:choose>
 			<core:when test="${empty error}">
 				<div id="success">
