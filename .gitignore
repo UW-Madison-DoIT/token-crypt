@@ -1,6 +1,9 @@
 .project
 .classpath
 .settings/
+.idea/
+*.iml
+*/*.iml
 /tcrypt-cli/target/
 /tcrypt-common/target/
 /tcrypt-filtering-resources-plugin/target/
