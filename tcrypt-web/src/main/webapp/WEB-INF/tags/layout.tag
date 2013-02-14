@@ -1,10 +1,6 @@
 <%@ attribute name="pageTitle" required="true" type="java.lang.String"%>
 
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
-<%@ taglib prefix="core" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ include file="/WEB-INF/views/taglibs.jsp"%>
 
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -19,9 +15,7 @@
 	src="http://code.jquery.com/ui/1.9.1/jquery-ui.js"></script>
 <title>${pageTitle} | University of Wisconsin-Madison</title>
 
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/main_no_top_nav.css"
-	type="text/css" media="all" />
+<link rel="stylesheet"	href="${pageContext.request.contextPath}/css/main_no_top_nav.css" type="text/css" media="all" />
 <!--[if IE 6]>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/ie6.css" type="text/css" media="screen" />
   <![endif]-->
@@ -50,9 +44,7 @@
 
 				<div id="siteTitle">
 					<h1>
-						<a href="index.html"><span><img
-								src="${pageContext.request.contextPath}/images/b_tokenEncyrption.png"
-								alt="Token Encryption" /></span></a>
+						<a href="index.html"><span><img	src="${pageContext.request.contextPath}/images/b_tokenEncyrption.png" alt="Token Encryption" /></span></a>
 					</h1>
 					<div id="tagline">
 						<span>Encrypting your tokens, one line at a time.</span>
@@ -82,10 +74,14 @@
 				<div id="sidebar" class="col">
 
 					<ul id="secondary-nav">
-						<li><a href="${pageContext.request.contextPath}/apps/encrypt">Encrypt
-								Token</a></li>
-						<li><a href="${pageContext.request.contextPath}/apps/create">Create
-								Service Key</a></li>
+						<li>
+							<core:url value="/apps/encrypt" var="EncryptTokenUrl" />
+							<a href="${EncryptTokenUrl}">Encrypt Token</a>
+						</li>
+						<li>
+						    <core:url value="/apps/index.html" var="HomeTokenUrl" />
+							<a href="${HomeTokenUrl}">Create Service Key</a>
+						</li>
 					</ul>
 
 					<div class="highlight">

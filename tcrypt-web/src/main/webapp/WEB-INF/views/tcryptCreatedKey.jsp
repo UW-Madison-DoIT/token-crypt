@@ -1,5 +1,4 @@
-<%@ taglib prefix="z" tagdir="/WEB-INF/tags" %>
-<%@ taglib prefix="core" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ include file="/WEB-INF/views/taglibs.jsp"%>
 
 <z:layout pageTitle="Credential Encryption">
 
