@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-
 import java.util.Iterator;
 import java.util.Set;
 
@@ -40,7 +39,7 @@ public class HomeController {
 		this.keysKeeper = keysKeeper;
 	}
 
-	@RequestMapping("/")
+	@RequestMapping("/index.html")
 	public ModelAndView handleRequest() throws Exception
     {
 	    logger.info("handleRequest() called...");
@@ -54,7 +53,6 @@ public class HomeController {
 
 		return modelAndView;
 	}
-	
 
 	private String formatForJavaScript(Set<String> serviceNames) {
 		Iterator<String> iterator = serviceNames.iterator();
