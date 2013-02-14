@@ -5,7 +5,11 @@
             <Pattern>%d{ISO8601} - [%thread] %-5level %logger [%M:%L] - %msg%n</Pattern>
         </layout>
     </appender>
+    <logger name="org.springframework">
+        <level value="DEBUG" />
+    </logger>
     <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>
+    
 </configuration>

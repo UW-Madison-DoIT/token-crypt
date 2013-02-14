@@ -12,7 +12,8 @@
 	<form name="encryptToken" action="encrypt" method="post" autocomplete="off">
 			<div>
 				<span class="label" >Service Name : </span>
-				<span><input type="text" name="encryptServiceName" id="serviceNames"/> </span>
+				<span>
+				<input type="text" name="serviceNames" id="serviceNames"/> </span>
 			</div>
 			<div>
 				<span class="label">Text : </span>
