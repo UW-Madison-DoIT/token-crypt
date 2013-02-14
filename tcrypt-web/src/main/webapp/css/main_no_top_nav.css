@@ -106,7 +106,7 @@ h1 span {
 	height: 36px;
 	margin-top: 0px;
 	text-indent: -999em;
-	background-image: url(../images/site-title.png);
+	background-image: url(../images/b_tokenEncyrption.png);
 	/*NOTE: E-mail web@uc.wisc.edu to request the main site-title.png graphic for your department*/
 	background-repeat: no-repeat;
 }
@@ -290,10 +290,18 @@ margin-left: 0;
 .col {
 	display: inline-block;
 	vertical-align: top;
+	float : left;
+	
+}
+
+.label {
+	padding : 10px 20px 10px 10px;
+	font-weight: bold;
 }
 
 #sidebar {
 	width: 180px;
+	height : 300px;
 	background-color: #F7F5E8;
 	padding: 0 15px 0 30px;
 }

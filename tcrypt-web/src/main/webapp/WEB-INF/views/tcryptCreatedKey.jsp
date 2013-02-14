@@ -1,26 +1,17 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
-    <%@ taglib prefix="core" uri="http://java.sun.com/jsp/jstl/core" %>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Credential Encryption</title>
-</head>
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
-<script type="text/javascript">
-function submitForm(element) {
-	$('#serviceName').val(element.id);
-	$('#keyType').val(element.name);
-	document.forms[0].submit();
-}
-</script>
-<body>
+<%@ taglib prefix="z" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="core" uri="http://java.sun.com/jsp/jstl/core"%>
 
-<a href="/"> Create A Service Key </a>
+<z:layout pageTitle="Credential Encryption">
 
-<form action="<%= request.getContextPath() %>/download" method="post" name="downloadKey">
-		<core:choose>
+	<script type="text/javascript">
+	function submitForm(element) {
+		$('#serviceName').val(element.id);
+		$('#keyType').val(element.name);
+		document.forms[0].submit();
+	}
+	</script>
+	<form action="${pageContext.request.contextPath}/download" method="post" name="downloadKey">
+			<core:choose>
 			<core:when test="${empty error}">
 				<div id="success">
 					<h3>Service Key created for ${serviceName} <br/>
@@ -46,6 +37,5 @@ function submitForm(element) {
 				</div>
 			</core:otherwise>
 		</core:choose>
-</form>
-</body>
-</html>
+	</form>
+</z:layout>
