@@ -42,7 +42,6 @@ public class HomeController {
 	@RequestMapping("/index.html")
 	public ModelAndView handleRequest() throws Exception
     {
-	    logger.info("handleRequest() called...");
 		ModelAndView modelAndView = new ModelAndView("tcryptCreateKey");
 		Set<String> serviceNames = keysKeeper.getListOfServiceNames();
 
