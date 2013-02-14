@@ -17,51 +17,77 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package edu.wisc.doit.tcrypt.vo;
 
-import java.io.InputStream;
+import java.security.KeyPair;
 import java.util.Date;
 
-public class ServiceKey {
-	
+public class ServiceKey
+{
 	//variables
-	private String name;
-	private int keyLength;
-	private InputStream publicKey;
-	private InputStream privateKey;
+	private String serviceName;
+	private Integer keyLength;
+	private String createdByNetId;
 	private Date dayCreated;
-	
+	private KeyPair keyPair;
+
+	/**
+	 * Constructor
+	 */
+	public ServiceKey()
+	{
+		super();
+	}
+
 	//Getters/setters
-	
-	public InputStream getPrivateKey() {
-		return privateKey;
-	}
-	public void setPrivateKey(InputStream privateKey) {
-		this.privateKey = privateKey;
-	}
-	public InputStream getPublicKey() {
-		return publicKey;
-	}
-	public void setPublicKey(InputStream publicKey) {
-		this.publicKey = publicKey;
-	}
-	public int getKeyLength() {
+	public Integer getKeyLength()
+	{
 		return keyLength;
 	}
-	public void setKeyLength(int keyLength) {
+
+	public void setKeyLength(Integer keyLength)
+	{
 		this.keyLength = keyLength;
 	}
-	public String getName() {
-		return name;
+
+	public String getServiceName()
+	{
+		return serviceName;
 	}
-	public void setName(String name) {
-		this.name = name;
+
+	public void setServiceName(String serviceName)
+	{
+		this.serviceName = serviceName;
 	}
-	public Date getDayCreated() {
+
+	public KeyPair getKeyPair()
+	{
+		return keyPair;
+	}
+
+	public void setKeyPair(KeyPair keyPair)
+	{
+		this.keyPair = keyPair;
+	}
+
+	public Date getDayCreated()
+	{
 		return dayCreated;
 	}
-	public void setDayCreated(Date dayCreated) {
+
+	public void setDayCreated(Date dayCreated)
+	{
 		this.dayCreated = dayCreated;
 	}
-	
+
+	public String getCreatedByNetId()
+	{
+		return createdByNetId;
+	}
+
+	public void setCreatedByNetId(String createdByNetId)
+	{
+		this.createdByNetId = createdByNetId;
+	}
 }
