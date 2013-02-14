@@ -1,4 +1,4 @@
-<%@ taglib prefix="z" tagdir="/WEB-INF/tags" %>
+<%@ include file="/WEB-INF/views/taglibs.jsp"%>
 <z:layout pageTitle="Credential Encryption">
 <script type="text/javascript">
 	$(function() {

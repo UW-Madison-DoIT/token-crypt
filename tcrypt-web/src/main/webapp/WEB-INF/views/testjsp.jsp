@@ -1,4 +1,6 @@
-<%@ taglib prefix="z" tagdir="/WEB-INF/tags" %>
-<z:layout pageTitle="A simple page">
-    <span>Hello, JSP!</span>
+<%@ include file="/WEB-INF/views/taglibs.jsp"%>
+<z:layout pageTitle="Info Page">
+    <div>
+    <span>Information Page</span>
+    </div>
 </z:layout>
