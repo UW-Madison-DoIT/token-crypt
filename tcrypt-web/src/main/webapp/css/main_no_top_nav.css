@@ -278,8 +278,6 @@ margin-left: 0;
 
 #shell {
 	position: relative;
-	background-color: #fff;
-	z-index: 1;
 	width: 958px;
 	border-width: 1px 1px 2px;
 	border-color: #c3bca1 #c3bca1 #b70101;
@@ -290,8 +288,6 @@ margin-left: 0;
 .col {
 	display: inline-block;
 	vertical-align: top;
-	float : left;
-	
 }
 
 .label {
@@ -307,8 +303,7 @@ margin-left: 0;
 }
 
 #content {
-	width: 673px;
-	padding: 20px 30px 0 30px;
+  padding: 20px 30px 0 30px;
   background-color: #fff;
 }
 
