@@ -1,24 +1,26 @@
 package edu.wisc.doit.tcrypt;
 
-import java.io.PrintWriter;
-import java.security.KeyPair;
-
-import org.bouncycastle.openssl.PEMWriter;
 import org.junit.Test;
+import java.security.KeyPair;
+import static org.junit.Assert.assertNotNull;
 
-public class TokenKeyPairCreationTest {
+public class TokenKeyPairCreationTest
+{
     @Test
-    public void testKeyGeneration() throws Exception {
+    public void testKeyGeneration() throws Exception
+    {
         final BouncyCastleKeyPairGenerator bouncyCastleKeyPairGenerator = new BouncyCastleKeyPairGenerator();
         final KeyPair generateKeyPair = bouncyCastleKeyPairGenerator.generateKeyPair();
-        
+        assertNotNull(generateKeyPair);
+        assertNotNull(generateKeyPair.getPrivate());
+        assertNotNull(generateKeyPair.getPublic());
+/*
         final PEMWriter pemWriter = new PEMWriter(new PrintWriter(System.out));
-        
         pemWriter.writeObject(generateKeyPair.getPrivate());
         pemWriter.flush();
         pemWriter.writeObject(generateKeyPair.getPublic());
         pemWriter.flush();
         pemWriter.close();
-        
+*/
     }
 }
