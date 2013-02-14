@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:merge="http://maven.apache.org/plugin-merge" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>edu.wisc.doit.tcrypt</groupId>    
+        <groupId>edu.wisc.doit.tcrypt</groupId>
         <artifactId>tcrypt-parent</artifactId>
         <version>1.0.4-SNAPSHOT</version>
     </parent>
 
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>tcrypt-filtering-resources-plugin</artifactId>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>tcrypt-filtering-resources-plugin</artifactId>
 
     <name>Maven Resource Filtering Token Crypto Plugin</name>
     <description>Decrypts encrypted properties via a custom maven-resources-plugin filter</description>
-    
+
     <dependencies>
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
@@ -52,21 +54,15 @@
                             <pluginExecutions>
                                 <pluginExecution>
                                     <pluginExecutionFilter>
-                                        <groupId>
-                                            org.codehaus.plexus
-                                        </groupId>
-                                        <artifactId>
-                                            plexus-maven-plugin
-                                        </artifactId>
-                                        <versionRange>
-                                            [1.3.4,)
-                                        </versionRange>
+                                        <groupId>org.codehaus.plexus</groupId>
+                                        <artifactId>plexus-maven-plugin</artifactId>
+                                        <versionRange>[1.3.4,)</versionRange>
                                         <goals>
                                             <goal>descriptor</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore />
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>

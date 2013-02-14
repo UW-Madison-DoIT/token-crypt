@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:merge="http://maven.apache.org/plugin-merge" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>edu.wisc.doit.code</groupId>
@@ -7,9 +9,9 @@
         <version>3</version>
     </parent>
 
-	<modelVersion>4.0.0</modelVersion>
-    <groupId>edu.wisc.doit.tcrypt</groupId>    
-	<artifactId>tcrypt-parent</artifactId>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>edu.wisc.doit.tcrypt</groupId>
+    <artifactId>tcrypt-parent</artifactId>
     <version>1.0.4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -21,12 +23,12 @@
         <developerConnection>scm:git:git@github.com:UW-Madison-DoIT/token-crypt.git</developerConnection>
         <url>https://github.com/UW-Madison-DoIT/token-crypt</url>
     </scm>
-    
+
     <properties>
         <project.build.sourceVersion>1.6</project.build.sourceVersion>
         <project.build.targetVersion>1.6</project.build.targetVersion>
     </properties>
-    
+
     <modules>
         <module>tcrypt-filtering-resources-plugin</module>
         <module>tcrypt-common</module>
@@ -40,7 +42,7 @@
             <url>https://code.doit.wisc.edu/maven/content/repositories/public-releases/</url>
         </repository>
     </repositories>
-    
+
     <dependencyManagement>
         <dependencies>
             <dependency>
