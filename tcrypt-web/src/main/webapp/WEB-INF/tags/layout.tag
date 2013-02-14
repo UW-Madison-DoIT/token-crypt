@@ -79,7 +79,7 @@
 							<a href="${EncryptTokenUrl}">Encrypt Token</a>
 						</li>
 						<li>
-						    <core:url value="/apps/index.html" var="HomeTokenUrl" />
+						    <core:url value="/apps/create" var="HomeTokenUrl" />
 							<a href="${HomeTokenUrl}">Create Service Key</a>
 						</li>
 					</ul>

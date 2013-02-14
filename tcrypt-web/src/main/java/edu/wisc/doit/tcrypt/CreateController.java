@@ -29,7 +29,8 @@ public class CreateController {
 	
 	@RequestMapping(value = "/create", method = RequestMethod.GET)
 	public ModelAndView createServiceKey() {
-		return new ModelAndView("tcryptCreatedKey");
+		ModelAndView mv = new ModelAndView("createServiceKeyBefore");
+		return mv;
 	}
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
@@ -38,7 +39,7 @@ public class CreateController {
 			@RequestParam("keyLength") int keyLength) throws Exception {
 
 		KeyPair generateKeyPair = bouncyCastleKeyPairGenerator.generateKeyPair();
-		ModelAndView modelAndView = new ModelAndView("tcryptCreatedKey");
+		ModelAndView modelAndView = new ModelAndView("createServiceKeyDownload");
 		
 		//error checking
 		if(tcryptHelper.checkIfKeyExistsOnServer(serviceName, authenticationState.getCurrentUserName()))

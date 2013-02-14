@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,7 +30,15 @@ public class EncryptController {
 	
 	@RequestMapping(value = "/encrypt", method = RequestMethod.GET)
 	public ModelAndView encryptText() {
-		return new ModelAndView("tcryptEncryptKey");
+		ModelAndView modelAndView = new ModelAndView("encryptTokenBefore");
+		
+		/*Set<String> serviceNames =  tcryptHelper.getListOfServiceNames();
+
+        if (!serviceNames.isEmpty())
+        {
+            modelAndView.addObject("serviceNames", formatForJavaScript(serviceNames));
+        }*/
+		return modelAndView;
 	}
 	
 	@RequestMapping(value = "/encrypt", method = RequestMethod.POST)
@@ -36,7 +46,7 @@ public class EncryptController {
 			@RequestParam("encryptServiceName") String serviceName,
 			@RequestParam("text") String text) throws Exception {
 
-		ModelAndView modelAndView = new ModelAndView("tcryptEncryptKey");
+		ModelAndView modelAndView = new ModelAndView("encryptTokenResult");
         
 		TokenEncrypter tokenEncrypter;
 		if(tokenEncrypters.containsKey(serviceName))
@@ -52,6 +62,15 @@ public class EncryptController {
         modelAndView.addObject("serviceName", serviceName);
 		modelAndView.addObject("encryptedText", token);
 		return modelAndView;
+	}
+	
+	private String formatForJavaScript(Set<String> serviceNames) {
+		Iterator<String> iterator = serviceNames.iterator();
+		String commaSeparated = "[ '" + iterator.next() + "'";
+		for (; iterator.hasNext();) 
+			commaSeparated =  commaSeparated + ", '" + iterator.next() + "'";
+		commaSeparated = commaSeparated+ "]";
+		return commaSeparated;
 	}
 
 }
