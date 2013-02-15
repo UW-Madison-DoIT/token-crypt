@@ -10,7 +10,7 @@ public class TokenKeyPairCreationTest
     public void testKeyGeneration() throws Exception
     {
         final BouncyCastleKeyPairGenerator bouncyCastleKeyPairGenerator = new BouncyCastleKeyPairGenerator();
-        final KeyPair generateKeyPair = bouncyCastleKeyPairGenerator.generateKeyPair();
+        final KeyPair generateKeyPair = bouncyCastleKeyPairGenerator.generateKeyPair(2048);
         assertNotNull(generateKeyPair);
         assertNotNull(generateKeyPair.getPrivate());
         assertNotNull(generateKeyPair.getPublic());

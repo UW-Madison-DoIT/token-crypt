@@ -1,16 +1,15 @@
 package edu.wisc.doit.tcrypt;
 
+import org.bouncycastle.openssl.PEMWriter;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.security.KeyPair;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import org.bouncycastle.openssl.PEMWriter;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 /**
  * Test that tries to go through each of the lifecycle phases that will be used by the token crypt webapp
@@ -37,7 +36,7 @@ public class WebappLifecycleTest {
         final Date generationTimestamp = new Date();
         
         //Generate the key pair
-        final KeyPair generateKeyPair = bouncyCastleKeyPairGenerator.generateKeyPair();
+        final KeyPair generateKeyPair = bouncyCastleKeyPairGenerator.generateKeyPair(2048);
         
         final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
         final String keyFilePrefix = serviceName + "_" + remoteUser + "_" + simpleDateFormat.format(generationTimestamp) + "-";
