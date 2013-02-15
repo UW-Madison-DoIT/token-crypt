@@ -65,7 +65,7 @@ public class KeyReadingAndWritingTest
 		original.setCreatedByNetId(System.getProperty("user.name"));
 		original.setDayCreated(new Date());
 		original.setKeyLength(2048);
-		KeyPair keyPair = keysKeeper.generateKeyPair();
+		KeyPair keyPair = keysKeeper.generateKeyPair(2048);
 		original.setPrivateKey(keyPair.getPrivate());
 		original.setPublicKey(keyPair.getPublic());
 		original.setServiceName("test.doit.wisc.edu");

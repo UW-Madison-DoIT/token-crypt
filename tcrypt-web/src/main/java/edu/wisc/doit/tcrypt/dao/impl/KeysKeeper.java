@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import java.io.*;
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.PublicKey;
 import java.text.SimpleDateFormat;
@@ -104,6 +105,12 @@ public class KeysKeeper implements IKeysKeeper
 
 		logger.warn("Didn't find a key on the file system for this service.");
 		return null;
+	}
+
+	@Override
+	public byte[] getKeyAsBytes(Key key)
+	{
+		return key.getEncoded();
 	}
 
 	@Override
