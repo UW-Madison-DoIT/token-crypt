@@ -1,5 +1,7 @@
-package edu.wisc.doit.tcrypt;
+package edu.wisc.doit.tcrypt.dao.impl;
 
+import edu.wisc.doit.tcrypt.TokenKeyPairGenerator;
+import edu.wisc.doit.tcrypt.dao.IKeysKeeper;
 import edu.wisc.doit.tcrypt.vo.ServiceKey;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PEMWriter;
@@ -9,7 +11,6 @@ import java.io.*;
 import java.security.KeyPair;
 import java.security.PublicKey;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,50 +33,17 @@ public class KeysKeeper implements IKeysKeeper
 	}
 
 	@Override
-	public String getKeyLocationToSaveOnServer(String serviceName, String remoteUser, String keyType) throws IOException
-	{
-
-		final Date generationTimestamp = new Date();
-		final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
-		final String keyFilePrefix = directoryname + "/" + serviceName + "_"
-				+ remoteUser + "_"
-				+ simpleDateFormat.format(generationTimestamp) + "-" + keyType
-				+ ".pem";
-		return keyFilePrefix;
-	}
-
-
-	@Override
-	public String getKeyLocationToDownloadFromServer(String serviceName, String remoteUser, String keyType) throws IOException
-	{
-		final String filePrefix = serviceName + "_" + remoteUser + "_";
-		final String fileSuffix = "-" + keyType + ".pem";
-		return directoryname + finder(directoryname, filePrefix, fileSuffix)[0];
-	}
-
-	@Override
-	public boolean checkIfKeyExistsOnServer(String serviceName, String remoteUser)
-	{
-		final String filePrefix = serviceName + "_" + remoteUser + "_";
-		final String fileSuffix = ".pem";
-		if (finder(directoryname, filePrefix, fileSuffix).length != 0)
-			return true;
-
-		return false;
-	}
-
-	//perform in the background??
-	@Override
 	public Set<String> getListOfServiceNames()
 	{
-		String[] fileNames = finder(directoryname, "", "");
+		File dir = new File(directoryname);
+		String[] fileNames = dir.list();
 		Set<String> serviceNames = new HashSet<String>();
 
 		if (fileNames != null)
 		{
 			for (String string : fileNames)
 			{
-				serviceNames.add(string.split("_")[0]);
+				serviceNames.add(string.substring(string.indexOf("_")));
 			}
 		}
 		return serviceNames;
@@ -176,19 +144,4 @@ public class KeysKeeper implements IKeysKeeper
 		// Return Results
 		return result;
 	}
-
-	private String[] finder(String dirName, final String filePrefix, final String fileSuffix)
-	{
-		File dir = new File(dirName);
-		return dir.list(new FilenameFilter()
-		{
-			public boolean accept(File dir, String name)
-			{
-				if (name.startsWith(filePrefix) && name.endsWith(fileSuffix))
-					return true;
-				return false;
-			}
-		});
-	}
-
 }

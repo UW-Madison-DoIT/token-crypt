@@ -10,5 +10,4 @@ public class ExceptionController extends BaseController {
 	  public ModelAndView handleException (Exception e) {
 		  return new ModelAndView("genericError");
 	  }
-
 }

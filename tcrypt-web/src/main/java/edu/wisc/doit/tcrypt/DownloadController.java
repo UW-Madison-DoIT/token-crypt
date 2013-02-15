@@ -1,17 +1,12 @@
 package edu.wisc.doit.tcrypt;
 
-import java.io.File;
-import java.io.FileInputStream;
-
-import javax.activation.MimetypesFileTypeMap;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import edu.wisc.doit.tcrypt.dao.IKeysKeeper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 public class DownloadController extends BaseController {
@@ -27,6 +22,7 @@ public class DownloadController extends BaseController {
 	
 	@RequestMapping("/download")
 	public void downloadKey(@RequestParam("serviceName") String serviceName,@RequestParam("keyType") String keyType, HttpServletRequest request, HttpServletResponse response) throws Exception {
+/*
 		try {
 			String fileLocationOnServer = tcryptHelper.getKeyLocationToDownloadFromServer(serviceName, authenticationState.getCurrentUserName(), keyType);
 			File file = new File(fileLocationOnServer);
@@ -38,5 +34,6 @@ public class DownloadController extends BaseController {
 			logger.error("Issue downloading the key " + keyType,e);
 			throw new Exception (e);
 		}
+*/
 	}
 }

@@ -42,9 +42,14 @@
 	  <property name="prefix" value="/WEB-INF/views/"/>
 	  <property name="suffix" value=".jsp"/>
   </bean>
-  
-  <bean id="keysKeeper" class="edu.wisc.doit.tcrypt.KeysKeeper">
+
+    <bean id="tcryptServices" class="edu.wisc.doit.tcrypt.services.impl.TCryptServicesImpl">
+        <constructor-arg ref="keysKeeper"/>
+    </bean>
+
+  <bean id="keysKeeper" class="edu.wisc.doit.tcrypt.dao.impl.KeysKeeper">
     <constructor-arg value="WEB-INF/keys"/>
+    <constructor-arg ref="bouncyCastleKeyPairGenerator"/>
   </bean>
   <bean id="bouncyCastleKeyPairGenerator" class="edu.wisc.doit.tcrypt.BouncyCastleKeyPairGenerator" />
   <bean id="authenticationState" class="edu.wisc.doit.tcrypt.AuthenticationState" />

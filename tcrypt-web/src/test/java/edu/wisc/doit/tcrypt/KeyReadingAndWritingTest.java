@@ -5,6 +5,8 @@
 
 package edu.wisc.doit.tcrypt;
 
+import edu.wisc.doit.tcrypt.dao.IKeysKeeper;
+import edu.wisc.doit.tcrypt.dao.impl.KeysKeeper;
 import edu.wisc.doit.tcrypt.vo.ServiceKey;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.DateUtils;

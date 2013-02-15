@@ -1,10 +1,6 @@
 package edu.wisc.doit.tcrypt;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.security.KeyPair;
-
+import edu.wisc.doit.tcrypt.dao.IKeysKeeper;
 import org.bouncycastle.openssl.PEMWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.security.KeyPair;
 
 @Controller
 public class CreateController extends BaseController {
@@ -43,6 +42,7 @@ public class CreateController extends BaseController {
 
 		ModelAndView modelAndView = new ModelAndView("createServiceKeyDownload");
 
+/*
 		try {
 			//error checking
 			if(tcryptHelper.checkIfKeyExistsOnServer(serviceName, authenticationState.getCurrentUserName()))
@@ -86,6 +86,7 @@ public class CreateController extends BaseController {
 			modelAndView.addObject("error", Constants.KEY_NOT_CREATED);
 			return modelAndView;
 		}
+*/
 		return modelAndView;
 	}
 
