@@ -9,7 +9,7 @@
 		document.forms[0].submit();
 	}
 	</script>
-	<form action="${pageContext.request.contextPath}/download" method="post" name="downloadKey">
+	<form action="${pageContext.request.contextPath}/apps/download" method="post" name="downloadKey">
 			<core:choose>
 			<core:when test="${empty error}">
 				<div id="success">
@@ -29,12 +29,6 @@
 					</h2>
 				</div>
 			</core:when>
-			<core:otherwise>
-				<div id="error">
-				<h2> Oops! Something's gonna bit wrong! <br/> </h2>
-				<h3>${error}</h3>
-				</div>
-			</core:otherwise>
 		</core:choose>
 	</form>
 </z:layout>

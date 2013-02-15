@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-public class EncryptController {
+public class EncryptController extends BaseController {
 
 	private IKeysKeeper tcryptHelper;
 	private AuthenticationState authenticationState;
@@ -31,36 +31,47 @@ public class EncryptController {
 	@RequestMapping(value = "/encrypt", method = RequestMethod.GET)
 	public ModelAndView encryptText() {
 		ModelAndView modelAndView = new ModelAndView("encryptTokenBefore");
-		
-		/*Set<String> serviceNames =  tcryptHelper.getListOfServiceNames();
-
-        if (!serviceNames.isEmpty())
-        {
-            modelAndView.addObject("serviceNames", formatForJavaScript(serviceNames));
-        }*/
+		try {
+			Set<String> serviceNames =  tcryptHelper.getListOfServiceNames();
+	
+	        if (!serviceNames.isEmpty())
+	        {
+	            modelAndView.addObject("serviceNames", formatForJavaScript(serviceNames));
+	        }
+		} catch (Exception e) {
+			logger.error("Issue populating list of service names, recoverable error.",e);
+		}
 		return modelAndView;
 	}
 	
 	@RequestMapping(value = "/encrypt", method = RequestMethod.POST)
 	public ModelAndView encryptText(
-			@RequestParam("encryptServiceName") String serviceName,
+			@RequestParam("serviceNames") String serviceName,
 			@RequestParam("text") String text) throws Exception {
 
 		ModelAndView modelAndView = new ModelAndView("encryptTokenResult");
-        
-		TokenEncrypter tokenEncrypter;
-		if(tokenEncrypters.containsKey(serviceName))
-			tokenEncrypter = tokenEncrypters.get(serviceName);
-		else
-		{
-			String keyFileName = tcryptHelper.getKeyLocationToDownloadFromServer(serviceName, authenticationState.getCurrentUserName(), Constants.PUBLIC_SUFFIX);
-			tokenEncrypter = new BouncyCastleTokenEncrypter(new InputStreamReader(new FileInputStream(new File(keyFileName))));
-			tokenEncrypters.put(serviceName, tokenEncrypter);
-		}
-			
-        final String token = tokenEncrypter.encrypt(text);
-        modelAndView.addObject("serviceName", serviceName);
-		modelAndView.addObject("encryptedText", token);
+        try {
+			TokenEncrypter tokenEncrypter;
+			if(tokenEncrypters.containsKey(serviceName)) {
+				tokenEncrypter = tokenEncrypters.get(serviceName);
+			} else {
+				String keyFileName = tcryptHelper.getKeyLocationToDownloadFromServer(serviceName, authenticationState.getCurrentUserName(), Constants.PUBLIC_SUFFIX);
+				tokenEncrypter = new BouncyCastleTokenEncrypter(new InputStreamReader(new FileInputStream(new File(keyFileName))));
+				tokenEncrypters.put(serviceName, tokenEncrypter);
+			}
+				
+	        final String token = tokenEncrypter.encrypt(text);
+	        modelAndView.addObject("serviceName", serviceName);
+			modelAndView.addObject("encryptedText", token);
+		
+        } catch (Exception e) {
+    		logger.error("Error encrypting text",e);
+        	modelAndView = new ModelAndView("encryptTokenBefore");
+			modelAndView.addObject("error", Constants.ENCRYPTION_FAILED);
+			modelAndView.getModelMap().addAttribute("serviceNames",serviceName);
+			modelAndView.getModelMap().addAttribute("text",text);
+        }
+		
 		return modelAndView;
 	}
 	
