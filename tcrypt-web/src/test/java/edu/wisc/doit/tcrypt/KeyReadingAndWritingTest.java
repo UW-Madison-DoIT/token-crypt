@@ -6,6 +6,7 @@
 package edu.wisc.doit.tcrypt;
 
 import edu.wisc.doit.tcrypt.vo.ServiceKey;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -42,8 +43,15 @@ public class KeyReadingAndWritingTest
 	{
 		if (tempKeyDirctory.exists())
 		{
-			Boolean result = tempKeyDirctory.delete();
-			logger.info("tempKeyDirectory deletion attempt result: {}", result);
+			try
+			{
+				FileUtils.deleteDirectory(tempKeyDirctory);
+			}
+			catch (Exception e)
+			{
+				logger.error("Error Deleting tempKeyDirectory {}", e.toString());
+			}
+			logger.info("tempKeyDirectory attempted to be deleted. Still exist? {}", tempKeyDirctory.exists());
 		}
 	}
 
@@ -67,7 +75,7 @@ public class KeyReadingAndWritingTest
 		ServiceKey fileKey = keysKeeper.readServiceKeyFromFileSystem(original.getServiceName());
 		assertNotNull(fileKey);
 
-		// TODO Step 4: Compare original ServiceKey content with new ServiceKey read from filesystem
+		// Compare original ServiceKey content with new ServiceKey read from filesystem
 		assertEquals(original.getCreatedByNetId(), fileKey.getCreatedByNetId());
 		assertTrue(DateUtils.isSameDay(original.getDayCreated(), fileKey.getDayCreated()));
 		assertEquals(original.getKeyLength(), fileKey.getKeyLength());
