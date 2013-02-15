@@ -89,7 +89,12 @@
 					</div>
 				</div>
 				<div id="content" class="main col">
-					<jsp:doBody />
+				    <core:if test="${not empty error}">
+					   	<div class="error">
+					   		Error: ${error}
+					   	</div>
+					</core:if>
+				    <jsp:doBody />
 				</div>
 			</div>
 		</div>

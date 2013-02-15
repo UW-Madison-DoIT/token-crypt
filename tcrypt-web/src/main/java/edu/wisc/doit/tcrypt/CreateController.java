@@ -8,13 +8,14 @@ import java.security.KeyPair;
 import org.bouncycastle.openssl.PEMWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-public class CreateController {
+public class CreateController extends BaseController {
 
 	private TokenKeyPairGenerator bouncyCastleKeyPairGenerator;
 	private IKeysKeeper tcryptHelper;
@@ -28,49 +29,63 @@ public class CreateController {
 	}
 	
 	@RequestMapping(value = "/create", method = RequestMethod.GET)
-	public ModelAndView createServiceKey() {
+	@ExceptionHandler(Exception.class)
+	public ModelAndView createServiceKeyInit() {
 		ModelAndView mv = new ModelAndView("createServiceKeyBefore");
 		return mv;
 	}
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
+	@ExceptionHandler(Exception.class)
 	public ModelAndView createServiceKey(
-			@RequestParam("createServiceName") String serviceName,
+			@RequestParam("serviceName") String serviceName,
 			@RequestParam("keyLength") int keyLength) throws Exception {
 
-		KeyPair generateKeyPair = bouncyCastleKeyPairGenerator.generateKeyPair();
 		ModelAndView modelAndView = new ModelAndView("createServiceKeyDownload");
-		
-		//error checking
-		if(tcryptHelper.checkIfKeyExistsOnServer(serviceName, authenticationState.getCurrentUserName()))
-		{
-			modelAndView.addObject("error", Constants.KEY_ALREADY_FOUND);
-			return modelAndView;
-		}
-		
-		final File privateKeyFile = new File(tcryptHelper.getKeyLocationToSaveOnServer(serviceName, authenticationState.getCurrentUserName(), Constants.PRIVATE_SUFFIX));
-		FileWriter privateKeyFileWriter = new FileWriter(privateKeyFile);
-		
-		final File publicKeyFile = new File(tcryptHelper.getKeyLocationToSaveOnServer(serviceName, authenticationState.getCurrentUserName(), Constants.PUBLIC_SUFFIX));
-		FileWriter publicKeyFileWriter = new FileWriter(publicKeyFile);
-		
+
 		try {
-			generateAndWriteKeys(generateKeyPair, privateKeyFileWriter,	publicKeyFileWriter);
-		}
-		
-		catch(Exception e){
+			//error checking
+			if(tcryptHelper.checkIfKeyExistsOnServer(serviceName, authenticationState.getCurrentUserName()))
+			{
+				modelAndView.addObject("error", Constants.KEY_ALREADY_FOUND);
+				return modelAndView;
+			}
+			
+			KeyPair generateKeyPair = bouncyCastleKeyPairGenerator.generateKeyPair();
+			
+			final File privateKeyFile = new File(tcryptHelper.getKeyLocationToSaveOnServer(serviceName, authenticationState.getCurrentUserName(), Constants.PRIVATE_SUFFIX));
+			FileWriter privateKeyFileWriter = new FileWriter(privateKeyFile);
+			
+			final File publicKeyFile = new File(tcryptHelper.getKeyLocationToSaveOnServer(serviceName, authenticationState.getCurrentUserName(), Constants.PUBLIC_SUFFIX));
+			FileWriter publicKeyFileWriter = new FileWriter(publicKeyFile);
+			
+			try {
+				generateAndWriteKeys(generateKeyPair, privateKeyFileWriter,	publicKeyFileWriter);
+			} catch(Exception e) {
+				logger.error("Issue during key writing: " + e.getMessage(),e);
+				modelAndView = new ModelAndView ("createServiceKeyBefore");
+				
+				modelAndView.addObject("error", Constants.KEY_NOT_CREATED);
+				return modelAndView;
+			}
+			
+			finally {
+				publicKeyFile.setReadOnly(); // changing permissions to readonly
+				privateKeyFile.setReadOnly(); // changing permissions to readonly
+				publicKeyFileWriter.close();
+				privateKeyFileWriter.close();
+			}
+			
+			modelAndView.addObject("serviceName", serviceName);
+			
+		} catch(Exception e) {
+			logger.error("Issue during key creation: " + e.getMessage(),e);
+			modelAndView = new ModelAndView ("createServiceKeyBefore");
+			modelAndView.getModelMap().addAttribute("serviceName", serviceName);
+			modelAndView.getModelMap().addAttribute("keyLength", keyLength);
 			modelAndView.addObject("error", Constants.KEY_NOT_CREATED);
 			return modelAndView;
 		}
-		
-		finally {
-			publicKeyFile.setReadOnly(); // changing permissions to readonly
-			privateKeyFile.setReadOnly(); // changing permissions to readonly
-			publicKeyFileWriter.close();
-			privateKeyFileWriter.close();
-		}
-		
-		modelAndView.addObject("serviceName", serviceName);
 		return modelAndView;
 	}
 

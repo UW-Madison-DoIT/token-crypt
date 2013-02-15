@@ -48,4 +48,15 @@
   </bean>
   <bean id="bouncyCastleKeyPairGenerator" class="edu.wisc.doit.tcrypt.BouncyCastleKeyPairGenerator" />
   <bean id="authenticationState" class="edu.wisc.doit.tcrypt.AuthenticationState" />
+  
+  <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+	   <property name="exceptionMappings">
+	      <props>
+	         <prop key="java.lang.Exception">
+	            genericError
+	         </prop>
+	      </props>
+	   </property>
+	   <property name="defaultErrorView" value="error"/>
+	</bean>
 </beans>
