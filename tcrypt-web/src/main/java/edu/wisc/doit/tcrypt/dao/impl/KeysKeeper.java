@@ -7,6 +7,9 @@ import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PEMWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Repository;
 import java.io.*;
 import java.security.KeyPair;
 import java.security.PublicKey;
@@ -14,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Set;
 
+@Repository("keysKeeper")
 public class KeysKeeper implements IKeysKeeper
 {
 	private static final Logger logger = LoggerFactory.getLogger(KeysKeeper.class);
@@ -26,9 +30,12 @@ public class KeysKeeper implements IKeysKeeper
 	 * @param directoryname Location of keys directory
 	 * @param keyPairGenerator KeyPair Generator
 	 */
-	public KeysKeeper(String directoryname, TokenKeyPairGenerator keyPairGenerator)
+	@Autowired
+	public KeysKeeper(@Value("${edu.wisc.doit.tcrypt.path.keydirectory:WEB-INF/keys}") String directoryname, TokenKeyPairGenerator keyPairGenerator)
 	{
+		super();
 		this.directoryname = directoryname;
+		logger.info("DirectoryName = {}", directoryname);
 		this.keyPairGenerator = keyPairGenerator;
 	}
 

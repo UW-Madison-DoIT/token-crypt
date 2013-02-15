@@ -51,7 +51,7 @@ public class KeyReadingAndWritingTest
 			}
 			catch (Exception e)
 			{
-				logger.error("Error Deleting tempKeyDirectory {}", e.toString());
+				logger.error("Error Deleting tempKeyDirectory", e);
 			}
 			logger.info("tempKeyDirectory attempted to be deleted. Still exist? {}", tempKeyDirctory.exists());
 		}

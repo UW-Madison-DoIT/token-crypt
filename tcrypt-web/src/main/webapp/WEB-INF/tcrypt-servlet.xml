@@ -43,16 +43,15 @@
 	  <property name="suffix" value=".jsp"/>
   </bean>
 
-    <bean id="tcryptServices" class="edu.wisc.doit.tcrypt.services.impl.TCryptServicesImpl">
-        <constructor-arg ref="keysKeeper"/>
-    </bean>
-
-  <bean id="keysKeeper" class="edu.wisc.doit.tcrypt.dao.impl.KeysKeeper">
-    <constructor-arg value="WEB-INF/keys"/>
-    <constructor-arg ref="bouncyCastleKeyPairGenerator"/>
-  </bean>
   <bean id="bouncyCastleKeyPairGenerator" class="edu.wisc.doit.tcrypt.BouncyCastleKeyPairGenerator" />
   <bean id="authenticationState" class="edu.wisc.doit.tcrypt.AuthenticationState" />
+    <bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:webapp.properties</value>
+            </list>
+        </property>
+    </bean>
   
   <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
 	   <property name="exceptionMappings">

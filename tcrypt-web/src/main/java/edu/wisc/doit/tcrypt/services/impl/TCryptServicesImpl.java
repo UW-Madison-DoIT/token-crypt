@@ -7,9 +7,12 @@ package edu.wisc.doit.tcrypt.services.impl;
 import edu.wisc.doit.tcrypt.dao.IKeysKeeper;
 import edu.wisc.doit.tcrypt.services.TCryptServices;
 import edu.wisc.doit.tcrypt.vo.ServiceKey;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import java.security.KeyPair;
 import java.util.Set;
 
+@Service("tCryptServicesImpl")
 public class TCryptServicesImpl implements TCryptServices
 {
 	private IKeysKeeper keysKeeper;
@@ -18,6 +21,7 @@ public class TCryptServicesImpl implements TCryptServices
 	 * Constructor
 	 * @param keysKeeper DAO for working with Keys (Generating and File Storage)
 	 */
+	@Autowired
 	public TCryptServicesImpl(IKeysKeeper keysKeeper)
 	{
 		super();
