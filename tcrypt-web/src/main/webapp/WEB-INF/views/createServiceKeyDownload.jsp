@@ -1,6 +1,6 @@
 <%@ include file="/WEB-INF/views/taglibs.jsp"%>
 
-<z:layout pageTitle="Credential Encryption">
+<z:layout pageTitle="Token Encryption">
 
 	<script type="text/javascript">
 	function submitForm(element) {

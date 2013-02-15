@@ -1,5 +1,5 @@
 <%@ include file="/WEB-INF/views/taglibs.jsp"%>
-<z:layout pageTitle="Encrypt Key">
+<z:layout pageTitle="Token Encryption">
 	<script type="text/javascript">
 	$(document).ready(function(){
 	    $('a#copy').zclip({

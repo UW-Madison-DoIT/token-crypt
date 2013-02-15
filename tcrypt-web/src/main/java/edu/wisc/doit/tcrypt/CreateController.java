@@ -8,6 +8,7 @@ import java.security.KeyPair;
 import org.bouncycastle.openssl.PEMWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,12 +29,14 @@ public class CreateController extends BaseController {
 	}
 	
 	@RequestMapping(value = "/create", method = RequestMethod.GET)
-	public ModelAndView createServiceKey() {
+	@ExceptionHandler(Exception.class)
+	public ModelAndView createServiceKeyInit() {
 		ModelAndView mv = new ModelAndView("createServiceKeyBefore");
 		return mv;
 	}
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
+	@ExceptionHandler(Exception.class)
 	public ModelAndView createServiceKey(
 			@RequestParam("serviceName") String serviceName,
 			@RequestParam("keyLength") int keyLength) throws Exception {

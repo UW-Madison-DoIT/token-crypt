@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-public class DownloadController {
+public class DownloadController extends BaseController {
 	
 	private IKeysKeeper tcryptHelper;
 	private AuthenticationState authenticationState;
@@ -27,11 +27,16 @@ public class DownloadController {
 	
 	@RequestMapping("/download")
 	public void downloadKey(@RequestParam("serviceName") String serviceName,@RequestParam("keyType") String keyType, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String fileLocationOnServer = tcryptHelper.getKeyLocationToDownloadFromServer(serviceName, authenticationState.getCurrentUserName(), keyType);
-		File file = new File(fileLocationOnServer);
-	    response.setContentType(new MimetypesFileTypeMap().getContentType(file));
-	    response.setContentLength((int)file.length());
-	    response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
-	    FileCopyUtils.copy(new FileInputStream(file), response.getOutputStream());
+		try {
+			String fileLocationOnServer = tcryptHelper.getKeyLocationToDownloadFromServer(serviceName, authenticationState.getCurrentUserName(), keyType);
+			File file = new File(fileLocationOnServer);
+		    response.setContentType(new MimetypesFileTypeMap().getContentType(file));
+		    response.setContentLength((int)file.length());
+		    response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
+		    FileCopyUtils.copy(new FileInputStream(file), response.getOutputStream());
+		} catch (Exception e) {
+			logger.error("Issue downloading the key " + keyType,e);
+			throw new Exception (e);
+		}
 	}
 }

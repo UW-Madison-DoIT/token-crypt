@@ -1,5 +1,5 @@
 <%@ include file="/WEB-INF/views/taglibs.jsp"%>
-<z:layout pageTitle="Credential Encryption">
+<z:layout pageTitle="Token Encryption">
 	
 	
 	<form name="createServiceKey" action="${pageContext.request.contextPath}/apps/create" method="post" autocomplete="off">
