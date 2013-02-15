@@ -1,6 +1,8 @@
 package edu.wisc.doit.tcrypt;
 
 import edu.wisc.doit.tcrypt.dao.IKeysKeeper;
+import edu.wisc.doit.tcrypt.vo.ServiceKey;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,7 +29,7 @@ public class EncryptController extends BaseController {
 	}
 	
 	@RequestMapping(value = "/encrypt", method = RequestMethod.GET)
-	public ModelAndView encryptTextInit() {
+	public ModelAndView encryptTextInit() throws Exception {
 		ModelAndView modelAndView = new ModelAndView("encryptTokenBefore");
 		try {
 			Set<String> serviceNames =  keysHelper.getListOfServiceNames();
@@ -38,6 +40,7 @@ public class EncryptController extends BaseController {
 	        }
 		} catch (Exception e) {
 			logger.error("Issue populating list of service names, recoverable error.",e);
+			throw new Exception (e);
 		}
 		return modelAndView;
 	}
@@ -49,15 +52,20 @@ public class EncryptController extends BaseController {
 			@RequestParam("text") String text) throws Exception {
 
 		ModelAndView modelAndView = new ModelAndView("encryptTokenResult");
-/*
+
         try {
 			TokenEncrypter tokenEncrypter;
 			if(tokenEncrypters.containsKey(serviceName)) {
 				tokenEncrypter = tokenEncrypters.get(serviceName);
 			} else {
-				String keyFileName = keysHelper.getKeyLocationToDownloadFromServer(serviceName, authenticationState.getCurrentUserName(), Constants.PUBLIC_SUFFIX);
-				tokenEncrypter = new BouncyCastleTokenEncrypter(new InputStreamReader(new FileInputStream(new File(keyFileName))));
-				tokenEncrypters.put(serviceName, tokenEncrypter);
+				ServiceKey sk = keysHelper.readServiceKeyFromFileSystem(serviceName);
+				if(sk != null) {
+					tokenEncrypter = new BouncyCastleTokenEncrypter(sk.getPublicKey());
+					tokenEncrypters.put(sk.getServiceName(), tokenEncrypter);
+				} else {
+					throw new Exception("Issue finding the Service Key");
+				}
+				
 			}
 				
 	        final String token = tokenEncrypter.encrypt(text);
@@ -71,7 +79,7 @@ public class EncryptController extends BaseController {
 			modelAndView.getModelMap().addAttribute("serviceNames",serviceName);
 			modelAndView.getModelMap().addAttribute("text",text);
         }
-*/
+
 		return modelAndView;
 	}
 	

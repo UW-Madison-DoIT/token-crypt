@@ -41,6 +41,14 @@ public class ServiceKey
 	{
 		super();
 	}
+	public ServiceKey(String serviceName, Integer keyLength, String createdByNetId, Date dayCreated, PublicKey publicKey, PrivateKey privateKey) {
+		this.serviceName = serviceName;
+		this.keyLength = keyLength;
+		this.createdByNetId = createdByNetId;
+		this.dayCreated = dayCreated;
+		this.publicKey = publicKey;
+		this.privateKey = privateKey;
+	}
 
 	//Getters/setters
 	public Integer getKeyLength()

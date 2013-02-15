@@ -13,20 +13,24 @@
 			<core:choose>
 			<core:when test="${empty error}">
 				<div id="success">
-					<h3>Service Key created for ${serviceName} <br/>
-					<a id="${serviceName}" name="private" href="javascript:void(0);"
-						onclick="submitForm(this); return false;">Private Key</a> <br /> 
-						<a id="${serviceName}" name="public" href="javascript:void(0);" onclick="submitForm(this); return false;">Public Key</a> 
+					<div>
+					<span class="label">A service key has been created for: ${serviceName} </span>
+					</div>
+					<div>
+					<span>
+						<a id="${serviceName}" name="private" href="javascript:void(0);" onclick="submitForm(this); return false;">Private Key Download</a> 
+						&nbsp;|&nbsp;
+						<a id="${serviceName}" name="public" href="javascript:void(0);" onclick="submitForm(this); return false;">Public Key Download</a>
 						<input type="hidden" name="serviceName" id="serviceName" /> 
 						<input type="hidden" name="keyType" id="keyType" />
-					</h3>
-
-					<h2>
-						The private key can only be downloaded now! <br /> Please take
-						care to transfer and store the private key securely. <br /> If you
-						need to restore a private key please contact the Administrator
-						(whoever that is!)
-					</h2>
+					</span>
+					<span>
+					<p>
+						The private key can <b>only</b> be downloaded now! Please take
+						care to transfer and store the private key securely.  If you
+						need to restore a private key please contact the Administrator (whoever that is!)
+					</p>
+					</span>
 				</div>
 			</core:when>
 		</core:choose>

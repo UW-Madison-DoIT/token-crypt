@@ -52,8 +52,7 @@
 				</div>
 
 				<ul id="globalnav">
-					<li id="uwsearch"><a href="http://www.wisc.edu/search/">UW
-							Search</a></li>
+					<li id="uwsearch"><a href="http://www.wisc.edu/search/">UW Search</a></li>
 					<li><a href="http://my.wisc.edu">My UW</a></li>
 					<li><a href="http://map.wisc.edu">Map</a></li>
 					<li id="last_tool"><a href="http://www.today.wisc.edu">Calendar</a></li>
@@ -61,9 +60,9 @@
 
 				<form id="search" action="post">
 					<div>
-						<label for="searchstring">Search this site: </label> <input
-							name="searchstring" id="searchstring" type="text" value="" /><input
-							name="submit" id="submit" type="submit" value="Go!" />
+						<label for="searchstring">Search this site: </label> 
+						<input name="searchstring" id="searchstring" type="text" value="" />
+						<input name="submit" id="submit" type="submit" value="Go!" />
 					</div>
 				</form>
 			</div>
