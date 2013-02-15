@@ -11,5 +11,5 @@ public interface TokenKeyPairGenerator {
     /**
      * @return A newly generated key pair
      */
-    KeyPair generateKeyPair();
+    KeyPair generateKeyPair(Integer keyLength);
 }

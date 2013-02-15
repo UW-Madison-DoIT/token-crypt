@@ -7,7 +7,7 @@ import java.util.Set;
 public interface IKeysKeeper
 {
 	public Set<String> getListOfServiceNames();
-	public KeyPair generateKeyPair();
+	public KeyPair generateKeyPair(Integer keyLength);
 	public Boolean writeServiceKeyToFileSystem(ServiceKey serviceKey);
 	public ServiceKey readServiceKeyFromFileSystem(String serviceName);
 }

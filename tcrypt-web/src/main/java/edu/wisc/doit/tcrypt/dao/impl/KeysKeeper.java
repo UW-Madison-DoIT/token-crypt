@@ -107,9 +107,13 @@ public class KeysKeeper implements IKeysKeeper
 	}
 
 	@Override
-	public KeyPair generateKeyPair()
+	public KeyPair generateKeyPair(Integer keyLength)
 	{
-		return keyPairGenerator.generateKeyPair();
+		if (keyLength == null || keyLength == 0)
+		{
+			keyLength = 2048;
+		}
+		return keyPairGenerator.generateKeyPair(keyLength);
 	}
 
 	@Override

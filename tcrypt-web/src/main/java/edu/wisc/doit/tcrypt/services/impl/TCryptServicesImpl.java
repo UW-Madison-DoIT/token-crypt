@@ -35,9 +35,9 @@ public class TCryptServicesImpl implements TCryptServices
 	}
 
 	@Override
-	public KeyPair generateKeyPair()
+	public KeyPair generateKeyPair(Integer keyLength)
 	{
-		return keysKeeper.generateKeyPair();
+		return keysKeeper.generateKeyPair(keyLength);
 	}
 
 	@Override

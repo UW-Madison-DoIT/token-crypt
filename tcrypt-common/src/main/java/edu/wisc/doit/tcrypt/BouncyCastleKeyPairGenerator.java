@@ -13,7 +13,7 @@ public class BouncyCastleKeyPairGenerator implements TokenKeyPairGenerator
     }
     
     @Override
-    public KeyPair generateKeyPair() {
+    public KeyPair generateKeyPair(Integer keyLength) {
         final KeyPairGenerator kpg;
         try {
             kpg = KeyPairGenerator.getInstance("RSA", BouncyCastleProvider.PROVIDER_NAME);
@@ -25,7 +25,7 @@ public class BouncyCastleKeyPairGenerator implements TokenKeyPairGenerator
             throw new IllegalStateException("BounceCastle support could not be found. There is a problem with this JVM.", e);
         }
         
-        kpg.initialize(2048);
+        kpg.initialize(keyLength);
         return kpg.generateKeyPair();
     }
 }
