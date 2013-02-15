@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
+import java.security.KeyPair;
 import java.util.Date;
 import static org.junit.Assert.*;
 
@@ -29,7 +30,7 @@ public class KeyReadingAndWritingTest
 		keysKeeper = new KeysKeeper(tempKeyDirctory.getAbsolutePath(), new BouncyCastleKeyPairGenerator());
 		if (!tempKeyDirctory.exists())
 		{
-			Boolean result = tempKeyDirctory.createNewFile();
+			Boolean result = tempKeyDirctory.mkdir();
 			logger.info("tempKeyDirectory creation attempt result: {}", result);
 		}
 	}
@@ -52,7 +53,9 @@ public class KeyReadingAndWritingTest
 		original.setCreatedByNetId(System.getProperty("user.name"));
 		original.setDayCreated(new Date());
 		original.setKeyLength(2048);
-		original.setKeyPair(keysKeeper.generateKeyPair());
+		KeyPair keyPair = keysKeeper.generateKeyPair();
+		original.setPrivateKey(keyPair.getPrivate());
+		original.setPublicKey(keyPair.getPublic());
 		original.setServiceName("test.doit.wisc.edu");
 
 		// TODO Step 2: Write ServiceKey to filesystem
@@ -66,7 +69,8 @@ public class KeyReadingAndWritingTest
 		assertEquals(original.getCreatedByNetId(), fileKey.getCreatedByNetId());
 		assertEquals(original.getDayCreated(), fileKey.getDayCreated());
 		assertEquals(original.getKeyLength(), fileKey.getKeyLength());
-		assertEquals(original.getKeyPair(), fileKey.getKeyPair());
+		assertEquals(original.getPublicKey(), fileKey.getPublicKey());
+		assertNull(fileKey.getPrivateKey());
 		assertEquals(original.getServiceName(), fileKey.getServiceName());
 	}
 }

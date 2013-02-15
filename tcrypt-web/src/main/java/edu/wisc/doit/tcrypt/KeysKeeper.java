@@ -1,9 +1,10 @@
 package edu.wisc.doit.tcrypt;
 
 import edu.wisc.doit.tcrypt.vo.ServiceKey;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import org.bouncycastle.openssl.PEMWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.io.*;
 import java.security.KeyPair;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -12,8 +13,10 @@ import java.util.Set;
 
 public class KeysKeeper implements IKeysKeeper
 {
+	private static final Logger logger = LoggerFactory.getLogger(KeysKeeper.class);
 	private String directoryname;
 	private TokenKeyPairGenerator keyPairGenerator;
+	private static final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 
 	/**
 	 * Constructor
@@ -89,9 +92,43 @@ public class KeysKeeper implements IKeysKeeper
 	}
 
 	@Override
-	public Boolean writeServiceKeyToFileSystem(ServiceKey serviceKey)
+	public synchronized Boolean writeServiceKeyToFileSystem(ServiceKey serviceKey)
 	{
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		// Build File Name
+		// Pattern: SERVICENAME_NETID_YYYYMMDDHHMMSS_KEYLENGTH_public.pem
+		StringBuffer fileName = new StringBuffer();
+		fileName.append(serviceKey.getServiceName());
+		fileName.append("_").append(serviceKey.getCreatedByNetId()).append("_");
+		fileName.append(fileDateFormat.format(serviceKey.getDayCreated()));
+		fileName.append("_").append(serviceKey.getKeyLength());
+		fileName.append("_public.pem");
+		logger.info("ServiceKey file name = {}", fileName.toString());
+		String path = directoryname + System.getProperty("file.separator") + fileName;
+		logger.info("Path = {}", path);
+
+		// Write To FileSystem
+		Boolean result = Boolean.TRUE;
+		try
+		{
+			File file = new File(path);
+			if (file.exists())
+			{
+				file.delete();
+			}
+			file.createNewFile();
+			final PEMWriter pemWriter = new PEMWriter(new FileWriter(file));
+			pemWriter.writeObject(serviceKey.getPublicKey());
+			pemWriter.close();
+		}
+		catch (IOException e)
+		{
+			logger.error(e.toString());
+			result = Boolean.FALSE;
+		}
+		logger.info("Result of writing to file: {}", result);
+
+		// Return Results
+		return result;
 	}
 
 	private String[] finder(String dirName, final String filePrefix, final String fileSuffix)

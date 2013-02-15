@@ -20,7 +20,8 @@
 
 package edu.wisc.doit.tcrypt.vo;
 
-import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Date;
 
 public class ServiceKey
@@ -30,7 +31,8 @@ public class ServiceKey
 	private Integer keyLength;
 	private String createdByNetId;
 	private Date dayCreated;
-	private KeyPair keyPair;
+	private PublicKey publicKey;
+	private PrivateKey privateKey;
 
 	/**
 	 * Constructor
@@ -61,16 +63,6 @@ public class ServiceKey
 		this.serviceName = serviceName;
 	}
 
-	public KeyPair getKeyPair()
-	{
-		return keyPair;
-	}
-
-	public void setKeyPair(KeyPair keyPair)
-	{
-		this.keyPair = keyPair;
-	}
-
 	public Date getDayCreated()
 	{
 		return dayCreated;
@@ -89,5 +81,25 @@ public class ServiceKey
 	public void setCreatedByNetId(String createdByNetId)
 	{
 		this.createdByNetId = createdByNetId;
+	}
+
+	public PublicKey getPublicKey()
+	{
+		return publicKey;
+	}
+
+	public void setPublicKey(PublicKey publicKey)
+	{
+		this.publicKey = publicKey;
+	}
+
+	public PrivateKey getPrivateKey()
+	{
+		return privateKey;
+	}
+
+	public void setPrivateKey(PrivateKey privateKey)
+	{
+		this.privateKey = privateKey;
 	}
 }
