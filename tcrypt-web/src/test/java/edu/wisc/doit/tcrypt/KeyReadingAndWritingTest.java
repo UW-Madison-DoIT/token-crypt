@@ -6,6 +6,7 @@
 package edu.wisc.doit.tcrypt;
 
 import edu.wisc.doit.tcrypt.vo.ServiceKey;
+import org.apache.commons.lang3.time.DateUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyPair;
+import java.util.Arrays;
 import java.util.Date;
 import static org.junit.Assert.*;
 
@@ -48,7 +50,7 @@ public class KeyReadingAndWritingTest
 	@Test
 	public void testCreateWriteAndReadBackKey() throws Exception
 	{
-		// TODO Step 1: Create ServiceKey
+		// Create ServiceKey
 		ServiceKey original = new ServiceKey();
 		original.setCreatedByNetId(System.getProperty("user.name"));
 		original.setDayCreated(new Date());
@@ -58,18 +60,18 @@ public class KeyReadingAndWritingTest
 		original.setPublicKey(keyPair.getPublic());
 		original.setServiceName("test.doit.wisc.edu");
 
-		// TODO Step 2: Write ServiceKey to filesystem
+		// Write ServiceKey to filesystem
 		assertTrue(keysKeeper.writeServiceKeyToFileSystem(original));
 
-		// TODO Step 3: Read ServiceKey from filesystem
+		// Step 3: Read ServiceKey from filesystem
 		ServiceKey fileKey = keysKeeper.readServiceKeyFromFileSystem(original.getServiceName());
 		assertNotNull(fileKey);
 
 		// TODO Step 4: Compare original ServiceKey content with new ServiceKey read from filesystem
 		assertEquals(original.getCreatedByNetId(), fileKey.getCreatedByNetId());
-		assertEquals(original.getDayCreated(), fileKey.getDayCreated());
+		assertTrue(DateUtils.isSameDay(original.getDayCreated(), fileKey.getDayCreated()));
 		assertEquals(original.getKeyLength(), fileKey.getKeyLength());
-		assertEquals(original.getPublicKey(), fileKey.getPublicKey());
+		assertTrue(Arrays.equals(original.getPublicKey().getEncoded(), fileKey.getPublicKey().getEncoded()));
 		assertNull(fileKey.getPrivateKey());
 		assertEquals(original.getServiceName(), fileKey.getServiceName());
 	}

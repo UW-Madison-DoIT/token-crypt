@@ -1,11 +1,13 @@
 package edu.wisc.doit.tcrypt;
 
 import edu.wisc.doit.tcrypt.vo.ServiceKey;
+import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PEMWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.security.KeyPair;
+import java.security.PublicKey;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -80,9 +82,53 @@ public class KeysKeeper implements IKeysKeeper
 	}
 
 	@Override
-	public ServiceKey readServiceKeyFromFileSystem(String serviceName)
+	public synchronized ServiceKey readServiceKeyFromFileSystem(final String serviceName)
 	{
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		logger.info("ServiceName to look for '{}'", serviceName);
+		// Look For File with Service Name in Directory
+		File dir = new File(directoryname);
+		String[] fileNames = dir.list(new FilenameFilter() {
+			@Override
+			public boolean accept(File file, String s)
+			{
+				return s.toUpperCase().contains(serviceName.toUpperCase());
+			}
+		});
+
+		// If File Found Read It Into ServiceKey object
+		if (fileNames.length > 0)
+		{
+			String file = fileNames[0];
+			logger.info("Found file = {}", file);
+
+			ServiceKey serviceKey = null;
+			try
+			{
+				serviceKey = new ServiceKey();
+				Integer lastIndex = file.indexOf("_");
+				serviceKey.setServiceName(file.substring(0, lastIndex));
+				Integer newLastIndex = file.indexOf("_", lastIndex + 1);
+				serviceKey.setCreatedByNetId(file.substring(lastIndex + 1, newLastIndex));
+				lastIndex = newLastIndex;
+				newLastIndex = file.indexOf("_", lastIndex + 1);
+				serviceKey.setDayCreated(fileDateFormat.parse(file.substring(lastIndex + 1, newLastIndex)));
+				lastIndex = newLastIndex;
+				newLastIndex = file.indexOf("_", lastIndex + 1);
+				serviceKey.setKeyLength(Integer.parseInt(file.substring(lastIndex + 1, newLastIndex)));
+
+				final PEMReader pemReader = new PEMReader(new FileReader(new File(directoryname + System.getProperty("file.separator") + file)));
+				serviceKey.setPublicKey((PublicKey)pemReader.readObject());
+				pemReader.close();
+			}
+			catch (Exception e)
+			{
+				logger.error("Error reading ServiceKey: "+ e.toString());
+			}
+			return serviceKey;
+		}
+
+		logger.warn("Didn't find a key on the file system for this service.");
+		return null;
 	}
 
 	@Override
