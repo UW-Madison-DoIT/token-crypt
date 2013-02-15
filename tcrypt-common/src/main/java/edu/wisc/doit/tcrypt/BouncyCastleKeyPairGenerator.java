@@ -1,14 +1,10 @@
 package edu.wisc.doit.tcrypt;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.Security;
-
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import java.security.*;
 
-public class BouncyCastleKeyPairGenerator implements TokenKeyPairGenerator {
+public class BouncyCastleKeyPairGenerator implements TokenKeyPairGenerator
+{
     static {
         //TODO hook to unregister?
         if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
