@@ -16,10 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.security.KeyPair;
 import java.util.Arrays;
 import java.util.Date;
@@ -104,14 +101,20 @@ public class KeyReadingAndWritingTest
 
 		assertNotNull(original);
 
-		// Write Service Key to Memory
+		// Write Service Key to Memory Using InputStream
 		InputStream inputStream = keysKeeper.getKeyAsInputStream(original.getPublicKey());
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		IOUtils.copy(inputStream, outputStream);
 		logger.debug("Writer toString(): {}", outputStream.toString("UTF-8"));
 		assertTrue(Arrays.equals(original.getPublicKey().getEncoded(), outputStream.toByteArray()));
-		String originalString = new String(original.getPublicKey().getEncoded());
-		String outputString = new String(outputStream.toByteArray());
+		final String originalString = new String(original.getPublicKey().getEncoded());
+		final String outputString = new String(outputStream.toByteArray());
 		assertEquals(originalString, outputString);
+
+		Reader inputStreamReader = keysKeeper.getKeyAsInputStreamReader(original.getPublicKey());
+		StringWriter stringWriter = new StringWriter();
+		IOUtils.copy(inputStreamReader, stringWriter);
+		final String writerString = stringWriter.getBuffer().toString();
+		assertEquals(originalString, writerString);
 	}
 }

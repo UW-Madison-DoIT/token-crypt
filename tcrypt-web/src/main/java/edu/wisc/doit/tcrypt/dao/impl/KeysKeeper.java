@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.PublicKey;
@@ -111,6 +112,12 @@ public class KeysKeeper implements IKeysKeeper
 	public InputStream getKeyAsInputStream(Key key)
 	{
 		return new ByteArrayInputStream(key.getEncoded());
+	}
+
+	@Override
+	public Reader getKeyAsInputStreamReader(Key key)
+	{
+		return new InputStreamReader(new ByteArrayInputStream(key.getEncoded()), Charset.forName("UTF-8"));
 	}
 
 	@Override
