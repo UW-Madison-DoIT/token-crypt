@@ -1,4 +1,4 @@
-package edu.wisc.doit.tcrypt;
+package edu.wisc.doit.tcrypt.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

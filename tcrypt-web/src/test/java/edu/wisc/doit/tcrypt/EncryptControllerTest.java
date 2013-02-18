@@ -1,5 +1,6 @@
 package edu.wisc.doit.tcrypt;
 
+import edu.wisc.doit.tcrypt.controller.EncryptController;
 import edu.wisc.doit.tcrypt.services.TCryptServices;
 
 import org.junit.Test;

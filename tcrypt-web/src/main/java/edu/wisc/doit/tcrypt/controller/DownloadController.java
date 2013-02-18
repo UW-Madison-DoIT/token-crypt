@@ -1,4 +1,4 @@
-package edu.wisc.doit.tcrypt;
+package edu.wisc.doit.tcrypt.controller;
 
 import java.io.FileWriter;
 import java.security.Key;

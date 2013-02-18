@@ -1,5 +1,7 @@
-package edu.wisc.doit.tcrypt;
+package edu.wisc.doit.tcrypt.controller;
 
+import edu.wisc.doit.tcrypt.exception.ServiceErrorException;
+import edu.wisc.doit.tcrypt.exception.ValidationException;
 import edu.wisc.doit.tcrypt.services.TCryptServices;
 import edu.wisc.doit.tcrypt.vo.ServiceKey;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +26,11 @@ public class CreateController extends BaseController {
 	}
 	
 	@RequestMapping(value = "/create", method = RequestMethod.GET)
-	@ExceptionHandler(Exception.class)
 	public ModelAndView createServiceKeyInit() {
-		ModelAndView mv = new ModelAndView("createServiceKeyBefore");
-		return mv;
+		return new ModelAndView("createServiceKeyBefore");
 	}
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	@ExceptionHandler(Exception.class)
 	public ModelAndView createServiceKey(
 			@RequestParam("serviceName") String serviceName,
 			@RequestParam("keyLength") int keyLength,
@@ -39,18 +38,21 @@ public class CreateController extends BaseController {
 
 		ModelAndView modelAndView = new ModelAndView("createServiceKeyDownload");
 		
+		//validation
+		String validationResult = validate(serviceName);
+		if(!validationResult.isEmpty()) {
+			throw new ValidationException(validationResult);
+		}
+		
 		try {
-			//validation
-			String validationResult = validate(serviceName);
-			if(!validationResult.isEmpty()) {
-				modelAndView = new ModelAndView ("createServiceKeyBefore");
-				modelAndView.addObject("error", validationResult);
-				return modelAndView;
-			}
-			
+		
 			//Generate keys
 			KeyPair generatedKeyPair = tcryptServices.generateKeyPair(keyLength);
+			if(generatedKeyPair == null) {
+				throw new Exception("Error generating key pair");
+			}
 			String username = request.getUserPrincipal() != null ? request.getUserPrincipal().getName() : "na";
+			
 			//Create ServiceKey Object and write public key out to FS
 			ServiceKey sk = new ServiceKey(serviceName,keyLength,username,new Date(),generatedKeyPair.getPublic(),generatedKeyPair.getPrivate());
 			tcryptServices.writeServiceKeyToFileSystem(sk);
@@ -58,26 +60,37 @@ public class CreateController extends BaseController {
 			//Add serviceKey object on session (for download) and put the serviceName in the object list
 			request.getSession().setAttribute("serviceKey_"+sk.getServiceName(), sk);
 			modelAndView.addObject("serviceName", serviceName);
-		} catch(Exception e) {
-			logger.error("Issue during key creation: " + e.getMessage(),e);
-			// TODO Will be refactored as part of Exception handling refactoring
-/*
-			modelAndView = new ModelAndView ("createServiceKeyBefore");
-			modelAndView.getModelMap().addAttribute("serviceName", serviceName);
-			modelAndView.getModelMap().addAttribute("keyLength", keyLength);
-			modelAndView.addObject("error", Constants.KEY_NOT_CREATED);
-*/
-			return modelAndView;
+		} catch (Exception e) {
+			logger.error("An error occurred when creating a service key",e);
+			throw new ServiceErrorException(serviceName,"error.createServiceKey");
 		}
 
 		return modelAndView;
 	}
+	
+	@ExceptionHandler(ValidationException.class)
+	public ModelAndView handleException(ValidationException e) throws Exception {
+		ModelAndView mav  = createServiceKeyInit();
+		mav.addObject("errorMessage", e.getErrorMessage());		
+		return mav;
+	}
+	
+	@ExceptionHandler(ServiceErrorException.class)
+	public ModelAndView handleException(ServiceErrorException e) throws Exception {
+		ModelAndView mav  = createServiceKeyInit();
+
+		mav.addObject("errorMessage",e.getErrorMessage());
+		mav.addObject("zero",e.getServiceName());
+		
+		return mav;
+	}
+	
 	private String validate(String serviceName) {
 		String error = "";
 		if(serviceName == null || serviceName.isEmpty()) {
-			error = "A service name is required";			
+			error = "error.serviceNameRequired";			
 		} else if (-1 != serviceName.indexOf("_")) {
-			error = "A service name cannot contain a understore.";
+			error = "error.serviceNameUnderscore";
 		}
 		//TODO : Validate the name doesn't exist already
 		
