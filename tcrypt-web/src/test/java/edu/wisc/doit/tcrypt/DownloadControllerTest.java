@@ -1,5 +1,6 @@
 package edu.wisc.doit.tcrypt;
 
+import edu.wisc.doit.tcrypt.controller.DownloadController;
 import edu.wisc.doit.tcrypt.dao.IKeysKeeper;
 import org.junit.Test;
 import org.junit.runner.RunWith;

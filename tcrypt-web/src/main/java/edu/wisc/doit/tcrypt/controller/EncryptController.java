@@ -1,5 +1,9 @@
-package edu.wisc.doit.tcrypt;
+package edu.wisc.doit.tcrypt.controller;
 
+import edu.wisc.doit.tcrypt.BouncyCastleTokenEncrypter;
+import edu.wisc.doit.tcrypt.TokenEncrypter;
+import edu.wisc.doit.tcrypt.exception.ServiceErrorException;
+import edu.wisc.doit.tcrypt.exception.ValidationException;
 import edu.wisc.doit.tcrypt.services.TCryptServices;
 import edu.wisc.doit.tcrypt.vo.ServiceKey;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +29,8 @@ public class EncryptController extends BaseController {
 		tokenEncrypters = new HashMap<String,TokenEncrypter>();
 	}
 	
+	//Request actions
+	
 	@RequestMapping(value = "/encrypt", method = RequestMethod.GET)
 	public ModelAndView encryptTextInit() throws Exception {
 		ModelAndView modelAndView = new ModelAndView("encryptTokenBefore");
@@ -37,51 +43,72 @@ public class EncryptController extends BaseController {
 	        }
 		} catch (Exception e) {
 			logger.error("Issue populating list of service names, recoverable error.",e);
-			throw new Exception (e);
+			throw new ValidationException("error.issuePopulatingServiceNames");
 		}
 		return modelAndView;
 	}
 	
 	@RequestMapping(value = "/encrypt", method = RequestMethod.POST)
-	@ExceptionHandler({Exception.class})
 	public ModelAndView encryptText(
 			@RequestParam("serviceNames") String serviceName,
 			@RequestParam("text") String text) throws Exception {
 
 		ModelAndView modelAndView = new ModelAndView("encryptTokenResult");
 
-        try {
-			TokenEncrypter tokenEncrypter;
-			if(tokenEncrypters.containsKey(serviceName)) {
-				tokenEncrypter = tokenEncrypters.get(serviceName);
+		TokenEncrypter tokenEncrypter;
+		if(tokenEncrypters.containsKey(serviceName)) {
+			tokenEncrypter = tokenEncrypters.get(serviceName);
+		} else {
+			ServiceKey sk = tcryptServices.readServiceKeyFromFileSystem(serviceName);
+			if(sk != null  && sk.getPublicKey() != null) {
+				tokenEncrypter = new BouncyCastleTokenEncrypter(sk.getPublicKey());
+				tokenEncrypters.put(sk.getServiceName(), tokenEncrypter);
 			} else {
-				ServiceKey sk = tcryptServices.readServiceKeyFromFileSystem(serviceName);
-				if(sk != null  && sk.getPublicKey() != null) {
-					tokenEncrypter = new BouncyCastleTokenEncrypter(sk.getPublicKey());
-					tokenEncrypters.put(sk.getServiceName(), tokenEncrypter);
-				} else {
-					throw new Exception("Issue finding the Service Key");
-				}
-				
+				throw new ServiceErrorException(serviceName,"error.serviceKeyNotFound");
 			}
-				
-	        final String token = tokenEncrypter.encrypt(text);
-	        modelAndView.addObject("serviceName", serviceName);
-			modelAndView.addObject("encryptedText", token);
-		
-        } catch (Exception e) {
-    		logger.error("Error encrypting text",e);
-			// TODO Will be refactored as part of Exception handling refactoring
-/*
-        	modelAndView = new ModelAndView("encryptTokenBefore");
-			modelAndView.addObject("error", Constants.ENCRYPTION_FAILED);
-			modelAndView.getModelMap().addAttribute("serviceNames",serviceName);
-			modelAndView.getModelMap().addAttribute("text",text);
-*/
-        }
-
-		return modelAndView;
+			
+		}
+			
+        final String token = tokenEncrypter.encrypt(text);
+        modelAndView.addObject("serviceName", serviceName);
+		modelAndView.addObject("encryptedText", token);
+			return modelAndView;
 	}
+	
+	//Exception Handlers
+	
+	@ExceptionHandler(ValidationException.class)
+	public ModelAndView handleException(ValidationException e) throws Exception {
+		ModelAndView mav;
+		try {
+			mav = encryptTextInit();
+		} catch (Exception e1) {
+			logger.error("Error resetting view after error",e);
+			throw new Exception(e);
+		}
+		
+		mav.addObject(e.getErrorMessage());
+		
+		return mav;
+	}
+	
+	@ExceptionHandler(ServiceErrorException.class)
+	public ModelAndView handleException(ServiceErrorException e) throws Exception {
+		ModelAndView mav;
+		try {
+			mav = encryptTextInit();
+		} catch (Exception e1) {
+			logger.error("Error resetting view after error",e);
+			throw new Exception(e);
+		}
+		
+		mav.addObject("errorMessage",e.getErrorMessage());
+		mav.addObject("zero",e.getServiceName());
+		
+		return mav;
+	}
+	
+	//Private Methods
 	
 	private String formatForJavaScript(Set<String> serviceNames) {
 		Iterator<String> iterator = serviceNames.iterator();

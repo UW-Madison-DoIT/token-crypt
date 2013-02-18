@@ -88,9 +88,9 @@
 					</div>
 				</div>
 				<div id="content" class="main col">
-				    <core:if test="${not empty error}">
+				    <core:if test="${not empty errorMessage}">
 					   	<div class="error">
-					   		Error: ${error}
+					   		Error: <spring:message code="${errorMessage}" arguments="${zero}" />
 					   	</div>
 					</core:if>
 				    <jsp:doBody />
