@@ -1,10 +1,7 @@
 package edu.wisc.doit.tcrypt;
 
-import java.security.KeyPair;
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-
+import edu.wisc.doit.tcrypt.services.TCryptServices;
+import edu.wisc.doit.tcrypt.vo.ServiceKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,10 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-
-import edu.wisc.doit.tcrypt.services.TCryptServices;
-import edu.wisc.doit.tcrypt.vo.ServiceKey;
-
+import javax.servlet.http.HttpServletRequest;
+import java.security.KeyPair;
+import java.util.Date;
 
 @Controller
 public class CreateController extends BaseController {
@@ -64,10 +60,13 @@ public class CreateController extends BaseController {
 			modelAndView.addObject("serviceName", serviceName);
 		} catch(Exception e) {
 			logger.error("Issue during key creation: " + e.getMessage(),e);
+			// TODO Will be refactored as part of Exception handling refactoring
+/*
 			modelAndView = new ModelAndView ("createServiceKeyBefore");
 			modelAndView.getModelMap().addAttribute("serviceName", serviceName);
 			modelAndView.getModelMap().addAttribute("keyLength", keyLength);
 			modelAndView.addObject("error", Constants.KEY_NOT_CREATED);
+*/
 			return modelAndView;
 		}
 

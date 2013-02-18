@@ -2,7 +2,6 @@ package edu.wisc.doit.tcrypt;
 
 import edu.wisc.doit.tcrypt.dao.IKeysKeeper;
 import edu.wisc.doit.tcrypt.vo.ServiceKey;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -74,10 +73,13 @@ public class EncryptController extends BaseController {
 		
         } catch (Exception e) {
     		logger.error("Error encrypting text",e);
+			// TODO Will be refactored as part of Exception handling refactoring
+/*
         	modelAndView = new ModelAndView("encryptTokenBefore");
 			modelAndView.addObject("error", Constants.ENCRYPTION_FAILED);
 			modelAndView.getModelMap().addAttribute("serviceNames",serviceName);
 			modelAndView.getModelMap().addAttribute("text",text);
+*/
         }
 
 		return modelAndView;
