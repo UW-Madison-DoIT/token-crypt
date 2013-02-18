@@ -98,7 +98,7 @@ public class KeysKeeper implements IKeysKeeper
 			}
 			catch (Exception e)
 			{
-				logger.error("Error reading ServiceKey: "+ e.toString());
+				logger.error("Error reading ServiceKey: ", e);
 			}
 			return serviceKey;
 		}
@@ -108,9 +108,9 @@ public class KeysKeeper implements IKeysKeeper
 	}
 
 	@Override
-	public byte[] getKeyAsBytes(Key key)
+	public InputStream getKeyAsInputStream(Key key)
 	{
-		return key.getEncoded();
+		return new ByteArrayInputStream(key.getEncoded());
 	}
 
 	@Override

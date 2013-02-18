@@ -9,6 +9,7 @@ import edu.wisc.doit.tcrypt.services.TCryptServices;
 import edu.wisc.doit.tcrypt.vo.ServiceKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.io.InputStream;
 import java.security.Key;
 import java.security.KeyPair;
 import java.util.Set;
@@ -54,8 +55,8 @@ public class TCryptServicesImpl implements TCryptServices
 	}
 
 	@Override
-	public byte[] getKeyAsBytes(Key key)
+	public InputStream getKeyAsInputStream(Key key)
 	{
-		return keysKeeper.getKeyAsBytes(key);
+		return keysKeeper.getKeyAsInputStream(key);
 	}
 }

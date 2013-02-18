@@ -9,14 +9,17 @@ import edu.wisc.doit.tcrypt.dao.IKeysKeeper;
 import edu.wisc.doit.tcrypt.dao.impl.KeysKeeper;
 import edu.wisc.doit.tcrypt.vo.ServiceKey;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyPair;
 import java.util.Arrays;
 import java.util.Date;
@@ -84,5 +87,31 @@ public class KeyReadingAndWritingTest
 		assertTrue(Arrays.equals(original.getPublicKey().getEncoded(), fileKey.getPublicKey().getEncoded()));
 		assertNull(fileKey.getPrivateKey());
 		assertEquals(original.getServiceName(), fileKey.getServiceName());
+	}
+
+	@Test
+	public void testCreateReadAndWriteKeyInMemory() throws Exception
+	{
+		// Create ServiceKey
+		ServiceKey original = new ServiceKey();
+		original.setCreatedByNetId(System.getProperty("user.name"));
+		original.setDayCreated(new Date());
+		original.setKeyLength(2048);
+		KeyPair keyPair = keysKeeper.generateKeyPair(2048);
+		original.setPrivateKey(keyPair.getPrivate());
+		original.setPublicKey(keyPair.getPublic());
+		original.setServiceName("test-memory.doit.wisc.edu");
+
+		assertNotNull(original);
+
+		// Write Service Key to Memory
+		InputStream inputStream = keysKeeper.getKeyAsInputStream(original.getPublicKey());
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		IOUtils.copy(inputStream, outputStream);
+		logger.debug("Writer toString(): {}", outputStream.toString("UTF-8"));
+		assertTrue(Arrays.equals(original.getPublicKey().getEncoded(), outputStream.toByteArray()));
+		String originalString = new String(original.getPublicKey().getEncoded());
+		String outputString = new String(outputStream.toByteArray());
+		assertEquals(originalString, outputString);
 	}
 }

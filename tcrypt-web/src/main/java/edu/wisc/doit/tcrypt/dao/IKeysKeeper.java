@@ -1,6 +1,7 @@
 package edu.wisc.doit.tcrypt.dao;
 
 import edu.wisc.doit.tcrypt.vo.ServiceKey;
+import java.io.InputStream;
 import java.security.Key;
 import java.security.KeyPair;
 import java.util.Set;
@@ -11,5 +12,5 @@ public interface IKeysKeeper
 	public KeyPair generateKeyPair(Integer keyLength);
 	public Boolean writeServiceKeyToFileSystem(ServiceKey serviceKey);
 	public ServiceKey readServiceKeyFromFileSystem(String serviceName);
-	public byte[] getKeyAsBytes(Key key);
+	public InputStream getKeyAsInputStream(Key key);
 }
