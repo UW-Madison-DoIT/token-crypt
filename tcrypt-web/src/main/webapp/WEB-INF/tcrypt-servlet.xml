@@ -44,7 +44,6 @@
     </bean>
 
     <bean id="bouncyCastleKeyPairGenerator" class="edu.wisc.doit.tcrypt.BouncyCastleKeyPairGenerator"/>
-    <bean id="authenticationState" class="edu.wisc.doit.tcrypt.AuthenticationState"/>
     <bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
