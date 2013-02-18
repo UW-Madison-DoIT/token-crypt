@@ -18,11 +18,22 @@
 					</div>
 					<div>
 					<span>
-						<a id="${serviceName}" name="private" href="javascript:void(0);" onclick="submitForm(this); return false;">Private Key Download</a> 
+						<core:url value="/apps/download" var="publicKeyUrl">
+							<core:param name="serviceName" value="${serviceName}"/>
+							<core:param name="keyType" value="public"/>
+						</core:url>
+						<core:url value="/apps/download" var="privateKeyUrl">
+							<core:param name="serviceName" value="${serviceName}"/>
+							<core:param name="keyType" value="private"/>
+						</core:url>
+						<a href="${publicKeyUrl }" target="_blank">Public Key Download </a>
+						&nbsp;|&nbsp;
+						<a href="${privateKeyUrl }" target="_blank">Private Key Download </a>
+						<!-- <a id="${serviceName}" name="private" href="javascript:void(0);" onclick="submitForm(this); return false;">Private Key Download</a> 
 						&nbsp;|&nbsp;
 						<a id="${serviceName}" name="public" href="javascript:void(0);" onclick="submitForm(this); return false;">Public Key Download</a>
 						<input type="hidden" name="serviceName" id="serviceName" /> 
-						<input type="hidden" name="keyType" id="keyType" />
+						<input type="hidden" name="keyType" id="keyType" /> -->
 					</span>
 					<span>
 					<p>

@@ -26,12 +26,12 @@ public class CreateControllerTest {
 		assertEquals(handleRequest.getViewName(),"createServiceKeyBefore");
 	}
 	
-	@Test
+	/*@Test
 	public void testKeyCreationFailure() throws Exception {
 		when(tcryptServices.generateKeyPair(2048)).thenReturn(null);
 		ModelAndView mav = createController.createServiceKey("test", 2048, request);
 		assertEquals(mav.getViewName(),"createServiceKeyBefore");
-	}
+	}*/
 	
 	@Test
 	public void testKeyCreationSuccess() throws Exception {

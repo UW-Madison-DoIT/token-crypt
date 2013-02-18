@@ -9,7 +9,7 @@
 	});
 </script>
 
-	<form name="encryptToken" action="${pageContext.request.contextPath}/apps/encrypt" method="post" autocomplete="off">
+	<form name="encryptToken" action="${pageContext.request.contextPath}/apps/encrypt" method="post">
 			<div>
 				<span class="label" >Service Name : </span>
 				<span>
