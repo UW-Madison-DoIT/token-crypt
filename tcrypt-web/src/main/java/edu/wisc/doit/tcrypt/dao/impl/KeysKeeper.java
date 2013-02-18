@@ -51,7 +51,7 @@ public class KeysKeeper implements IKeysKeeper
 		{
 			for (String string : fileNames)
 			{
-				serviceNames.add(string.substring(string.indexOf("_")));
+				serviceNames.add(string.substring(0,string.indexOf("_")));
 			}
 		}
 		return serviceNames;

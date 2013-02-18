@@ -1,6 +1,7 @@
 package edu.wisc.doit.tcrypt;
 
-import edu.wisc.doit.tcrypt.dao.IKeysKeeper;
+import edu.wisc.doit.tcrypt.services.TCryptServices;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -12,7 +13,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(MockitoJUnitRunner.class)
 public class EncryptControllerTest {
 	@InjectMocks private EncryptController encryptController;
-	@Mock private IKeysKeeper keyKeeper;
+	@Mock private TCryptServices tcryptServices;
 	@Mock private AuthenticationState as;
 	
 	@Test

@@ -1,6 +1,6 @@
 package edu.wisc.doit.tcrypt;
 
-import edu.wisc.doit.tcrypt.dao.IKeysKeeper;
+import edu.wisc.doit.tcrypt.services.TCryptServices;
 import edu.wisc.doit.tcrypt.vo.ServiceKey;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,14 +17,12 @@ import java.util.Set;
 @Controller
 public class EncryptController extends BaseController {
 
-	private IKeysKeeper keysHelper;
-	private AuthenticationState authenticationState;
+	private TCryptServices tcryptServices;
 	private HashMap<String,TokenEncrypter> tokenEncrypters;
 	
 	@Autowired
-	public EncryptController(IKeysKeeper tcryptHelper, AuthenticationState authenticationState) {
-		this.keysHelper = tcryptHelper;
-		this.authenticationState = authenticationState;
+	public EncryptController(TCryptServices tcryptServices) {
+		this.tcryptServices = tcryptServices;
 		tokenEncrypters = new HashMap<String,TokenEncrypter>();
 	}
 	
@@ -32,7 +30,7 @@ public class EncryptController extends BaseController {
 	public ModelAndView encryptTextInit() throws Exception {
 		ModelAndView modelAndView = new ModelAndView("encryptTokenBefore");
 		try {
-			Set<String> serviceNames =  keysHelper.getListOfServiceNames();
+			Set<String> serviceNames =  tcryptServices.getListOfServiceNames();
 	
 	        if (!serviceNames.isEmpty())
 	        {
@@ -58,8 +56,8 @@ public class EncryptController extends BaseController {
 			if(tokenEncrypters.containsKey(serviceName)) {
 				tokenEncrypter = tokenEncrypters.get(serviceName);
 			} else {
-				ServiceKey sk = keysHelper.readServiceKeyFromFileSystem(serviceName);
-				if(sk != null) {
+				ServiceKey sk = tcryptServices.readServiceKeyFromFileSystem(serviceName);
+				if(sk != null  && sk.getPublicKey() != null) {
 					tokenEncrypter = new BouncyCastleTokenEncrypter(sk.getPublicKey());
 					tokenEncrypters.put(sk.getServiceName(), tokenEncrypter);
 				} else {
