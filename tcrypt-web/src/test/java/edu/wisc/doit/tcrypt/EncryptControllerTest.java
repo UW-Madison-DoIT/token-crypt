@@ -14,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 public class EncryptControllerTest {
 	@InjectMocks private EncryptController encryptController;
 	@Mock private TCryptServices tcryptServices;
-	@Mock private AuthenticationState as;
 	
 	@Test
 	public void shouldHandleSlashHandleMapping() throws Exception{
