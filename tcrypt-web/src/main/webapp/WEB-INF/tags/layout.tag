@@ -12,6 +12,7 @@
 <title>${pageTitle} | University of Wisconsin-Madison</title>
 
 <link rel="stylesheet"	href="${pageContext.request.contextPath}/css/main_no_top_nav.css" type="text/css" media="all" />
+<link rel="stylesheet"	href="${pageContext.request.contextPath}/css/site.css" type="text/css" media="all" />
 <!--[if IE 6]>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/ie6.css" type="text/css" media="screen" />
   <![endif]-->

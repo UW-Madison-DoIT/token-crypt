@@ -1,0 +1,44 @@
+.userForms
+{
+    margin:0 auto;
+    width:400px;
+    padding:14px;
+}
+
+#stylizedForm label
+{
+    display:block;
+    font-weight:bold;
+    text-align:right;
+    width:140px;
+    float:left;
+}
+#stylizedForm input textarea select
+{
+    float:left;
+    font-size:12px;
+    padding:4px 2px;
+    border:solid 1px #aacfe4;
+    width:200px;
+    margin:2px 0 20px 10px;
+}
+#stylizedForm button
+{
+    clear:both;
+    margin-left:150px;
+    width:140px;
+    height:30px;
+    padding: 5px;
+    background:#666666 no-repeat;
+    text-align:center;
+    vertical-align: middle;;
+    color:#FFFFFF;
+    font-size:12px;
+    font-weight:bold;
+}
+#keyLength
+{
+    float: left;
+}
+
+
