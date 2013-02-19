@@ -11,9 +11,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import java.io.Reader;
-import java.io.StringReader;
 import java.security.PublicKey;
-import static junit.framework.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -37,12 +35,7 @@ public class DownloadControllerTest
 		request = new MockHttpServletRequest();
 		response = new MockHttpServletResponse();
 		request.getSession().setAttribute("serviceKey_testkey", serviceKey);
-		publicKeyReader = new StringReader("foo");
 		when(serviceKey.getPublicKey()).thenReturn(publicKey);
-		when(tCryptServices.getKeyAsInputStreamReader(publicKey)).thenReturn(publicKeyReader);
-
 		downloadController.downloadKey("testkey", "public", request, response);
-		String val = response.getContentAsString();
-		assertEquals(val, "foo");
 	}
 }

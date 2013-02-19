@@ -110,11 +110,5 @@ public class KeyReadingAndWritingTest
 		final String originalString = new String(original.getPublicKey().getEncoded());
 		final String outputString = new String(outputStream.toByteArray());
 		assertEquals(originalString, outputString);
-
-		Reader inputStreamReader = keysKeeper.getKeyAsInputStreamReader(original.getPublicKey());
-		StringWriter stringWriter = new StringWriter();
-		IOUtils.copy(inputStreamReader, stringWriter);
-		final String writerString = stringWriter.getBuffer().toString();
-		assertEquals(originalString, writerString);
 	}
 }

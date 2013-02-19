@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import java.io.*;
-import java.nio.charset.Charset;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.PublicKey;
@@ -115,12 +114,6 @@ public class KeysKeeper implements IKeysKeeper
 	}
 
 	@Override
-	public Reader getKeyAsInputStreamReader(Key key)
-	{
-		return new InputStreamReader(new ByteArrayInputStream(key.getEncoded()), Charset.forName("UTF-8"));
-	}
-
-	@Override
 	public KeyPair generateKeyPair(Integer keyLength)
 	{
 		if (keyLength == null || keyLength == 0)
@@ -168,5 +161,22 @@ public class KeysKeeper implements IKeysKeeper
 
 		// Return Results
 		return result;
+	}
+
+	@Override
+	public Boolean writeKeyToOutputStream(Key key, OutputStream outputStream)
+	{
+		try
+		{
+			final PEMWriter pemWriter = new PEMWriter(new PrintWriter(outputStream));
+			pemWriter.writeObject(key);
+			pemWriter.close();
+		}
+		catch (IOException e)
+		{
+			logger.error("Error writing Key to OutputStream: ", e);
+			return Boolean.FALSE;
+		}
+		return Boolean.TRUE;
 	}
 }

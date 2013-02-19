@@ -6,7 +6,7 @@ package edu.wisc.doit.tcrypt.services;
 
 import edu.wisc.doit.tcrypt.vo.ServiceKey;
 import java.io.InputStream;
-import java.io.Reader;
+import java.io.OutputStream;
 import java.security.Key;
 import java.security.KeyPair;
 import java.util.Set;
@@ -18,5 +18,5 @@ public interface TCryptServices
 	public Boolean writeServiceKeyToFileSystem(ServiceKey serviceKey);
 	public ServiceKey readServiceKeyFromFileSystem(String serviceName);
 	public InputStream getKeyAsInputStream(Key key);
-	public Reader getKeyAsInputStreamReader(Key key);
+	public Boolean writeKeyToOutputStream(Key key, OutputStream outputStream);
 }
