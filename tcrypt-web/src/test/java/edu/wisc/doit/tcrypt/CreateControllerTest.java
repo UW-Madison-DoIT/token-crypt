@@ -20,8 +20,10 @@ import org.springframework.web.servlet.ModelAndView;
 import edu.wisc.doit.tcrypt.controller.CreateController;
 import edu.wisc.doit.tcrypt.dao.impl.KeysKeeper;
 import edu.wisc.doit.tcrypt.exception.ServiceErrorException;
+import edu.wisc.doit.tcrypt.exception.ValidationException;
 import edu.wisc.doit.tcrypt.services.TCryptServices;
 import edu.wisc.doit.tcrypt.services.impl.TCryptServicesImpl;
+
 
 @RunWith(MockitoJUnitRunner.class)
 public class CreateControllerTest {
@@ -45,11 +47,35 @@ public class CreateControllerTest {
 			createController.createServiceKey("test", 2048, request);
 			fail();
 		} catch (Exception e) {
-			if(e instanceof ServiceErrorException) {
-				//expected, do nothing
+			if(e instanceof ServiceErrorException) { 
+				assert(true);
 			} else {
 				fail();
 			}
+		}
+	}
+	
+	@Test
+	public void testValidation() throws Exception {
+		//test underscore
+		try {
+			createController.createServiceKey("test_with_underscore", 2048, request);
+		} catch (ValidationException e) {
+			assertEquals("error.serviceNameUnderscore",e.getErrorMessage());
+		}
+		
+		//test not null
+		try {
+			createController.createServiceKey(null, 2048, request);
+		} catch (ValidationException e) {
+			assertEquals("error.serviceNameRequired",e.getErrorMessage());
+		}
+		
+		//test empty string
+		try {
+			createController.createServiceKey("", 2048, request);
+		} catch (ValidationException e) {
+			assertEquals("error.serviceNameRequired",e.getErrorMessage());
 		}
 	}
 	
