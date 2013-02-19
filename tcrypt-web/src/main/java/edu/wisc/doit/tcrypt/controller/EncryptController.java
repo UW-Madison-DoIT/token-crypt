@@ -68,11 +68,16 @@ public class EncryptController extends BaseController {
 			}
 			
 		}
-			
-        final String token = tokenEncrypter.encrypt(text);
+		final String token;
+		try {
+			token = tokenEncrypter.encrypt(text);
+		} catch (Exception e) {
+			logger.error("Could not encrypt text",e);
+			throw new ValidationException("error.encryptionFailed");
+		}
         modelAndView.addObject("serviceName", serviceName);
 		modelAndView.addObject("encryptedText", token);
-			return modelAndView;
+		return modelAndView;
 	}
 	
 	//Exception Handlers
