@@ -41,4 +41,11 @@
     float: left;
 }
 
+#success span.label
+{
+	font-weight:bold;
+	padding : 0px;
+}
+
+
 

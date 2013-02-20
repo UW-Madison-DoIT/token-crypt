@@ -14,34 +14,28 @@
 			<core:when test="${empty error}">
 				<div id="success">
 					<div>
-					<span class="label">A service key has been created for: ${serviceName} </span>
+						<span class="label"><spring:message code="label.newServiceKey" />:</span> <span>${serviceName} </span>
 					</div>
 					<div>
-					<span>
-						<core:url value="/apps/download" var="publicKeyUrl">
-							<core:param name="serviceName" value="${serviceName}"/>
-							<core:param name="keyType" value="public"/>
-						</core:url>
-						<core:url value="/apps/download" var="privateKeyUrl">
-							<core:param name="serviceName" value="${serviceName}"/>
-							<core:param name="keyType" value="private"/>
-						</core:url>
-						<a href="${publicKeyUrl }" target="_blank">Public Key Download </a>
-						&nbsp;|&nbsp;
-						<a href="${privateKeyUrl }" target="_blank">Private Key Download </a>
-						<!-- <a id="${serviceName}" name="private" href="javascript:void(0);" onclick="submitForm(this); return false;">Private Key Download</a> 
-						&nbsp;|&nbsp;
-						<a id="${serviceName}" name="public" href="javascript:void(0);" onclick="submitForm(this); return false;">Public Key Download</a>
-						<input type="hidden" name="serviceName" id="serviceName" /> 
-						<input type="hidden" name="keyType" id="keyType" /> -->
-					</span>
-					<span>
-					<p>
-						The private key can <b>only</b> be downloaded now! Please take
-						care to transfer and store the private key securely.  If you
-						need to restore a private key please contact the Administrator (whoever that is!)
-					</p>
-					</span>
+						<span>
+							<core:url value="/apps/download" var="publicKeyUrl">
+								<core:param name="serviceName" value="${serviceName}"/>
+								<core:param name="keyType" value="public"/>
+							</core:url>
+							<core:url value="/apps/download" var="privateKeyUrl">
+								<core:param name="serviceName" value="${serviceName}"/>
+								<core:param name="keyType" value="private"/>
+							</core:url>
+							<a href="${publicKeyUrl }" target="_blank"><spring:message code="label.publicKeyDownload" /></a>
+							&nbsp;|&nbsp;
+							<a href="${privateKeyUrl }" target="_blank"><spring:message code="label.privateKeyDownload" /></a>
+						</span>
+						<span>
+						<p>
+							<spring:message code="message.createKeySuccessWarning" />
+						</p>
+						</span>
+					</div>
 				</div>
 			</core:when>
 		</core:choose>
