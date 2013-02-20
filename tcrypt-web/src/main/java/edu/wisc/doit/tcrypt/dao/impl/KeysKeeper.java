@@ -15,8 +15,8 @@ import java.security.Key;
 import java.security.KeyPair;
 import java.security.PublicKey;
 import java.text.SimpleDateFormat;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Repository("keysKeeper")
 public class KeysKeeper implements IKeysKeeper
@@ -41,20 +41,20 @@ public class KeysKeeper implements IKeysKeeper
 	}
 
 	@Override
-	public Set<String> getListOfServiceNames()
+	public List<String> getListOfServiceNames()
 	{
 		File dir = new File(directoryname);
 		String[] fileNames = dir.list();
-		Set<String> serviceNames = new HashSet<String>();
+		List<String> results = new ArrayList<String>();
 
 		if (fileNames != null)
 		{
 			for (String string : fileNames)
 			{
-				serviceNames.add(string.substring(0,string.indexOf("_")));
+				results.add(string.substring(0,string.indexOf("_")));
 			}
 		}
-		return serviceNames;
+		return results;
 	}
 
 	@Override

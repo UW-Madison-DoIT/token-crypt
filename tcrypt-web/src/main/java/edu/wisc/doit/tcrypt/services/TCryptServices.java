@@ -9,11 +9,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.Key;
 import java.security.KeyPair;
-import java.util.Set;
+import java.util.List;
 
 public interface TCryptServices
 {
-	public Set<String> getListOfServiceNames();
+	public List<String> getListOfServiceNames();
 	public KeyPair generateKeyPair(Integer keyLength);
 	public Boolean writeServiceKeyToFileSystem(ServiceKey serviceKey);
 	public ServiceKey readServiceKeyFromFileSystem(String serviceName);

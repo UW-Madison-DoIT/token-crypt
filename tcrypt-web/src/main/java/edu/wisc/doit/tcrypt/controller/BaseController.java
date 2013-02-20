@@ -11,6 +11,7 @@ public class BaseController {
 	
 	@ExceptionHandler(Exception.class)
     public ModelAndView handleException (Exception e) {
-	    return new ModelAndView("genericError");
+	    logger.error("Something Bad Happened: ", e);
+		return new ModelAndView("genericError");
     }
 }

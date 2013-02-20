@@ -8,14 +8,10 @@ import edu.wisc.doit.tcrypt.services.TCryptServices;
 import edu.wisc.doit.tcrypt.vo.ServiceKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
 @Controller
 public class EncryptController extends BaseController {
@@ -34,20 +30,15 @@ public class EncryptController extends BaseController {
 	@RequestMapping(value = "/encrypt", method = RequestMethod.GET)
 	public ModelAndView encryptTextInit() throws Exception {
 		ModelAndView modelAndView = new ModelAndView("encryptTokenBefore");
-		try {
-			Set<String> serviceNames =  tcryptServices.getListOfServiceNames();
-	
-	        if (!serviceNames.isEmpty())
-	        {
-	            modelAndView.addObject("serviceNames", formatForJavaScript(serviceNames));
-	        }
-		} catch (Exception e) {
-			logger.error("Issue populating list of service names, recoverable error.",e);
-			throw new ValidationException("error.issuePopulatingServiceNames");
-		}
 		return modelAndView;
 	}
-	
+
+	@RequestMapping(value = "/encryptionServices", method = RequestMethod.GET)
+	public @ResponseBody List<String> getShopInJSON()
+	{
+		return tcryptServices.getListOfServiceNames();
+	}
+
 	@RequestMapping(value = "/encrypt", method = RequestMethod.POST)
 	public ModelAndView encryptText(
 			@RequestParam("serviceNames") String serviceName,
@@ -112,16 +103,4 @@ public class EncryptController extends BaseController {
 		
 		return mav;
 	}
-	
-	//Private Methods
-	
-	private String formatForJavaScript(Set<String> serviceNames) {
-		Iterator<String> iterator = serviceNames.iterator();
-		String commaSeparated = "[ '" + iterator.next() + "'";
-		for (; iterator.hasNext();) 
-			commaSeparated =  commaSeparated + ", '" + iterator.next() + "'";
-		commaSeparated = commaSeparated+ "]";
-		return commaSeparated;
-	}
-
 }

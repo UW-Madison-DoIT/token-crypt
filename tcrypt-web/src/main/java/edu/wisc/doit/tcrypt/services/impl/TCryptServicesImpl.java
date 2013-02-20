@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.Key;
 import java.security.KeyPair;
-import java.util.Set;
+import java.util.List;
 
 @Service("tCryptServicesImpl")
 public class TCryptServicesImpl implements TCryptServices
@@ -32,7 +32,7 @@ public class TCryptServicesImpl implements TCryptServices
 	}
 
 	@Override
-	public Set<String> getListOfServiceNames()
+	public List<String> getListOfServiceNames()
 	{
 		return keysKeeper.getListOfServiceNames();
 	}

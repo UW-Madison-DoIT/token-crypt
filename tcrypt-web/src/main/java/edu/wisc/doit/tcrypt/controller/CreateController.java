@@ -14,7 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import java.security.KeyPair;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 @Controller
 public class CreateController extends BaseController {
@@ -94,7 +94,7 @@ public class CreateController extends BaseController {
 			error = "error.serviceNameUnderscore";
 		} else {
 			//Validate if service exists
-			Set<String> serviceNames =  tcryptServices.getListOfServiceNames();
+			List<String> serviceNames =  tcryptServices.getListOfServiceNames();
 			if(serviceNames.contains(serviceName)) {
 				error = "error.serviceNameExists";
 			}
