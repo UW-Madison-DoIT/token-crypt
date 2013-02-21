@@ -30,6 +30,7 @@ public class EncryptController extends BaseController {
 	@RequestMapping(value = "/encrypt", method = RequestMethod.GET)
 	public ModelAndView encryptTextInit() throws Exception {
 		ModelAndView modelAndView = new ModelAndView("encryptTokenBefore");
+		modelAndView.addObject("serviceNames", tcryptServices.getListOfServiceNames());
 		return modelAndView;
 	}
 
