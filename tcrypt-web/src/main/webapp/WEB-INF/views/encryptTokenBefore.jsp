@@ -84,7 +84,24 @@
                                 .appendTo( ul );
                     };
 
-                    input.val("");
+                    var mySelect = $('#serviceNames');
+                    var set = false;
+                    var selectedServiceName = $("#selectedServiceName").val();
+                    if(selectedServiceName.length > 0) {
+			        	for(var i=0; i < mySelect.length; i++) {
+							var option = mySelect[i];
+							//alert("option: " + option.value);
+							//alert("selectedServiceName: " + $("#selectedServiceName").val());
+							if(option.value == selectedServiceName) {
+								input.val(selectedServiceName);
+								set = true;
+								break;
+							}
+						}
+                    }
+		        	if(!set) {
+		        		input.val("");
+		        	}
 
                     $( "<a>" )
                             .attr( "tabIndex", -1 )
@@ -141,7 +158,20 @@
             </select>
             <label>Text :</label>
             <textarea rows="5" cols="30" id="text" name="text"></textarea>
-            <button type="submit">Encrypt</button>
+            <button type="submit">Encrypt</button>&nbsp; <a href="#" id="copyshare" title="Share with friends."><img src="${ pageContext.request.contextPath }/images/Link-icon.png" /></a><img class="check" src="${ pageContext.request.contextPath }/images/checkmark.png" style="display : none" alt='copied' />
+            
+            <input type='hidden' name="selectedServiceName" value="${selectedServiceName}" id="selectedServiceName"/>
+            <script lang='javascript'>
+            $(document).ready(function() {	
+            	$("#copyshare").zclip({
+				    path: "${ pageContext.request.contextPath }/js/ZeroClipboard.swf",
+				    copy:function(){return (window.location.host + '${pageContext.request.contextPath}/apps/encrypt/' + $('#serviceNames option:selected').val());},
+					afterCopy:function(){
+			            $(this).next('.check').show();
+			        }
+				});
+            });	
+		    </script>
         </form>
     </div>
 </z:layout>

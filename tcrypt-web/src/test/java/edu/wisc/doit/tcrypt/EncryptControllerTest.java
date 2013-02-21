@@ -18,7 +18,7 @@ public class EncryptControllerTest {
 	
 	@Test
 	public void shouldHandleSlashHandleMapping() throws Exception{
-		ModelAndView handleRequest = encryptController.encryptTextInit();
+		ModelAndView handleRequest = encryptController.encryptTextInit("");
 		assertEquals(handleRequest.getViewName(),"encryptTokenBefore");
 	}
 	

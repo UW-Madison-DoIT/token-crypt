@@ -9,6 +9,7 @@
 <link rel="icon" type="image/gif" href="${pageContext.request.contextPath}/images/favicon.ico" />
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" src="http://code.jquery.com/ui/1.9.1/jquery-ui.js"></script>
+<script type="text/javascript" src="${ pageContext.request.contextPath }/js/jquery.zclip.min.js" ></script>
 <title>${pageTitle} | University of Wisconsin-Madison</title>
 
 <link rel="stylesheet"	href="${pageContext.request.contextPath}/css/main_no_top_nav.css" type="text/css" media="all" />

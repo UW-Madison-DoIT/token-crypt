@@ -27,10 +27,11 @@ public class EncryptController extends BaseController {
 	
 	//Request actions
 	
-	@RequestMapping(value = "/encrypt", method = RequestMethod.GET)
-	public ModelAndView encryptTextInit() throws Exception {
+	@RequestMapping(value = "/encrypt/{selectedServiceName}", method = RequestMethod.GET)
+	public ModelAndView encryptTextInit(@PathVariable String selectedServiceName) throws Exception {
 		ModelAndView modelAndView = new ModelAndView("encryptTokenBefore");
 		modelAndView.addObject("serviceNames", tcryptServices.getListOfServiceNames());
+		modelAndView.addObject("selectedServiceName",selectedServiceName);
 		return modelAndView;
 	}
 
@@ -78,7 +79,7 @@ public class EncryptController extends BaseController {
 	public ModelAndView handleException(ValidationException e) throws Exception {
 		ModelAndView mav;
 		try {
-			mav = encryptTextInit();
+			mav = encryptTextInit("");
 		} catch (Exception e1) {
 			logger.error("Error resetting view after error",e);
 			throw new Exception(e);
@@ -93,7 +94,7 @@ public class EncryptController extends BaseController {
 	public ModelAndView handleException(ServiceErrorException e) throws Exception {
 		ModelAndView mav;
 		try {
-			mav = encryptTextInit();
+			mav = encryptTextInit("");
 		} catch (Exception e1) {
 			logger.error("Error resetting view after error",e);
 			throw new Exception(e);
