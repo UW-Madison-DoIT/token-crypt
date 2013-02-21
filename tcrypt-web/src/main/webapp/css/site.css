@@ -60,6 +60,28 @@
 	padding : 0px;
 }
 
+span.keyDownloads 
+{
+	padding: 10px 0 10px 0;
+	line-height: 50px;
+}
+
+p.warning 
+{
+	padding: 10px 10px 10px 10px;
+	-moz-border-radius: 5px; /* Firefox */
+    -webkit-border-radius: 5px; /* Safari */
+    border-radius: 5px; /* CSS3 (Opera?) */
+    border-style: solid;
+    border-width: 1px;
+    background-color: #FFE7E7;
+    border-color: #DF9898;
+    border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-top-width: 1px;
+    border-top-style: solid;
+}
+
 .ui-combobox {
     position: relative;
     display: inline-block;
