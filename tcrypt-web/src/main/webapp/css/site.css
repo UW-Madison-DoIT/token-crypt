@@ -11,9 +11,7 @@
     font-weight:bold;
     text-align:right;
     width:140px;
-/*
     margin-right: 5px;
-*/
     float:left;
 }
 #stylizedForm input textarea #keyLength
@@ -25,7 +23,6 @@
     width:200px;
     margin:2px 0 20px 10px;
 }
-/*
 #stylizedForm #serviceNames
 {
     float:left;
@@ -34,7 +31,7 @@
     width:250px;
     margin:5px 5px 20px 10px;
 }
-*/
+
 #stylizedForm button
 {
     clear:both;
