@@ -20,12 +20,10 @@
 				&nbsp;|&nbsp;
 				<a href="${privateKeyUrl }" target="_blank"><spring:message code="label.privateKeyDownload" /></a>
 			</span>
-			<span>
-			<p/>
-			<p class="warning">
-				<spring:message code="message.createKeySuccessWarning" />
-			</p>
-			</span>
 		</div>
+		<p class="warning">
+			<spring:message code="message.createKeySuccessWarning" />
+		</p>
+		
 	</div>
 </z:layout>
