@@ -5,10 +5,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" />
+<link rel="stylesheet" href="//code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" />
 <link rel="icon" type="image/gif" href="${pageContext.request.contextPath}/images/favicon.ico" />
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-<script type="text/javascript" src="http://code.jquery.com/ui/1.9.1/jquery-ui.js"></script>
+<script type="text/javascript" src="//code.jquery.com/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="//code.jquery.com/ui/1.9.1/jquery-ui.js"></script>
 <script type="text/javascript" src="${ pageContext.request.contextPath }/js/jquery.zclip.min.js" ></script>
 <title>${pageTitle} | University of Wisconsin-Madison</title>
 
