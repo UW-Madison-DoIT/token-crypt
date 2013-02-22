@@ -71,7 +71,7 @@ public class CreateController extends BaseController {
 			if(generatedKeyPair == null) {
 				throw new Exception("Error generating key pair");
 			}
-			String username = request.getUserPrincipal() != null ? request.getUserPrincipal().getName() : "na";
+			String username = request.getRemoteUser() != null ? request.getRemoteUser() : "UNKNOWNUSERNAME";
 			
 			//Create ServiceKey Object and write public key out to FS
 			ServiceKey sk = new ServiceKey(serviceName,keyLength,username,new Date(),generatedKeyPair.getPublic(),generatedKeyPair.getPrivate());
