@@ -35,7 +35,6 @@
 #stylizedForm button
 {
     clear:both;
-    margin-left:150px;
     width:140px;
     height:30px;
     padding: 5px;
@@ -46,6 +45,12 @@
     font-size:12px;
     font-weight:bold;
 }
+
+#stylizedForm button.shiftRight 
+{
+	margin-left:150px;
+}
+
 #keyLength
 {
     float: left;

@@ -27,13 +27,21 @@ public class EncryptController extends BaseController {
 	
 	//Request actions
 	
-	@RequestMapping(value = "/encrypt/{selectedServiceName}", method = RequestMethod.GET)
-	public ModelAndView encryptTextInit(@PathVariable String selectedServiceName) throws Exception {
+	@RequestMapping(value = "/encrypt", method = RequestMethod.GET)
+	public ModelAndView encryptTextInit() throws Exception {
 		ModelAndView modelAndView = new ModelAndView("encryptTokenBefore");
 		modelAndView.addObject("serviceNames", tcryptServices.getListOfServiceNames());
+		return modelAndView;
+	}
+	
+	@RequestMapping(value = "/encrypt/{selectedServiceName}", method = RequestMethod.GET)
+	public ModelAndView encryptTextInit(@PathVariable String selectedServiceName) throws Exception {
+		ModelAndView modelAndView = encryptTextInit();
 		modelAndView.addObject("selectedServiceName",selectedServiceName);
 		return modelAndView;
 	}
+	
+	
 
 	@RequestMapping(value = "/encryptionServices", method = RequestMethod.GET)
 	public @ResponseBody List<String> getShopInJSON()

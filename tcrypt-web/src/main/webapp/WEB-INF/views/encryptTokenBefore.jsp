@@ -158,7 +158,7 @@
             </select>
             <label>Text :</label>
             <textarea rows="5" cols="30" id="text" name="text"></textarea>
-            <button type="submit">Encrypt</button>&nbsp; <a href="#" id="copyshare" title="Share with friends."><img src="${ pageContext.request.contextPath }/images/Link-icon.png" /></a><img class="check" src="${ pageContext.request.contextPath }/images/checkmark.png" style="display : none" alt='copied' />
+            <button type="submit" class="shiftRight">Encrypt</button>&nbsp; <a href="#" id="copyshare" title="Share with friends."><img src="${ pageContext.request.contextPath }/images/Link-icon.png" /></a><img class="check" src="${ pageContext.request.contextPath }/images/checkmark.png" style="display : none" alt='copied' />
             
             <input type='hidden' name="selectedServiceName" value="${selectedServiceName}" id="selectedServiceName"/>
             <script lang='javascript'>
