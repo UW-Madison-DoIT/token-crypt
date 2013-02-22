@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.wisc.doit.tcrypt</groupId>
     <artifactId>tcrypt-parent</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Token Crypto Parent</name>
@@ -20,7 +20,7 @@
         <connection>scm:git:git://github.com/UW-Madison-DoIT/token-crypt.git</connection>
         <developerConnection>scm:git:git@github.com:UW-Madison-DoIT/token-crypt.git</developerConnection>
         <url>https://github.com/UW-Madison-DoIT/token-crypt</url>
-      <tag>tcrypt-1.0.4</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <properties>
