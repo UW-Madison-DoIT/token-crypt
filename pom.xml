@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>edu.wisc.doit.code</groupId>
@@ -12,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.wisc.doit.tcrypt</groupId>
     <artifactId>tcrypt-parent</artifactId>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>1.0.4</version>
     <packaging>pom</packaging>
 
     <name>Token Crypto Parent</name>
@@ -22,7 +20,8 @@
         <connection>scm:git:git://github.com/UW-Madison-DoIT/token-crypt.git</connection>
         <developerConnection>scm:git:git@github.com:UW-Madison-DoIT/token-crypt.git</developerConnection>
         <url>https://github.com/UW-Madison-DoIT/token-crypt</url>
-    </scm>
+      <tag>tcrypt-1.0.4</tag>
+  </scm>
 
     <properties>
         <project.build.sourceVersion>1.6</project.build.sourceVersion>
