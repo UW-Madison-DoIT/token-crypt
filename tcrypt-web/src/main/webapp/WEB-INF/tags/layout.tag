@@ -49,7 +49,8 @@
 					<li id="uwsearch"><a href="http://www.wisc.edu/search/">UW Search</a></li>
 					<li><a href="http://my.wisc.edu">My UW</a></li>
 					<li><a href="http://map.wisc.edu">Map</a></li>
-					<li id="last_tool"><a href="http://www.today.wisc.edu">Calendar</a></li>
+					<li><a href="http://www.today.wisc.edu">Calendar</a></li>
+					<li id="last_tool"><a href="https://login.wisc.edu/logout">Logout</a></li>
 				</ul>
 <%--
 				<form id="search" action="post">
