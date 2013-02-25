@@ -30,8 +30,7 @@
 				<select name="keyLength" id="keyLength">
 					<option>2048</option>
 				</select>
-				<label>&nbsp;</label><label>&nbsp;</label>
-				<button>Create Service Key</button>
+				<button class="shiftRight">Create Service Key</button>
     	</form>
     </div>
 

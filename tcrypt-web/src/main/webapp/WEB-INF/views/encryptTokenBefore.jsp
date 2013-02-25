@@ -105,7 +105,7 @@
                                 .appendTo( ul );
                     };
 
-                    var mySelect = $('#serviceNames');
+                    var mySelect = document.getElementById("serviceNames");
                     var set = false;
                     var selectedServiceName = $("#selectedServiceName").val();
                     if(selectedServiceName.length > 0) {
