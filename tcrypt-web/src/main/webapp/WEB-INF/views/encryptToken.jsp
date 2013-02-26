@@ -115,6 +115,7 @@
 							//alert("selectedServiceName: " + $("#selectedServiceName").val());
 							if(option.value == selectedServiceName) {
 								input.val(selectedServiceName);
+								option.selected = true;
 								set = true;
 								break;
 							}
@@ -168,20 +169,75 @@
             $( "#serviceNames" ).combobox();
         });
     </script>
+    
+    <script type="text/javascript">
+        function doAjaxPost() {
+	        // get the form values
+	        var serviceName = $('#serviceNames').val();
+	        var text = $('#text').val();
+			if(serviceName.length == 0) {
+				alert("Service Name is required.");
+				
+			} else if (text.length == 0) {
+				alert("Text to encrypt is required.");
+			} else {
+		        $.ajax({
+		          type: "POST",
+		          url: "${pageContext.request.contextPath}/apps/encryptAjax",
+		          data: "serviceKeyName=" + serviceName + "&unencryptedText=" + text,
+		          success: function(response){
+		            // we have the response
+		            //alert(response);
+		            $('#encryptedText').val(response);
+		          },
+		          error: function(e){
+		           alert('Error: ' + e);
+		          }
+		        });
+        	}
+        }
+        </script>
+        
+        <script type="text/javascript">
+	        $(document).ready(function() {	
+	        	//On change of text in the text field clear out the encrypted text to reduce confusion
+	        	$("input#text").bind('keypress',function () {
+	        		$("#encryptedText").val("");
+	        	});
+	        });
+        </script>
+        
 
     <div id="stylizedForm" class="userForms">
         <form name="encryptToken" action="${pageContext.request.contextPath}/apps/encrypt" method="post" autocomplete="off">
             <label>Service Name:</label>
             <select id="serviceNames" name="serviceNames">
+                <option value="">&nbsp;</option>
                 <core:forEach var="name" items="${serviceNames}">
                     <option value ="<core:out value="${name}"/>"><core:out value="${name}"/></option>
                 </core:forEach>
             </select>
             <label>Text :</label>
-            <textarea rows="5" cols="30" id="text" name="text"></textarea>
-            <button type="submit" class="shiftRight">Encrypt</button>&nbsp; <a href="#" id="copyshare" title="Share with friends."><img src="${ pageContext.request.contextPath }/images/Link-icon.png" /></a><img class="check" src="${ pageContext.request.contextPath }/images/checkmark.png" style="display : none" alt='copied' />
+            <input type="text" id="text" name="text" />
+            <button class="smaller" onclick="doAjaxPost(); return false;" >Encrypt</button>&nbsp; <a href="#" id="copyshare" title="Share with friends."><img src="${ pageContext.request.contextPath }/images/Link-icon.png" /></a><img class="check" src="${ pageContext.request.contextPath }/images/checkmark.png" style="display : none" alt='copied' />
+            <label>Encrypted Text :</label>
+            <input type="text" id="encryptedText" />
+			<a href="#" id="copy-encrypted"><img src="${ pageContext.request.contextPath }/images/Clipboard-icon.png" alt="Copy to clipboard"/></a><img class="check2" src="${ pageContext.request.contextPath }/images/checkmark.png" style="display : none" alt='copied' />
+			<script type="text/javascript">
+			$(document).ready(function() {
+				$("#copy-encrypted").zclip({
+				    path: "${ pageContext.request.contextPath }/js/ZeroClipboard.swf",
+				    copy:function(){return $('input#encryptedText').val();
+					},
+					afterCopy:function(){
+			            $(this).next('.check2').show();
+			        }
+				});
+			});
+		
+			</script>
+			<input type='hidden' name="selectedServiceName" value="${selectedServiceName}" id="selectedServiceName"/>
             
-            <input type='hidden' name="selectedServiceName" value="${selectedServiceName}" id="selectedServiceName"/>
             <script lang='javascript'>
             $(document).ready(function() {	
             	$("#copyshare").zclip({

@@ -20,7 +20,7 @@
 .userForms
 {
     margin:0 auto;
-    width:450px;
+    width:500px;
     padding:14px;
 }
 
@@ -69,6 +69,11 @@
     color:#FFFFFF;
     font-size:12px;
     font-weight:bold;
+}
+
+#stylizedForm button.smaller
+{
+	width: 6em;
 }
 
 #stylizedForm button.shiftRight 
