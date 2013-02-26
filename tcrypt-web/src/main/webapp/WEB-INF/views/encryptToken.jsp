@@ -209,7 +209,7 @@
         
 
     <div id="stylizedForm" class="userForms">
-        <form name="encryptToken" action="${pageContext.request.contextPath}/apps/encrypt" method="post" autocomplete="off">
+        <form name="encryptToken" action="" method="" autocomplete="off">
             <label>Service Name:</label>
             <select id="serviceNames" name="serviceNames">
                 <option value="">&nbsp;</option>
