@@ -226,7 +226,7 @@
             <input type="text" id="encryptedText" />
 			<a href="#" id="copy-encrypted"><img src="${ pageContext.request.contextPath }/images/Clipboard-icon.png" alt="Copy to clipboard"/></a><img class="check2" src="${ pageContext.request.contextPath }/images/checkmark.png" style="display : none" alt='copied' />
 			<script type="text/javascript">
-			$(document).ready(function() {
+			$(window).load(function() {
 				$("#copy-encrypted").zclip({
 				    path: "${ pageContext.request.contextPath }/js/ZeroClipboard.swf",
 				    copy:function(){return $('input#encryptedText').val();
@@ -241,7 +241,7 @@
 			<input type='hidden' name="selectedServiceName" value="${selectedServiceName}" id="selectedServiceName"/>
             
             <script lang='javascript'>
-            $(document).ready(function() {	
+            $(window).load(function() {	
             	$("#copyshare").zclip({
 				    path: "${ pageContext.request.contextPath }/js/ZeroClipboard.swf",
 				    copy:function(){return (window.location.host + '${pageContext.request.contextPath}/apps/encrypt/' + $('#serviceNames option:selected').val());},
