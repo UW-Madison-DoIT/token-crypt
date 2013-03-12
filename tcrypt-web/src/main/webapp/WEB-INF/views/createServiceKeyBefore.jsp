@@ -22,16 +22,30 @@
 <%@ include file="/WEB-INF/views/taglibs.jsp"%>
 <z:layout pageTitle="Token Encryption">
 
-    <div id="stylizedForm" class="userForms">
+    
         <form name="createServiceKey" action="${pageContext.request.contextPath}/apps/create" method="post" autocomplete="off">
-				<label>Service Name :</label>
-				<input type="text" name="serviceName" id="serviceName" />
-				<label>Key Length :</label>
-				<select name="keyLength" id="keyLength">
-					<option>2048</option>
-				</select>
-				<button class="shiftRight">Create Service Key</button>
+        	<ul class="center">
+	        	<li>
+					<label>Service Name</label>
+					<div>
+						<input type="text" name="serviceName" id="serviceName" />
+					</div>
+				</li>
+				<li>
+					<label>Key Length</label>
+					<div>
+						<select name="keyLength" id="keyLength">
+							<option>2048</option>
+						</select>
+					</div>
+				</li>
+				<li>
+					<div>
+						<button>Create Service Key</button>
+					</div>
+				</li>
+			</ul>
     	</form>
-    </div>
+    
 
 </z:layout>
