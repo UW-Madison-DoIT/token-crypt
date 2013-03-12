@@ -201,7 +201,7 @@
         <script type="text/javascript">
 	        $(document).ready(function() {	
 	        	//On change of text in the text field clear out the encrypted text to reduce confusion
-	        	$("input#text").bind('keypress',function () {
+	        	$("input#text").bind('keydown',function () {
 	        		$("#encryptedText").val("");
 	        		$("img.check").hide();
 	        		$("img.check2").hide();
