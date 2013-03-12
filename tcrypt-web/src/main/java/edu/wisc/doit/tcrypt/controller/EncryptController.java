@@ -40,12 +40,10 @@ import java.util.List;
 public class EncryptController extends BaseController {
 
 	private TCryptServices tcryptServices;
-	private HashMap<String,TokenEncrypter> tokenEncrypters;
 	
 	@Autowired
 	public EncryptController(TCryptServices tcryptServices) {
 		this.tcryptServices = tcryptServices;
-		tokenEncrypters = new HashMap<String,TokenEncrypter>();
 	}
 	
 	//Request actions
@@ -64,21 +62,6 @@ public class EncryptController extends BaseController {
 		return modelAndView;
 	}
 	
-	@RequestMapping(value = "/encryptAjax", method = RequestMethod.POST)
-	public @ResponseBody String encryptTextAjax(@ModelAttribute (value="encryptToken") EncryptToken token, BindingResult result) throws ValidationException, IOException {
-		
-		TokenEncrypter tokenEncrypter = getTokenEncrypter(token.getServiceKeyName());
-		try {
-			token.setEncryptedText(tokenEncrypter.encrypt(token.getUnencryptedText()));
-		} catch (Exception e) {
-			logger.error("Could not encrypt text",e);
-			throw new ValidationException("error.encryptionFailed");
-		}
-		return token.getEncryptedText();
-	}
-	
-	
-
 	@RequestMapping(value = "/encryptionServices", method = RequestMethod.GET)
 	public @ResponseBody List<String> getShopInJSON()
 	{
@@ -118,23 +101,5 @@ public class EncryptController extends BaseController {
 		return mav;
 	}
 	
-	//private method
 	
-	private TokenEncrypter getTokenEncrypter (String serviceName) throws ServiceErrorException, IOException {
-		
-		TokenEncrypter tokenEncrypter = null;
-		if(tokenEncrypters.containsKey(serviceName)) {
-			tokenEncrypter = tokenEncrypters.get(serviceName);
-		} else {
-			ServiceKey sk = tcryptServices.readServiceKeyFromFileSystem(serviceName);
-			if(sk != null  && sk.getPublicKey() != null) {
-				tokenEncrypter = new BouncyCastleTokenEncrypter(sk.getPublicKey());
-				tokenEncrypters.put(sk.getServiceName(), tokenEncrypter);
-			} else {
-				throw new ServiceErrorException(serviceName,"error.serviceKeyNotFound");
-			}
-			
-		}
-		return tokenEncrypter;
-	}
 }

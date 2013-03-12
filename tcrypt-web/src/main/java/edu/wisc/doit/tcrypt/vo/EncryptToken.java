@@ -25,6 +25,7 @@ public class EncryptToken {
 	private String serviceKeyName;
 	private String unencryptedText;
 	private String encryptedText;
+	private String errorMessage;
 	
 	//getters/setters
 	public String getServiceKeyName() {
@@ -44,5 +45,11 @@ public class EncryptToken {
 	}
 	public void setEncryptedText(String encryptedText) {
 		this.encryptedText = encryptedText;
+	}
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
 	}
 }

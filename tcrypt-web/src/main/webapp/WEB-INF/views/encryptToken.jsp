@@ -176,26 +176,33 @@
 	        var serviceName = $('#serviceNames').val();
 	        var text = $('#text').val();
 			if(serviceName.length == 0) {
-				alert("Service Name is required.");
+				showError("<spring:message code='error.serviceNameRequired'/>");
 				
 			} else if (text.length == 0) {
-				alert("Text to encrypt is required.");
+				showError("<spring:message code='error.textRequired' />");
 			} else {
 		        $.ajax({
 		          type: "POST",
 		          url: "${pageContext.request.contextPath}/apps/encryptAjax",
 		          data: "serviceKeyName=" + serviceName + "&unencryptedText=" + text,
 		          success: function(response){
-		            // we have the response
-		            //alert(response);
-		            $('#encryptedText').val(response);
+		            $('#encryptedText').val(response.encryptedText);
 		          },
 		          error: function(e){
-		           alert('Error: ' + e);
+		       	  	var response = jQuery.parseJSON(e.responseText);
+		       	 	showError(response.errorMessage);
 		          }
 		        });
         	}
         }
+        
+     	// run the currently selected effect
+	    function showError(errorMessage) {
+	 	  // run the effect
+	 	  $( "#ajaxError").html(errorMessage);
+	      $( "#ajaxErrorDialog" ).show( "drop", {}, 500);
+	      
+	    };
         </script>
         
         <script type="text/javascript">
@@ -205,10 +212,15 @@
 	        		$("#encryptedText").val("");
 	        		$("img.check").hide();
 	        		$("img.check2").hide();
+	        		$( "#ajaxErrorDialog" ).hide("drop", {}, 500, null);
 	        	});
+	        	$( "#ajaxErrorDialog" ).hide();
 	        });
+	        
         </script>
-        
+    <div id="ajaxErrorDialog" title="Error">  
+		<p id="ajaxError" class="warning">&nbsp;</p>
+	</div>
 
     <div id="stylizedForm" class="userForms">
         <form name="encryptToken" action="" method="" autocomplete="off">

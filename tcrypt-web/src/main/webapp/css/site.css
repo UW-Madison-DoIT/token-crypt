@@ -114,6 +114,8 @@ p.warning
     border-top-style: solid;
 }
 
+
+
 .ui-combobox {
     position: relative;
     display: inline-block;
@@ -154,7 +156,6 @@ form ul {
 form li {
 	list-style-type: none;
 	width: auto !important;
-	padding : 2em;
 	
 }
 
@@ -196,3 +197,5 @@ form ul li button {
 ul.center {
 	margin-left: 13em;
 }
+
+#ajaxError { padding: 0.4em; position: relative; }
