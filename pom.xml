@@ -4,7 +4,7 @@
     <parent>
         <groupId>edu.wisc.doit.code</groupId>
         <artifactId>shared-tools-public-parent</artifactId>
-        <version>4</version>
+        <version>7</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
