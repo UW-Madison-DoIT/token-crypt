@@ -23,18 +23,13 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.security.PublicKey;
-import java.security.Security;
 
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.digests.GeneralDigest;
 import org.bouncycastle.crypto.digests.MD5Digest;
-import org.bouncycastle.crypto.encodings.PKCS1Encoding;
-import org.bouncycastle.crypto.engines.RSAEngine;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.bouncycastle.crypto.util.PublicKeyFactory;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.util.encoders.Base64;
 
 /**
@@ -43,53 +38,28 @@ import org.bouncycastle.util.encoders.Base64;
  * @author Eric Dalquist
  * @version $Revision: 187 $
  */
-public class BouncyCastleTokenEncrypter implements TokenEncrypter {
+public class BouncyCastleTokenEncrypter extends AbstractPublicKeyEncrypter implements TokenEncrypter {
     protected static final String ENCODING = "UTF-8";
     protected static final Charset CHARSET = Charset.forName(ENCODING);
     protected static final char SEPARATOR = ':';
     private static final byte[] SEPARATOR_BYTES = Character.toString(SEPARATOR).getBytes(CHARSET);
     
-    static {
-        //TODO hook to unregister?
-        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
-    }
-
-    private final AsymmetricKeyParameter publicKeyParam;
-
-    /**
-     * Create a token encrypter using the specified public key
-     * 
-     * @param publicKeyParam public key
-     */
     public BouncyCastleTokenEncrypter(AsymmetricKeyParameter publicKeyParam) {
-        if (publicKeyParam == null) {
-            throw new IllegalArgumentException("publicKeyParam cannot be null");
-        }
-        this.publicKeyParam = publicKeyParam;
+        super(publicKeyParam);
     }
 
-    /**
-     * Create a token encrypter using the specified public key
-     * 
-     * @param keyPair The public key to use
-     */
     public BouncyCastleTokenEncrypter(PublicKey publicKey) throws IOException {
-        this(PublicKeyFactory.createKey(publicKey.getEncoded()));
+        super(publicKey);
     }
 
-    /**
-     * Create a token encrypter specified {@link Reader}, note the
-     * caller is responsible for closing the Reader.
-     * 
-     * @param publicKeyReader Reader to load the {@link PublicKey} from
-     */
-    @SuppressWarnings("resource")
     public BouncyCastleTokenEncrypter(Reader publicKeyReader) throws IOException {
-        this((PublicKey)new PEMReader(publicKeyReader).readObject());
+        super(publicKeyReader);
     }
-    
+
+    public BouncyCastleTokenEncrypter(SubjectPublicKeyInfo publicKey) throws IOException {
+        super(publicKey);
+    }
+
     @Override
     public String encrypt(String token) throws InvalidCipherTextException {
         //Convert the token into a byte[]
@@ -114,28 +84,18 @@ public class BouncyCastleTokenEncrypter implements TokenEncrypter {
         //Copy in encoded hash bytes
         System.arraycopy(encodedHashBytes, 0, tokenWithHashBytes, tokenBytes.length + SEPARATOR_BYTES.length, encodedHashBytes.length);
         
-        //Setup the encrypting cypher
-        AsymmetricBlockCipher e = createCipher();
-        e = addEncoding(e);
-        e.init(true, publicKeyParam);
+        AsymmetricBlockCipher e = getEncryptCipher();
 
         //Encrypt the bytes
         final byte[] encryptedTokenWithHash = e.processBlock(tokenWithHashBytes, 0, tokenWithHashBytes.length);
         
         //Encode the encrypted data and convert it into a string
+        //TODO switch to commons-codec but need more test cases
         final String encryptedToken = new String(Base64.encode(encryptedTokenWithHash), CHARSET);
         return TOKEN_PREFIX + encryptedToken + TOKEN_SUFFIX;
     }
 
-    protected AsymmetricBlockCipher addEncoding(AsymmetricBlockCipher e) {
-        return new PKCS1Encoding(e);
-    }
-
     protected GeneralDigest createDigester() {
         return new MD5Digest();
-    }
-
-    protected AsymmetricBlockCipher createCipher() {
-        return new RSAEngine();
     }
 }
