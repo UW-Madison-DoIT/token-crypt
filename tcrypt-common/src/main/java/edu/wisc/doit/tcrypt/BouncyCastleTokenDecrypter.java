@@ -28,43 +28,26 @@ import java.util.regex.Matcher;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.digests.GeneralDigest;
+import org.bouncycastle.crypto.digests.MD5Digest;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.bouncycastle.crypto.util.PrivateKeyFactory;
-import org.bouncycastle.openssl.PEMReader;
+import org.bouncycastle.openssl.PEMKeyPair;
+import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.util.encoders.Base64;
 
 /**
  * @author Eric Dalquist
  */
-public class BouncyCastleTokenDecrypter extends BouncyCastleTokenEncrypter implements TokenDecrypter {
-    private final AsymmetricKeyParameter privateKeyParam;
-    
-    /**
-     * Create a token encrypter and decrypter using the specified public and private keys
-     * 
-     * @param publicKeyParam public key
-     * @param privateKeyParam private key
-     */
+public class BouncyCastleTokenDecrypter extends AbstractPublicKeyDecrypter implements TokenDecrypter {
     public BouncyCastleTokenDecrypter(AsymmetricKeyParameter publicKeyParam, AsymmetricKeyParameter privateKeyParam) {
-        super(publicKeyParam);
-        
-        if (!privateKeyParam.isPrivate()) {
-            throw new IllegalArgumentException("Private key parameter must be private");
-        }
-        
-        this.privateKeyParam = privateKeyParam;
+        super(publicKeyParam, privateKeyParam);
     }
 
-    /**
-     * Create a token encrypter and decrypter using the specified key pair
-     * 
-     * @param keyPair The key pair to use
-     */
     public BouncyCastleTokenDecrypter(KeyPair keyPair) throws IOException {
-        super(keyPair.getPublic());
-        
-        this.privateKeyParam = PrivateKeyFactory.createKey(keyPair.getPrivate().getEncoded());
+        super(keyPair);
+    }
 
+    public BouncyCastleTokenDecrypter(PEMKeyPair keyPair) throws IOException {
+        super(keyPair);
     }
 
     /**
@@ -75,7 +58,7 @@ public class BouncyCastleTokenDecrypter extends BouncyCastleTokenEncrypter imple
      */
     @SuppressWarnings("resource")
     public BouncyCastleTokenDecrypter(Reader privateKeyReader) throws IOException {
-        this((KeyPair)new PEMReader(privateKeyReader).readObject());
+        this((PEMKeyPair)new PEMParser(privateKeyReader).readObject());
     }
     
     @Override
@@ -96,20 +79,17 @@ public class BouncyCastleTokenDecrypter extends BouncyCastleTokenEncrypter imple
         //Decode the cipher text
         final byte[] encryptedTokenWithHash = Base64.decode(ciphertext);
         
-        //Decrypt the cipher text
-        AsymmetricBlockCipher e = this.createCipher();
-        e = this.addEncoding(e);
-        e.init(false, privateKeyParam);
+        final AsymmetricBlockCipher e = getDecryptCipher();
         final byte[] tokenWithHashBytes = e.processBlock(encryptedTokenWithHash, 0, encryptedTokenWithHash.length);
 
         //Split the decrypted text into the password and the hash
-        final String tokenWithHash = new String(tokenWithHashBytes, CHARSET);
-        final int seperatorIndex = tokenWithHash.lastIndexOf(SEPARATOR);
+        final String tokenWithHash = new String(tokenWithHashBytes, BouncyCastleTokenEncrypter.CHARSET);
+        final int seperatorIndex = tokenWithHash.lastIndexOf(BouncyCastleTokenEncrypter.SEPARATOR);
         if (seperatorIndex < 0) {
-            throw new IllegalArgumentException("token/hash string doesn't contain seperator: " + SEPARATOR);
+            throw new IllegalArgumentException("token/hash string doesn't contain seperator: " + BouncyCastleTokenEncrypter.SEPARATOR);
         }
-        final byte[] passwordBytes = tokenWithHash.substring(0, seperatorIndex).getBytes(CHARSET);
-        final byte[] passwordHashBytes = Base64.decode(tokenWithHash.substring(seperatorIndex + 1).getBytes(CHARSET));
+        final byte[] passwordBytes = tokenWithHash.substring(0, seperatorIndex).getBytes(BouncyCastleTokenEncrypter.CHARSET);
+        final byte[] passwordHashBytes = Base64.decode(tokenWithHash.substring(seperatorIndex + 1).getBytes(BouncyCastleTokenEncrypter.CHARSET));
         
         //Generate hash of the decrypted password
         final GeneralDigest digest = this.createDigester();
@@ -122,6 +102,10 @@ public class BouncyCastleTokenDecrypter extends BouncyCastleTokenEncrypter imple
             throw new IllegalArgumentException("Hash of the decrypted token does not match the decrypted hash");
         }
         
-        return new String(passwordBytes, CHARSET); 
+        return new String(passwordBytes, BouncyCastleTokenEncrypter.CHARSET); 
+    }
+
+    protected GeneralDigest createDigester() {
+        return new MD5Digest();
     }
 }

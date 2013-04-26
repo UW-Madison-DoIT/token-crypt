@@ -77,7 +77,7 @@ public class TokenEncryptDecryptTest {
         String encryptedToken = tokenEncrypter.encrypt(token);
         testDecrypt(token, encryptedToken);
 
-        encryptedToken = tokenDecrypter.encrypt(token);
+        encryptedToken = tokenEncrypter.encrypt(token);
         testDecrypt(token, encryptedToken);
     }
 

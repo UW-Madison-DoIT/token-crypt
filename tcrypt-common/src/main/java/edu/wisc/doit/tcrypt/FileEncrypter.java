@@ -19,32 +19,18 @@
  */
 package edu.wisc.doit.tcrypt;
 
-import java.util.regex.Pattern;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
 /**
- * Decrypts tokens
+ * Encrypts tokens
  * 
  * @author Eric Dalquist
  */
-public interface TokenDecrypter {
-
-    public static final Pattern BASE64_PATTERN = Pattern.compile("(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{4})");
-    public static final Pattern TOKEN_PATTERN = Pattern.compile(Pattern.quote(TokenEncrypter.TOKEN_PREFIX) + "(" + BASE64_PATTERN.pattern() + ")" + Pattern.quote(TokenEncrypter.TOKEN_SUFFIX));
-
-    /**
-     * Determine if the specified cipher text LOOKS LIKE an encrypted token. No actual verification of the encrypted data is done beyond pattern matching.
-     */
-    boolean isEncryptedToken(String ciphertext);
-
-    /**
-     * Decrypt the specified cipher text. 
-     * 
-     * @param ciphertext text to decrypt
-     * @return The decrypted text
-     * @throws InvalidCipherTextException If the cipher is invalid
-     */
-    String decrypt(String ciphertext) throws InvalidCipherTextException;
+public interface FileEncrypter {
+    
+    void encrypt(String fileName, InputStream inputStream, OutputStream outputStream) throws InvalidCipherTextException;
 
 }
