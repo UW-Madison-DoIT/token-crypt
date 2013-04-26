@@ -75,6 +75,15 @@
 						    <core:url value="/apps/create" var="HomeTokenUrl" />
 							<a href="${HomeTokenUrl}">Create Service Key</a>
 						</li>
+						<li>
+						<hr class="sidebar" />
+						</li>
+						<li>
+							<a href="https://wiki.doit.wisc.edu/confluence/x/YIjrAw" target="_blank"  title="The Documentation for this service">Documentation</a>
+						</li>
+						<li>
+							<a href="https://jira.doit.wisc.edu/jira/browse/TCRYPT" target="_blank" title="If you notice a bug or would like to request feature, please submit a Jira ticket">Log Issue</a>
+						</li>
 					</ul>
 				</div>
 				<div id="content" class="main col">
