@@ -22,16 +22,31 @@ package edu.wisc.doit.tcrypt;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
 /**
- * Encrypts tokens
+ * Encrypts a file
  * 
  * @author Eric Dalquist
  */
 public interface FileEncrypter {
+    static final String ENCODING = "UTF-8";
+    static final Charset CHARSET = Charset.forName(ENCODING);
     
+    static final String ENC_SUFFIX = ".enc";
+    
+    static final String KEYFILE_ENC_NAME = "keyfile" + ENC_SUFFIX;
+    
+    static final char KEYFILE_LINE_SEPERATOR = '\n';
+
+    /**
+     * @param fileName Name of the file being encrypted
+     * @param size Size of the file being encrypted, this MUST be accurate
+     * @param inputStream Input stream to read the file from
+     * @param outputStream Output stream to write the TAR file to
+     */
     void encrypt(String fileName, int size, InputStream inputStream, OutputStream outputStream) throws InvalidCipherTextException, IOException;
 
 }

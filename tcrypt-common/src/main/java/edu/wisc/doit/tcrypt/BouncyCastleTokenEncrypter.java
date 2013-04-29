@@ -21,16 +21,15 @@ package edu.wisc.doit.tcrypt;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.nio.charset.Charset;
 import java.security.PublicKey;
 
+import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.digests.GeneralDigest;
 import org.bouncycastle.crypto.digests.MD5Digest;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.bouncycastle.util.encoders.Base64;
 
 /**
  * Encrypts tokens using a public key
@@ -39,8 +38,6 @@ import org.bouncycastle.util.encoders.Base64;
  * @version $Revision: 187 $
  */
 public class BouncyCastleTokenEncrypter extends AbstractPublicKeyEncrypter implements TokenEncrypter {
-    protected static final String ENCODING = "UTF-8";
-    protected static final Charset CHARSET = Charset.forName(ENCODING);
     protected static final char SEPARATOR = ':';
     private static final byte[] SEPARATOR_BYTES = Character.toString(SEPARATOR).getBytes(CHARSET);
     
@@ -70,7 +67,7 @@ public class BouncyCastleTokenEncrypter extends AbstractPublicKeyEncrypter imple
         digest.update(tokenBytes, 0, tokenBytes.length);
         final byte[] hashBytes = new byte[digest.getDigestSize()];
         digest.doFinal(hashBytes, 0);
-        final byte[] encodedHashBytes = Base64.encode(hashBytes);
+        final byte[] encodedHashBytes = Base64.encodeBase64(hashBytes);
         
         //Create the pre-encryption byte[] to hold the token, separator, and hash
         final byte[] tokenWithHashBytes = new byte[tokenBytes.length + SEPARATOR_BYTES.length + encodedHashBytes.length];
@@ -90,8 +87,7 @@ public class BouncyCastleTokenEncrypter extends AbstractPublicKeyEncrypter imple
         final byte[] encryptedTokenWithHash = e.processBlock(tokenWithHashBytes, 0, tokenWithHashBytes.length);
         
         //Encode the encrypted data and convert it into a string
-        //TODO switch to commons-codec but need more test cases
-        final String encryptedToken = new String(Base64.encode(encryptedTokenWithHash), CHARSET);
+        final String encryptedToken = new String(Base64.encodeBase64(encryptedTokenWithHash), CHARSET);
         return TOKEN_PREFIX + encryptedToken + TOKEN_SUFFIX;
     }
 

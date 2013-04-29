@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.nio.charset.Charset;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 
@@ -51,16 +50,10 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  * @version $Revision: 187 $
  */
 public class BouncyCastleFileEncrypter extends AbstractPublicKeyEncrypter implements FileEncrypter {
-    public static final String ENCODING = "UTF-8";
-    public static final Charset CHARSET = Charset.forName(ENCODING);
-    public static final String ENC_SUFFIX = ".enc";
-    public static final String KEYFILE_ENC_NAME = "keyfile" + ENC_SUFFIX;
-    public static final char KEYFILE_LINE_SEPERATOR = '\n';
     public static final int PASSWORD_LENGTH = 128;
     public static final int SALT_LENGTH = 8;
     public static final int KEY_LENGTH = 256;
     public static final int IV_LENGTH = 128;
-    
     
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     

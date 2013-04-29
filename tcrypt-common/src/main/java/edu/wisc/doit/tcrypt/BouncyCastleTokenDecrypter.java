@@ -25,6 +25,7 @@ import java.security.KeyPair;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 
+import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.digests.GeneralDigest;
@@ -32,7 +33,6 @@ import org.bouncycastle.crypto.digests.MD5Digest;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.util.encoders.Base64;
 
 /**
  * @author Eric Dalquist
@@ -77,7 +77,7 @@ public class BouncyCastleTokenDecrypter extends AbstractPublicKeyDecrypter imple
         }
         
         //Decode the cipher text
-        final byte[] encryptedTokenWithHash = Base64.decode(ciphertext);
+        final byte[] encryptedTokenWithHash = Base64.decodeBase64(ciphertext);
         
         final AsymmetricBlockCipher e = getDecryptCipher();
         final byte[] tokenWithHashBytes = e.processBlock(encryptedTokenWithHash, 0, encryptedTokenWithHash.length);
@@ -89,7 +89,7 @@ public class BouncyCastleTokenDecrypter extends AbstractPublicKeyDecrypter imple
             throw new IllegalArgumentException("token/hash string doesn't contain seperator: " + BouncyCastleTokenEncrypter.SEPARATOR);
         }
         final byte[] passwordBytes = tokenWithHash.substring(0, seperatorIndex).getBytes(BouncyCastleTokenEncrypter.CHARSET);
-        final byte[] passwordHashBytes = Base64.decode(tokenWithHash.substring(seperatorIndex + 1).getBytes(BouncyCastleTokenEncrypter.CHARSET));
+        final byte[] passwordHashBytes = Base64.decodeBase64(tokenWithHash.substring(seperatorIndex + 1).getBytes(BouncyCastleTokenEncrypter.CHARSET));
         
         //Generate hash of the decrypted password
         final GeneralDigest digest = this.createDigester();

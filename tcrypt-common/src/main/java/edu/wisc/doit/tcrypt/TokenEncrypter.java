@@ -19,6 +19,8 @@
  */
 package edu.wisc.doit.tcrypt;
 
+import java.nio.charset.Charset;
+
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
 /**
@@ -27,15 +29,18 @@ import org.bouncycastle.crypto.InvalidCipherTextException;
  * @author Eric Dalquist
  */
 public interface TokenEncrypter {
+    static final String ENCODING = "UTF-8";
+    static final Charset CHARSET = Charset.forName(ENCODING);
+
     /**
      * Prefix added to all encrypted strings 
      */
-    public static final String TOKEN_PREFIX = "ENC(";
+    static final String TOKEN_PREFIX = "ENC(";
     
     /**
      * Suffix added to all encrypted strings 
      */
-    public static final String TOKEN_SUFFIX = ")";
+    static final String TOKEN_SUFFIX = ")";
     
     String encrypt(String token) throws InvalidCipherTextException;
 
