@@ -34,6 +34,10 @@ done
 # Revert IFS
 IFS="${OIFS}"
 
+# Generate hash of plain file for verification
+PLAIN_HASH=`cat $PLAIN_FILE| openssl dgst -md5 -binary | openssl enc -A -a`
+echo $PLAIN_HASH
+
 # Encrypt the KEY and IV into keyfile.inc for later decryption
 echo -e "${KEY}\n${IV}" | openssl rsautl -encrypt -inkey $PUBLIC_KEY_FILE -pubin | openssl enc -A -a > $KEY_FILE
 
