@@ -72,13 +72,13 @@ public class EncryptController extends BaseController {
 	}
 	
 	@RequestMapping(value = "/encryptFile", method = RequestMethod.POST) 
-	public ModelAndView encryptFile(@RequestParam("filename") String filename, @RequestParam("fileToEncrypt") MultipartFile file, @RequestParam("selectedServiceName") String serviceName, HttpServletResponse response) throws Exception {
+	public ModelAndView encryptFile(@RequestParam("fileToEncrypt") MultipartFile file, @RequestParam("selectedServiceName") String serviceName, HttpServletResponse response) throws Exception {
 		ModelAndView modelAndView = encryptTextInit();
 		modelAndView.addObject("selectedServiceName",serviceName);
 		
 		if(!file.isEmpty()) {
 			//TODO TCRYPT-58 encrypt and push back to user
-			//response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + ".enc" + "\"");
+			//response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + ".enc" + "\"");
 			//tcryptServices.encryptFile(serviceName, file, response.getOutputStream());
 		}
 		
