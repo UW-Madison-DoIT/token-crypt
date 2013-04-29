@@ -9,6 +9,8 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
+import org.bouncycastle.crypto.digests.GeneralDigest;
+import org.bouncycastle.crypto.digests.MD5Digest;
 import org.bouncycastle.crypto.encodings.PKCS1Encoding;
 import org.bouncycastle.crypto.engines.AESFastEngine;
 import org.bouncycastle.crypto.engines.RSAEngine;
@@ -98,5 +100,9 @@ public abstract class AbstractPublicKeyEncrypter {
 
     protected AsymmetricBlockCipher addEncoding(AsymmetricBlockCipher e) {
         return new PKCS1Encoding(e);
+    }
+
+    protected GeneralDigest createDigester() {
+        return new MD5Digest();
     }
 }

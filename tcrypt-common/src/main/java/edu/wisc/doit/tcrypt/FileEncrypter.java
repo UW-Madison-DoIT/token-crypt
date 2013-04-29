@@ -47,6 +47,6 @@ public interface FileEncrypter {
      * @param inputStream Input stream to read the file from
      * @param outputStream Output stream to write the TAR file to
      */
-    void encrypt(String fileName, int size, InputStream inputStream, OutputStream outputStream) throws InvalidCipherTextException, IOException;
+    void encrypt(String fileName, InputStream inputStream, OutputStream outputStream) throws InvalidCipherTextException, IOException;
 
 }

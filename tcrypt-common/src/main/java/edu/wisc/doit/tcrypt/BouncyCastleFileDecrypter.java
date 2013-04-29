@@ -31,11 +31,13 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.TeeOutputStream;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.io.CipherOutputStream;
+import org.bouncycastle.crypto.io.DigestOutputStream;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
@@ -77,21 +79,32 @@ public class BouncyCastleFileDecrypter extends AbstractPublicKeyDecrypter implem
     @Override
     public void decrypt(TarArchiveInputStream inputStream, OutputStream outputStream) throws InvalidCipherTextException, IOException, DecoderException {
         //Read the cipher parameters from the tar file
-        final CipherParameters key = this.getCipherParameters(inputStream);
+        final Tuple<CipherParameters, String> keyData = this.getCipherParameters(inputStream);
+        final CipherParameters key = keyData.v1;
 
         //Advance to the next entry in the tar file
         inputStream.getNextTarEntry();
 
         //Get the block cipher used for decrypting
         final BufferedBlockCipher cipher = getDecryptBlockCipher(key);
+
+        //Create digest output stream used to generate digest while decrypting
+        final DigestOutputStream digestOutputStream = new DigestOutputStream(this.createDigester());
         
         //Do a streaming decryption of the file output
-        final CipherOutputStream cipherOutputStream = new CipherOutputStream(outputStream, cipher);
+        final CipherOutputStream cipherOutputStream = new CipherOutputStream(new TeeOutputStream(outputStream, digestOutputStream), cipher);
         IOUtils.copy(inputStream, cipherOutputStream);
         cipherOutputStream.close();
+        
+        final byte[] hashBytes = digestOutputStream.getDigest();
+        final String actualHash = new String(Base64.encodeBase64(hashBytes), FileEncrypter.CHARSET);
+        
+        if (!keyData.v2.equals(actualHash)) {
+            throw new IllegalArgumentException("Hash " + actualHash + " doesn't match expected hash " + keyData.v2 + " for decrypted file");
+        }
     }
 
-    protected CipherParameters getCipherParameters(TarArchiveInputStream inputStream) throws IOException, InvalidCipherTextException, DecoderException {
+    protected Tuple<CipherParameters, String> getCipherParameters(TarArchiveInputStream inputStream) throws IOException, InvalidCipherTextException, DecoderException {
         //Read keyfile.enc from the TAR  
         final TarArchiveEntry keyFileEntry = inputStream.getNextTarEntry();
         
@@ -117,16 +130,17 @@ public class BouncyCastleFileDecrypter extends AbstractPublicKeyDecrypter implem
 
         //Split the keyfile
         final String[] keyFileParts = KEYFILE_SEPERATOR_PATTERN.split(keyFileStr);
-        if (keyFileParts.length != 2) {
-            throw new IllegalArgumentException(FileEncrypter.KEYFILE_ENC_NAME + " must have exactly two lines, this one has: " + keyFileParts.length);
+        if (keyFileParts.length != 3) {
+            throw new IllegalArgumentException(FileEncrypter.KEYFILE_ENC_NAME + " must have exactly three lines, this one has: " + keyFileParts.length);
         }
         
-        //line 0 is the secretKey and line 1 is the initVector
+        //line 0 is the secretKey, 1 is the initVector, 2 is the file md5
         final byte[] secretKey = Hex.decodeHex(keyFileParts[0].toCharArray());
         final byte[] initVector = Hex.decodeHex(keyFileParts[1].toCharArray());
+        final String expectedHash = keyFileParts[2];
         
         //Create the key parameters
         final KeyParameter keyParam = new KeyParameter(secretKey);
-        return new ParametersWithIV(keyParam, initVector);
+        return new Tuple<CipherParameters, String>(new ParametersWithIV(keyParam, initVector), expectedHash);
     }
 }

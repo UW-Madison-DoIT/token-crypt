@@ -28,7 +28,6 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.digests.GeneralDigest;
-import org.bouncycastle.crypto.digests.MD5Digest;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 
 /**
@@ -89,9 +88,5 @@ public class BouncyCastleTokenEncrypter extends AbstractPublicKeyEncrypter imple
         //Encode the encrypted data and convert it into a string
         final String encryptedToken = new String(Base64.encodeBase64(encryptedTokenWithHash), CHARSET);
         return TOKEN_PREFIX + encryptedToken + TOKEN_SUFFIX;
-    }
-
-    protected GeneralDigest createDigester() {
-        return new MD5Digest();
     }
 }

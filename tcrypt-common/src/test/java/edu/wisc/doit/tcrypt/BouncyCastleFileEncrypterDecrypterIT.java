@@ -70,10 +70,9 @@ public class BouncyCastleFileEncrypterDecrypterIT {
         final File testFile = setupTempFile("testFile.txt");
         
         InputStream testFileInStream = new FileInputStream(testFile);
-        final int size = (int)testFile.length();
         
         final File encFile = this.testFolder.newFile("testFile.txt.tar");
-        this.fileEncrypter.encrypt("testFile.txt", size, testFileInStream, new FileOutputStream(encFile));
+        this.fileEncrypter.encrypt("testFile.txt", testFileInStream, new FileOutputStream(encFile));
         
         
         //Decrypt with OpenSSL

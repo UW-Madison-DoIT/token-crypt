@@ -41,11 +41,9 @@ public class BouncyCastleFileEncrypterDecrypterTest {
     @Test
     public void testFileEncryptDecrypt() throws Exception {
         InputStream testFileInStream = this.getClass().getResourceAsStream("/testFile.txt");
-        final int size = IOUtils.copy(testFileInStream, new NullOutputStream());
-        testFileInStream = this.getClass().getResourceAsStream("/testFile.txt");
         
         final ByteArrayOutputStream encTestFileOutStream = new ByteArrayOutputStream();
-        this.fileEncrypter.encrypt("testFile.txt", size, testFileInStream, encTestFileOutStream);
+        this.fileEncrypter.encrypt("testFile.txt", testFileInStream, encTestFileOutStream);
         
         final ByteArrayOutputStream decTestFileOutStream = new ByteArrayOutputStream();
         this.fileDecrypter.decrypt(new TarArchiveInputStream(new ByteArrayInputStream(encTestFileOutStream.toByteArray())), decTestFileOutStream);
