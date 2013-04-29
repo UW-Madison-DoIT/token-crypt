@@ -36,10 +36,9 @@ IFS="${OIFS}"
 
 # Generate hash of plain file for verification
 PLAIN_HASH=`cat $PLAIN_FILE| openssl dgst -md5 -binary | openssl enc -A -a`
-echo $PLAIN_HASH
 
 # Encrypt the KEY and IV into keyfile.inc for later decryption
-echo -e "${KEY}\n${IV}" | openssl rsautl -encrypt -inkey $PUBLIC_KEY_FILE -pubin | openssl enc -A -a > $KEY_FILE
+echo -e "${KEY}\n${IV}\n${PLAIN_HASH}" | openssl rsautl -encrypt -inkey $PUBLIC_KEY_FILE -pubin | openssl enc -A -a > $KEY_FILE
 
 # Encrypt the file using the KEY and IV
 openssl enc -in $PLAIN_FILE -out $ENC_FILE_NAME -aes-256-cbc -K "$KEY" -iv "$IV"
