@@ -5,6 +5,8 @@ import java.io.Reader;
 import java.security.KeyPair;
 
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
+import org.bouncycastle.crypto.BufferedBlockCipher;
+import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.util.PrivateKeyFactory;
 import org.bouncycastle.openssl.PEMKeyPair;
@@ -72,5 +74,11 @@ public abstract class AbstractPublicKeyDecrypter extends AbstractPublicKeyEncryp
         e = this.addEncoding(e);
         e.init(false, this.getPrivateKeyParam());
         return e;
+    }
+
+    protected BufferedBlockCipher getDecryptBlockCipher(final CipherParameters key) {
+        final BufferedBlockCipher cipher = this.createBlockCipher();
+        cipher.init(false, key);
+        return cipher;
     }
 }
