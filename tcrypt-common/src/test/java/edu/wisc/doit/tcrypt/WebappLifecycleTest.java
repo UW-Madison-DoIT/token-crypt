@@ -19,6 +19,8 @@
  */
 package edu.wisc.doit.tcrypt;
 
+import static org.junit.Assert.assertTrue;
+
 import org.bouncycastle.openssl.PEMWriter;
 import org.junit.Rule;
 import org.junit.Test;
@@ -96,6 +98,9 @@ public class WebappLifecycleTest {
         final TokenEncrypter tokenEncrypter = new BouncyCastleTokenEncrypter(new InputStreamReader(this.getClass().getResourceAsStream(keyFileName)));
         
         final String token = tokenEncrypter.encrypt(plainText);
+        
+        assertTrue(token.startsWith(TokenEncrypter.TOKEN_PREFIX));
+        assertTrue(token.endsWith(TokenEncrypter.TOKEN_SUFFIX));
         
         /*
          * At this point the user should be shown the encrypted token
