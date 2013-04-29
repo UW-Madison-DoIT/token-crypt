@@ -59,18 +59,5 @@ public class BouncyCastleFileEncrypter extends AbstractPublicKeyEncrypter implem
 
     @Override
     public void encrypt(String fileName, InputStream inputStream, OutputStream outputStream) throws InvalidCipherTextException {
-        //Generate random key
-        //  KEY=`openssl rand -base64 128`
-        final byte[] fileKey = new SecureRandom().generateSeed(FILE_KEY_LENGTH);
-        final String fileKeyStr = StringUtils.newStringUtf8(Base64.encodeBase64Chunked(fileKey));
-        
-        //Encrypt the fileKeyStr
-        //  echo $KEY | openssl rsautl -encrypt -inkey /my/up/etc/my-test.doit.wisc.edu-public.pem -pubin | openssl enc -A -a > keyfile.enc
-        
-        /*
-echo $KEY | openssl rsautl -encrypt -inkey /my/up/etc/my-test.doit.wisc.edu-public.pem -pubin | openssl enc -A -a > keyfile.enc
-openssl enc -in default.event-aggregation.xml -out default.event-aggregation.xml.enc -aes-256-cbc -k "$KEY"
-tar -cf encfile.tar keyfile.enc default.event-aggregation.xml.enc
-         */
     }
 }

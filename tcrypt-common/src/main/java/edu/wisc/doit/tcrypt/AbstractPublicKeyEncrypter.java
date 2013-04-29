@@ -7,8 +7,13 @@ import java.security.Security;
 
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
+import org.bouncycastle.crypto.BufferedBlockCipher;
+import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.encodings.PKCS1Encoding;
+import org.bouncycastle.crypto.engines.AESFastEngine;
 import org.bouncycastle.crypto.engines.RSAEngine;
+import org.bouncycastle.crypto.modes.CBCBlockCipher;
+import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.util.PublicKeyFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -75,6 +80,16 @@ public abstract class AbstractPublicKeyEncrypter {
         e = addEncoding(e);
         e.init(true, this.getPublicKeyParam());
         return e;
+    }
+
+    protected BufferedBlockCipher getEncryptBlockCipher(final CipherParameters key) {
+        final BufferedBlockCipher cipher = this.createBlockCipher();
+        cipher.init(true, key);
+        return cipher;
+    }
+    
+    protected BufferedBlockCipher createBlockCipher() {
+        return new PaddedBufferedBlockCipher(new CBCBlockCipher(new AESFastEngine()));
     }
 
     protected AsymmetricBlockCipher createCipher() {
