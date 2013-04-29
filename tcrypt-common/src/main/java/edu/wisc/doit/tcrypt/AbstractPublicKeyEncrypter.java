@@ -82,9 +82,9 @@ public abstract class AbstractPublicKeyEncrypter {
         return e;
     }
 
-    protected BufferedBlockCipher getEncryptBlockCipher(final CipherParameters key) {
+    protected BufferedBlockCipher getEncryptBlockCipher(final CipherParameters cipherParameters) {
         final BufferedBlockCipher cipher = this.createBlockCipher();
-        cipher.init(true, key);
+        cipher.init(true, cipherParameters);
         return cipher;
     }
     
