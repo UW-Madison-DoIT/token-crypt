@@ -20,8 +20,8 @@
 .userForms
 {
     margin:0 auto;
-    width:500px;
-    padding:14px;
+    width:30em;
+    padding:3em;
 }
 
 #stylizedForm label
@@ -30,7 +30,7 @@
     font-weight:bold;
     text-align:right;
     width:10em;
-    margin-right: 5px;
+    margin-right: .75em;
     float:left;
 }
 
@@ -60,14 +60,13 @@
 #stylizedForm button
 {
     clear:both;
-    width:140px;
-    height:30px;
-    padding: 5px;
+    width:15em;
+    height:2em;
     background:#666666 no-repeat;
     text-align:center;
     vertical-align: middle;;
     color:#FFFFFF;
-    font-size:12px;
+    font-size:.75em;
     font-weight:bold;
 }
 
@@ -89,7 +88,7 @@
 #success span.label
 {
 	font-weight:bold;
-	padding : 0px;
+	padding : 0;
 }
 
 span.keyDownloads 

@@ -175,24 +175,30 @@
 	        // get the form values
 	        var serviceName = $('#serviceNames').val();
 	        var text = $('#text').val();
+	        var file = $('#fileToEncrypt').val();
 			if(serviceName.length == 0) {
 				showError("<spring:message code='error.serviceNameRequired'/>");
 				
-			} else if (text.length == 0) {
-				showError("<spring:message code='error.textRequired' />");
+			} else if (text.length == 0 && file.length == 0) {
+				showError("<spring:message code='error.textOrFileRequired' />");
 			} else {
-		        $.ajax({
-		          type: "POST",
-		          url: "${pageContext.request.contextPath}/apps/encryptAjax",
-		          data: "serviceKeyName=" + serviceName + "&unencryptedText=" + text,
-		          success: function(response){
-		            $('#encryptedText').val(response.encryptedText);
-		          },
-		          error: function(e){
-		       	  	var response = jQuery.parseJSON(e.responseText);
-		       	 	showError(response.errorMessage);
-		          }
-		        });
+				if(text.length != 0) { //text encrypt via ajax
+			        $.ajax({
+			          type: "POST",
+			          url: "${pageContext.request.contextPath}/apps/encryptAjax",
+			          data: "serviceKeyName=" + serviceName + "&unencryptedText=" + text,
+			          success: function(response){
+			            $('#encryptedText').val(response.encryptedText);
+			          },
+			          error: function(e){
+			       	  	var response = jQuery.parseJSON(e.responseText);
+			       	 	showError(response.errorMessage);
+			          }
+			        });
+				} else { //file encryption via form submission
+					$('#selectedServiceName').val(serviceName);
+					$('#fileEncryptionForm').submit();
+				}
         	}
         }
         
@@ -206,50 +212,70 @@
         </script>
         
         <script type="text/javascript">
+        
+        	function clearAll(toClearText) {
+        		$("#encryptedText").val("");
+        		$("img.check").hide();
+        		$("img.check2").hide();
+        		$( "#ajaxErrorDialog" ).hide("drop", {}, 500, null);
+        		if(toClearText) {
+        			$("#text").val("");
+        		}
+        	}
+        
 	        $(document).ready(function() {	
 	        	//On change of text in the text field clear out the encrypted text to reduce confusion
 	        	$("input#text").bind('keydown',function () {
-	        		$("#encryptedText").val("");
-	        		$("img.check").hide();
-	        		$("img.check2").hide();
-	        		$( "#ajaxErrorDialog" ).hide("drop", {}, 500, null);
+	        		clearAll(false);
 	        	});
 	        	$( "#ajaxErrorDialog" ).hide();
 	        });
 	        
         </script>
+      
     <div id="ajaxErrorDialog" title="Error">  
 		<p id="ajaxError" class="warning">&nbsp;</p>
 	</div>
 
     <div id="stylizedForm" class="userForms">
-        <form name="encryptToken" action="" method="" autocomplete="off">
-            <label>Service Name:</label>
-            <select id="serviceNames" name="serviceNames">
-                <option value="">&nbsp;</option>
-                <core:forEach var="name" items="${serviceNames}">
-                    <option value ="<core:out value="${name}"/>"><core:out value="${name}"/></option>
-                </core:forEach>
-            </select>
-            <label>Text :</label>
-            <input type="text" id="text" name="text" />
-            <button class="smaller" onclick="doAjaxPost(); return false;" >Encrypt</button>&nbsp; <a href="#" id="copyshare" title="Share with friends."><img src="${ pageContext.request.contextPath }/images/Link-icon.png" /></a><img class="check" src="${ pageContext.request.contextPath }/images/checkmark.png" style="display : none" alt='copied' />
-            <label>Encrypted Text :</label>
-            <input type="text" id="encryptedText" />
-			<a href="#" id="copy-encrypted"><img src="${ pageContext.request.contextPath }/images/Clipboard-icon.png" alt="Copy to clipboard"/></a><img class="check2" src="${ pageContext.request.contextPath }/images/checkmark.png" style="display : none" alt='copied' />
-			<script type="text/javascript">
-			$(window).load(function() {
-				$("#copy-encrypted").zclip({
-				    path: "${ pageContext.request.contextPath }/js/ZeroClipboard.swf",
-				    copy:function(){return $('input#encryptedText').val();
-					},
-					afterCopy:function(){
-			            $(this).next('.check2').show();
-			        }
-				});
+        
+        <label>Service Name:</label>
+        <select id="serviceNames" name="serviceNames">
+            <option value="">&nbsp;</option>
+            <core:forEach var="name" items="${serviceNames}">
+                <option value ="<core:out value="${name}"/>"><core:out value="${name}"/></option>
+            </core:forEach>
+        </select>
+        <div id="textEncryption">
+        <label>Text :</label> <input type="text" id="text" name="text" /> 
+        <label>Encrypted Text :</label>
+        <input type="text" id="encryptedText" />
+		<a href="#" id="copy-encrypted"><img src="${ pageContext.request.contextPath }/images/Clipboard-icon.png" alt="Copy to clipboard"/></a><img class="check2" src="${ pageContext.request.contextPath }/images/checkmark.png" style="display : none" alt='copied' />
+		<script type="text/javascript">
+		$(window).load(function() {
+			$("#copy-encrypted").zclip({
+			    path: "${ pageContext.request.contextPath }/js/ZeroClipboard.swf",
+			    copy:function(){return $('input#encryptedText').val();
+				},
+				afterCopy:function(){
+		            $(this).next('.check2').show();
+		        }
 			});
+		});
+	
+		</script>
+		</div>
 		
-			</script>
+		<form name="encryptToken" id="fileEncryptionForm" action="${pageContext.request.contextPath}/apps/encryptFile" autocomplete="off" enctype="multipart/form-data" method="POST"> 
+			<div id="fileEncryption">
+				<label>File :</label>
+				<input type="file" name="fileToEncrypt" id="fileToEncrypt" onclick="clearAll(true);return true;" />
+			</div>
+			<div>
+			<label>&nbsp;</label>
+			<button onclick="doAjaxPost(); return false;" >Encrypt</button>&nbsp;<a href="#" id="copyshare" title="Share with friends."><img src="${ pageContext.request.contextPath }/images/Link-icon.png" /></a><img class="check" src="${ pageContext.request.contextPath }/images/checkmark.png" style="display : none" alt='copied' />
+			</div>
+			
 			<input type='hidden' name="selectedServiceName" value="${selectedServiceName}" id="selectedServiceName"/>
             
             <script lang='javascript'>
@@ -263,6 +289,6 @@
 				});
             });	
 		    </script>
-        </form>
+	    </form>
     </div>
 </z:layout>

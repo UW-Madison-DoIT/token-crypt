@@ -30,11 +30,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 public class EncryptController extends BaseController {
@@ -66,6 +69,20 @@ public class EncryptController extends BaseController {
 	public @ResponseBody List<String> getShopInJSON()
 	{
 		return tcryptServices.getListOfServiceNames();
+	}
+	
+	@RequestMapping(value = "/encryptFile", method = RequestMethod.POST) 
+	public ModelAndView encryptFile(@RequestParam("filename") String filename, @RequestParam("fileToEncrypt") MultipartFile file, @RequestParam("selectedServiceName") String serviceName, HttpServletResponse response) throws Exception {
+		ModelAndView modelAndView = encryptTextInit();
+		modelAndView.addObject("selectedServiceName",serviceName);
+		
+		if(!file.isEmpty()) {
+			//TODO TCRYPT-58 encrypt and push back to user
+			//response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + ".enc" + "\"");
+			//tcryptServices.encryptFile(serviceName, file, response.getOutputStream());
+		}
+		
+		return modelAndView;
 	}
 	
 	//Exception Handlers

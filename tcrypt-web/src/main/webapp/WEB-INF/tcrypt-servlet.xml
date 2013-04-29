@@ -73,5 +73,11 @@
     <bean id="handlerMapping" class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
         <property name="interceptors" ref="localeChangeInterceptor"/>
     </bean>
+    
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	 	<!-- one of the properties available; the maximum file size in bytes -->
+	    <property name="maxUploadSize" value="4194304"/>
+	</bean>
+	
 
 </beans>
