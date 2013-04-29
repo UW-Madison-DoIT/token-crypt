@@ -27,7 +27,7 @@ public class BouncyCastleFileEncrypterDecrypterTest {
     
     @Test
     public void testExistingFileDecryption() throws Exception {
-        final InputStream encTestFileInStream = this.getClass().getResourceAsStream("/testFile.tar");
+        final InputStream encTestFileInStream = this.getClass().getResourceAsStream("/testFile.txt.tar");
         final ByteArrayOutputStream testFileOutStream = new ByteArrayOutputStream();
         fileDecrypter.decrypt(new TarArchiveInputStream(encTestFileInStream), testFileOutStream);
         final String actual = new String(testFileOutStream.toByteArray(), Charset.defaultCharset()).trim();
