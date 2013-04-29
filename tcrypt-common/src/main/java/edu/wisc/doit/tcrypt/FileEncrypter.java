@@ -19,6 +19,7 @@
  */
 package edu.wisc.doit.tcrypt;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -31,6 +32,6 @@ import org.bouncycastle.crypto.InvalidCipherTextException;
  */
 public interface FileEncrypter {
     
-    void encrypt(String fileName, InputStream inputStream, OutputStream outputStream) throws InvalidCipherTextException;
+    void encrypt(String fileName, int size, InputStream inputStream, OutputStream outputStream) throws InvalidCipherTextException, IOException;
 
 }

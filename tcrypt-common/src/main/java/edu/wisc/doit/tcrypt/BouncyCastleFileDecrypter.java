@@ -28,7 +28,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.IOUtils;
@@ -36,6 +35,7 @@ import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.bouncycastle.crypto.io.CipherOutputStream;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
@@ -55,9 +55,7 @@ import org.bouncycastle.openssl.PEMKeyPair;
  * @version $Revision: 187 $
  */
 public class BouncyCastleFileDecrypter extends AbstractPublicKeyDecrypter implements FileDecrypter {
-    public static final String KEYFILE_ENC_NAME = "keyfile.enc";
-    public static final char KEYFILE_LINE_SEPERATOR = '\n';
-    public static final Pattern KEYFILE_SEPERATOR_PATTERN = Pattern.compile(Character.toString(KEYFILE_LINE_SEPERATOR));
+    public static final Pattern KEYFILE_SEPERATOR_PATTERN = Pattern.compile(Character.toString(BouncyCastleFileEncrypter.KEYFILE_LINE_SEPERATOR));
     public static final int MAX_ENCRYPTED_KEY_FILE_SIZE = 500;
     
     public BouncyCastleFileDecrypter(AsymmetricKeyParameter publicKeyParam, AsymmetricKeyParameter privateKeyParam) {
@@ -86,23 +84,11 @@ public class BouncyCastleFileDecrypter extends AbstractPublicKeyDecrypter implem
 
         //Get the block cipher used for decrypting
         final BufferedBlockCipher cipher = getDecryptBlockCipher(key);
-
-        //Do streaming decryption using 8KB chunks
-        final byte[] encryptedBytes = new byte[8192];
-        final byte[] decryptedBytes = new byte[cipher.getOutputSize(encryptedBytes.length)];
-        while (true) {
-            final int inLength = inputStream.read(encryptedBytes);
-            if (inLength < 0) {
-                break;
-            }
-            
-            final int outLength = cipher.processBytes(encryptedBytes, 0, inLength, decryptedBytes, 0);
-            outputStream.write(decryptedBytes, 0, outLength);
-        }
-
-        //Complete streaming decryption
-        final int length = cipher.doFinal(decryptedBytes, 0);
-        outputStream.write(decryptedBytes, 0, length);
+        
+        //Do a streaming decryption of the file output
+        final CipherOutputStream cipherOutputStream = new CipherOutputStream(outputStream, cipher);
+        IOUtils.copy(inputStream, cipherOutputStream);
+        cipherOutputStream.close();
     }
 
     protected CipherParameters getCipherParameters(TarArchiveInputStream inputStream) throws IOException, InvalidCipherTextException, DecoderException {
@@ -111,8 +97,8 @@ public class BouncyCastleFileDecrypter extends AbstractPublicKeyDecrypter implem
         
         //Verify file name
         final String keyFileName = keyFileEntry.getName();
-        if (!KEYFILE_ENC_NAME.equals(keyFileName)) {
-            throw new IllegalArgumentException("The first entry in the TAR must be name: " + KEYFILE_ENC_NAME);
+        if (!BouncyCastleFileEncrypter.KEYFILE_ENC_NAME.equals(keyFileName)) {
+            throw new IllegalArgumentException("The first entry in the TAR must be name: " + BouncyCastleFileEncrypter.KEYFILE_ENC_NAME);
         }
         
         //Verify file size
@@ -127,12 +113,12 @@ public class BouncyCastleFileDecrypter extends AbstractPublicKeyDecrypter implem
         //Decrypt the keyfile into UTF-8 String
         final AsymmetricBlockCipher decryptCipher = this.getDecryptCipher();
         final byte[] keyFileBytes = decryptCipher.processBlock(encKeyFileBytes, 0, encKeyFileBytes.length);
-        final String keyFileStr = StringUtils.newStringUtf8(keyFileBytes);
+        final String keyFileStr = new String(keyFileBytes, BouncyCastleFileEncrypter.CHARSET);
 
         //Split the keyfile
         final String[] keyFileParts = KEYFILE_SEPERATOR_PATTERN.split(keyFileStr);
         if (keyFileParts.length != 2) {
-            throw new IllegalArgumentException(KEYFILE_ENC_NAME + " must have exactly two lines, this one has: " + keyFileParts.length);
+            throw new IllegalArgumentException(BouncyCastleFileEncrypter.KEYFILE_ENC_NAME + " must have exactly two lines, this one has: " + keyFileParts.length);
         }
         
         //line 0 is the secretKey and line 1 is the initVector
