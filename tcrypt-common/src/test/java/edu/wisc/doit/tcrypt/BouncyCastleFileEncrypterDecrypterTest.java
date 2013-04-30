@@ -11,7 +11,6 @@ import java.nio.charset.Charset;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.NullOutputStream;
 import org.junit.Before;
 import org.junit.Test;
 

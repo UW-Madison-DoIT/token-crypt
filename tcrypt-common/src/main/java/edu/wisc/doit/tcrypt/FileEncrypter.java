@@ -27,7 +27,7 @@ import java.nio.charset.Charset;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
 /**
- * Encrypts a file
+ * Encrypts a file. The result is a TAR file with two entries that are both encrypted.
  * 
  * @author Eric Dalquist
  */
@@ -35,11 +35,14 @@ public interface FileEncrypter {
     static final String ENCODING = "UTF-8";
     static final Charset CHARSET = Charset.forName(ENCODING);
     
-    static final String ENC_SUFFIX = ".enc";
     
+    static final String ENC_SUFFIX = ".enc";
     static final String KEYFILE_ENC_NAME = "keyfile" + ENC_SUFFIX;
     
     static final char KEYFILE_LINE_SEPERATOR = '\n';
+
+    static final int KEY_LENGTH = 256;
+    static final int IV_LENGTH = 128;
 
     /**
      * @param fileName Name of the file being encrypted

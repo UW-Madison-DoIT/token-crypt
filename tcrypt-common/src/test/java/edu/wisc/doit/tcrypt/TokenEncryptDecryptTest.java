@@ -35,7 +35,7 @@ import org.junit.Test;
  */
 public class TokenEncryptDecryptTest {
     private TokenEncrypter tokenEncrypter;
-    private BouncyCastleTokenDecrypter tokenDecrypter;
+    private TokenDecrypter tokenDecrypter;
     
     @Before
     public void setup() throws IOException {

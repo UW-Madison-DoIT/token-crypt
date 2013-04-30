@@ -49,18 +49,15 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
 /**
- * Encrypts tokens using a public key
+ * Encrypts files using a public key
  * 
  * @author Eric Dalquist
  * @version $Revision: 187 $
  */
 public class BouncyCastleFileEncrypter extends AbstractPublicKeyEncrypter implements FileEncrypter {
-    public static final int PASSWORD_LENGTH = 128;
-    public static final int SALT_LENGTH = 8;
-    public static final int KEY_LENGTH = 256;
-    public static final int IV_LENGTH = 128;
-    
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+    private static final int PASSWORD_LENGTH = 128;
+    private static final int SALT_LENGTH = 8;
     
     public BouncyCastleFileEncrypter(AsymmetricKeyParameter publicKeyParam) {
         super(publicKeyParam);

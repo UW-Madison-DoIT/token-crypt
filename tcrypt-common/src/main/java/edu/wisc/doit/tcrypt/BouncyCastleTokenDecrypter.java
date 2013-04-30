@@ -73,7 +73,10 @@ public class BouncyCastleTokenDecrypter extends AbstractPublicKeyDecrypter imple
             ciphertext = tokenMatcher.group(1);
         }
         else {
-            throw new IllegalArgumentException("Specified ciphertext is not valid");
+            final Matcher base64Matcher = BASE64_PATTERN.matcher(ciphertext);
+            if (!base64Matcher.matches()) {
+                throw new IllegalArgumentException("Specified ciphertext is not valid");
+            }
         }
         
         //Decode the cipher text
