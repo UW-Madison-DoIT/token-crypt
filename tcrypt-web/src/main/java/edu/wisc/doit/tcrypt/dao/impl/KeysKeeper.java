@@ -19,184 +19,180 @@
  */
 package edu.wisc.doit.tcrypt.dao.impl;
 
-import edu.wisc.doit.tcrypt.TokenKeyPairGenerator;
-import edu.wisc.doit.tcrypt.dao.IKeysKeeper;
-import edu.wisc.doit.tcrypt.vo.ServiceKey;
-import org.bouncycastle.openssl.PEMReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.security.KeyPair;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.bouncycastle.openssl.PEMWriter;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Repository;
-import java.io.*;
-import java.security.Key;
-import java.security.KeyPair;
-import java.security.PublicKey;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
+
+import edu.wisc.doit.tcrypt.TokenKeyPairGenerator;
+import edu.wisc.doit.tcrypt.dao.IKeysKeeper;
+import edu.wisc.doit.tcrypt.vo.ServiceKey;
 
 @Repository("keysKeeper")
 public class KeysKeeper implements IKeysKeeper
 {
-    private static final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+    private static final Pattern KEY_NAME_PATTERN = Pattern.compile("^([^_]+)_([^_]+)_(\\d{14})_(\\d+)_([^\\.]+)\\.pem$");
+    private static final DateTimeFormatter KEY_CREATED_FORMATTER = DateTimeFormat.forPattern("yyyyMMddHHmmss");
     
 	protected final Logger logger = LoggerFactory.getLogger(KeysKeeper.class);
-	private String directoryname;
-	private TokenKeyPairGenerator keyPairGenerator;
+	private final Map<String, ServiceKey> keysCache = new ConcurrentHashMap<>();
+	private final TokenKeyPairGenerator keyPairGenerator;
+	private final File directory;
+	
+	private volatile DateTime lastScan = null;
 
 	/**
 	 * Constructor
-	 * @param directoryname Location of keys directory
+	 * @param directory Location of keys directory
 	 * @param keyPairGenerator KeyPair Generator
 	 */
 	@Autowired
 	public KeysKeeper(@Value("${edu.wisc.doit.tcrypt.path.keydirectory:WEB-INF/keys}") String directoryname, TokenKeyPairGenerator keyPairGenerator)
 	{
-		super();
-		this.directoryname = directoryname;
-		logger.info("DirectoryName = {}", directoryname);
+		this.directory = new File(directoryname);
+		if (!this.directory.exists()) {
+		    if (!this.directory.mkdirs()) {
+		        throw new IllegalArgumentException("Failed to create keys directory: '" + directoryname + "'");
+		    }
+		}
+		if (!this.directory.isDirectory() || !this.directory.canRead() || !this.directory.canWrite()) {
+		    throw new IllegalArgumentException("'" + directoryname + "' is not a directory that we have read/write access to");
+		}
+		
 		this.keyPairGenerator = keyPairGenerator;
+		logger.info("key directory: {}", directoryname);
+		
+		//Init keys cache
+		this.scanForKeys();
+	}
+	
+	//Make sure this gets called at least once/hour
+	@Scheduled(fixedDelay=3600000)
+	public void scanForKeys() {
+	    //Only re-scan every 1 minute at most
+	    final DateTime now = DateTime.now();
+	    if (this.lastScan != null && !this.lastScan.plusMinutes(1).isBefore(now)) {
+	        return;
+	    }
+	    this.lastScan = now;
+	    
+	    forcedScanForKeys();
 	}
 
+    private void forcedScanForKeys() {
+        try {
+            logger.debug("Scanning {} for updates to key files", directory);
+            
+    	    final File[] keyfiles = directory.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    if (KEY_NAME_PATTERN.matcher(name).matches()) {
+                        return true;
+                    }
+                    
+                    logger.warn("Ignoring {} in {}", name, dir);
+                    
+                    return false;
+                }
+            });
+    	    
+    	    final Set<String> oldKeys = new HashSet<>(this.keysCache.keySet());
+    	    
+    	    for (final File keyFile : keyfiles) {
+    	        final String keyName = keyFile.getName();
+    	        final Matcher keyNameMatcher = KEY_NAME_PATTERN.matcher(keyName);
+    	        
+    	        if (!keyNameMatcher.matches()) {
+    	            throw new IllegalStateException("Some how " + keyFile + " matched the FilenameFilter but does not match the key name pattern");
+    	        }
+    	        
+    	        logger.debug("Found key: {}", keyFile);
+    	        
+    	        final String serviceName = keyNameMatcher.group(1);
+    	        
+    	        //Record that we saw the service name and if it wasn't removed it must be a new key
+    	        if (!oldKeys.remove(serviceName)) {
+        	        final String createdByNetId = keyNameMatcher.group(2);
+        	        final String dayCreatedStr = keyNameMatcher.group(3);
+        	        final DateTime dayCreated = KEY_CREATED_FORMATTER.parseDateTime(dayCreatedStr);
+        	        final int keyLength = Integer.parseInt(keyNameMatcher.group(4));
+        	        
+        	        //TODO use an enum to verify this is "public"?
+    //    	        final String keyType = keyNameMatcher.group(5);
+        	        
+        	        final ServiceKey serviceKey = new ServiceKey(serviceName, keyLength, createdByNetId, dayCreated, keyFile);
+        	        this.keysCache.put(serviceName, serviceKey);
+    	        }
+    	    }
+    	    
+    	    //Remove any keys that have been deleted from the file system
+    	    this.keysCache.keySet().removeAll(oldKeys);
+    	    
+    	    logger.info("Scanned {}, keysCache contains {} keys", directory, this.keysCache.size());
+        }
+        catch (Exception e) {
+            logger.error("Failed to scan {} for keys", this.directory, e);
+        }
+    }
+	
 	@Override
-	public List<String> getListOfServiceNames()
-	{
-		File dir = new File(directoryname);
-		String[] fileNames = dir.list();
-		List<String> results = new ArrayList<String>();
-
-		if (fileNames != null)
-		{
-			for (String string : fileNames)
-			{
-				results.add(string.substring(0,string.indexOf("_")));
-			}
-		}
-		return results;
+	public Set<String> getListOfServiceNames() {
+	    return this.keysCache.keySet();
 	}
 
-	@Override
-	public synchronized ServiceKey readServiceKeyFromFileSystem(final String serviceName)
-	{
-		logger.info("ServiceName to look for '{}'", serviceName);
-		// Look For File with Service Name in Directory
-		File dir = new File(directoryname);
-		String[] fileNames = dir.list(new FilenameFilter() {
-			@Override
-			public boolean accept(File file, String s)
-			{
-				return s.toUpperCase().contains(serviceName.toUpperCase());
-			}
-		});
+    @Override
+    public KeyPair createServiceKey(String serviceName, int keyLength, String username) throws IOException {
+        if (this.keysCache.containsKey(serviceName)) {
+            throw new IllegalArgumentException("'" + serviceName + "' service key already exists.");
+        }
+        logger.debug("Generating {} bit KeyPair for service {} requested by {}", keyLength, serviceName, username);
+        
+        final KeyPair keyPair = this.keyPairGenerator.generateKeyPair(keyLength);
+        
+        // Build File Name
+        // Pattern: SERVICENAME_NETID_YYYYMMDDHHMMSS_KEYLENGTH_public.pem
+        final String fileName = serviceName + "_" + 
+                username + "_" + 
+                KEY_CREATED_FORMATTER.print(DateTime.now()) + "_" + 
+                keyLength + "_public.pem";
+        
+        final File publicKeyFile = new File(this.directory, fileName);
+        if (publicKeyFile.exists()) {
+            logger.warn("Key file already exists at {} it will be overwritten.", publicKeyFile);
+            publicKeyFile.delete();
+        }
 
-		// If File Found Read It Into ServiceKey object
-		if (fileNames.length > 0)
-		{
-			String file = fileNames[0];
-			logger.info("Found file = {}", file);
+        try (final PEMWriter pemWriter = new PEMWriter(new BufferedWriter(new FileWriter(publicKeyFile)))) {
+            pemWriter.writeObject(keyPair.getPublic());
+        }
+        logger.info("Wrote new public key for {} to {}", serviceName, publicKeyFile);
+        
+        this.forcedScanForKeys();
+        
+        return keyPair;
+    }
 
-			ServiceKey serviceKey = null;
-			try
-			{
-				serviceKey = new ServiceKey();
-				Integer lastIndex = file.indexOf("_");
-				serviceKey.setServiceName(file.substring(0, lastIndex));
-				Integer newLastIndex = file.indexOf("_", lastIndex + 1);
-				serviceKey.setCreatedByNetId(file.substring(lastIndex + 1, newLastIndex));
-				lastIndex = newLastIndex;
-				newLastIndex = file.indexOf("_", lastIndex + 1);
-				serviceKey.setDayCreated(fileDateFormat.parse(file.substring(lastIndex + 1, newLastIndex)));
-				lastIndex = newLastIndex;
-				newLastIndex = file.indexOf("_", lastIndex + 1);
-				serviceKey.setKeyLength(Integer.parseInt(file.substring(lastIndex + 1, newLastIndex)));
-
-				final PEMReader pemReader = new PEMReader(new FileReader(new File(directoryname + System.getProperty("file.separator") + file)));
-				serviceKey.setPublicKey((PublicKey)pemReader.readObject());
-				pemReader.close();
-			}
-			catch (Exception e)
-			{
-				logger.error("Error reading ServiceKey: ", e);
-			}
-			return serviceKey;
-		}
-
-		logger.warn("Didn't find a key on the file system for this service.");
-		return null;
-	}
-
-	@Override
-	public InputStream getKeyAsInputStream(Key key)
-	{
-		return new ByteArrayInputStream(key.getEncoded());
-	}
-
-	@Override
-	public KeyPair generateKeyPair(Integer keyLength)
-	{
-		if (keyLength == null || keyLength == 0)
-		{
-			keyLength = 2048;
-		}
-		return keyPairGenerator.generateKeyPair(keyLength);
-	}
-
-	@Override
-	public synchronized Boolean writeServiceKeyToFileSystem(ServiceKey serviceKey)
-	{
-		// Build File Name
-		// Pattern: SERVICENAME_NETID_YYYYMMDDHHMMSS_KEYLENGTH_public.pem
-		StringBuffer fileName = new StringBuffer();
-		fileName.append(serviceKey.getServiceName());
-		fileName.append("_").append(serviceKey.getCreatedByNetId()).append("_");
-		fileName.append(fileDateFormat.format(serviceKey.getDayCreated()));
-		fileName.append("_").append(serviceKey.getKeyLength());
-		fileName.append("_public.pem");
-		logger.info("ServiceKey file name = {}", fileName.toString());
-		String path = directoryname + System.getProperty("file.separator") + fileName;
-		logger.info("Path = {}", path);
-
-		// Write To FileSystem
-		Boolean result = Boolean.TRUE;
-		try
-		{
-			File file = new File(path);
-			if (file.exists())
-			{
-				file.delete();
-			}
-			file.createNewFile();
-			final PEMWriter pemWriter = new PEMWriter(new FileWriter(file));
-			pemWriter.writeObject(serviceKey.getPublicKey());
-			pemWriter.close();
-		}
-		catch (IOException e)
-		{
-			logger.error(e.toString());
-			result = Boolean.FALSE;
-		}
-		logger.info("Result of writing to file: {}", result);
-
-		// Return Results
-		return result;
-	}
-
-	@Override
-	public Boolean writeKeyToOutputStream(Key key, OutputStream outputStream)
-	{
-		try
-		{
-			final PEMWriter pemWriter = new PEMWriter(new PrintWriter(outputStream));
-			pemWriter.writeObject(key);
-			pemWriter.close();
-		}
-		catch (IOException e)
-		{
-			logger.error("Error writing Key to OutputStream: ", e);
-			return Boolean.FALSE;
-		}
-		return Boolean.TRUE;
-	}
+    @Override
+    public ServiceKey getServiceKey(String serviceName) {
+        return this.keysCache.get(serviceName);
+    }
 }

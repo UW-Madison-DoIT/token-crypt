@@ -79,6 +79,10 @@
       <artifactId>spring-webmvc</artifactId>
     </dependency>
     <dependency>
+      <groupId>javax.servlet.jsp</groupId>
+      <artifactId>jsp-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>taglibs</groupId>
       <artifactId>standard</artifactId>
     </dependency>
@@ -112,6 +116,10 @@
       <artifactId>spring-test</artifactId>
       <scope>test</scope>
     </dependency>
+<dependency>
+    <groupId>joda-time</groupId>
+    <artifactId>joda-time</artifactId>
+</dependency>
   </dependencies>
   <build>
     <finalName>tcrypt</finalName>

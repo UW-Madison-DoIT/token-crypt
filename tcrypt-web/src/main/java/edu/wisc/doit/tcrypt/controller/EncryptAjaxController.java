@@ -20,8 +20,6 @@
 package edu.wisc.doit.tcrypt.controller;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,10 +33,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import edu.wisc.doit.tcrypt.BouncyCastleTokenEncrypter;
 import edu.wisc.doit.tcrypt.TokenEncrypter;
+import edu.wisc.doit.tcrypt.dao.IKeysKeeper;
 import edu.wisc.doit.tcrypt.exception.ServiceErrorException;
-import edu.wisc.doit.tcrypt.services.TCryptServices;
 import edu.wisc.doit.tcrypt.vo.EncryptToken;
 import edu.wisc.doit.tcrypt.vo.ServiceKey;
 
@@ -47,12 +44,11 @@ public class EncryptAjaxController {
 	
 	protected static final Logger logger = LoggerFactory.getLogger(EncryptAjaxController.class);
 	
-	private final Map<String,TokenEncrypter> tokenEncrypters = new ConcurrentHashMap<String, TokenEncrypter>();
-	private final TCryptServices tcryptServices;
+	private final IKeysKeeper keysKeeper;
 	
 	@Autowired
-	public EncryptAjaxController(TCryptServices tcryptServices) {
-		this.tcryptServices = tcryptServices;
+	public EncryptAjaxController(IKeysKeeper keysKeeper) {
+		this.keysKeeper = keysKeeper;
 	}
 	
 	@RequestMapping(value = "/encryptAjax", method = RequestMethod.POST)
@@ -73,20 +69,11 @@ public class EncryptAjaxController {
 	//	private method
 
 	private TokenEncrypter getTokenEncrypter (String serviceName) throws ServiceErrorException, IOException {
-		
-		TokenEncrypter tokenEncrypter = tokenEncrypters.get(serviceName);
-		if (tokenEncrypter != null) {
-		    return tokenEncrypter;
+		ServiceKey sk = keysKeeper.getServiceKey(serviceName);
+		if (sk == null) {
+		    throw new ServiceErrorException(serviceName, "error.serviceKeyNotFound");
 		}
-		
-		ServiceKey sk = tcryptServices.readServiceKeyFromFileSystem(serviceName);
-		if (sk == null || sk.getPublicKey() == null) {
-		    throw new ServiceErrorException(serviceName,"error.serviceKeyNotFound");
-		}
-		
-		tokenEncrypter = new BouncyCastleTokenEncrypter(sk.getPublicKey());
-		tokenEncrypters.put(sk.getServiceName(), tokenEncrypter);
 
-		return tokenEncrypter;
+		return sk.getTokenEncrypter();
 	}
 }

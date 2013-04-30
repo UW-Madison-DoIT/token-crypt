@@ -24,110 +24,70 @@
 
 package edu.wisc.doit.tcrypt;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.io.File;
+import java.io.FileReader;
+import java.security.KeyPair;
+import java.security.PublicKey;
+
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.joda.time.DateTime;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
 import edu.wisc.doit.tcrypt.dao.IKeysKeeper;
 import edu.wisc.doit.tcrypt.dao.impl.KeysKeeper;
 import edu.wisc.doit.tcrypt.vo.ServiceKey;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import java.io.*;
-import java.security.KeyPair;
-import java.util.Arrays;
-import java.util.Date;
-import static org.junit.Assert.*;
 
 public class KeyReadingAndWritingTest
 {
-	private static final Logger logger = LoggerFactory.getLogger(KeyReadingAndWritingTest.class);
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
+    
 	private IKeysKeeper keysKeeper;
-	private final File tempKeyDirctory = new File(System.getProperty("user.dir") + System.getProperty("file.separator") + "tempKeys");
-
+	
 	@Before
-	public void setup() throws IOException
-	{
-		logger.info("TempKeyDirectory = {}", tempKeyDirctory.getAbsolutePath());
-		keysKeeper = new KeysKeeper(tempKeyDirctory.getAbsolutePath(), new BouncyCastleKeyPairGenerator());
-		if (!tempKeyDirctory.exists())
-		{
-			Boolean result = tempKeyDirctory.mkdir();
-			logger.info("tempKeyDirectory creation attempt result: {}", result);
-		}
-	}
-
-	@After
-	public void cleanup()
-	{
-		if (tempKeyDirctory.exists())
-		{
-			try
-			{
-				FileUtils.deleteDirectory(tempKeyDirctory);
-			}
-			catch (Exception e)
-			{
-				logger.error("Error Deleting tempKeyDirectory", e);
-			}
-			logger.info("tempKeyDirectory attempted to be deleted. Still exist? {}", tempKeyDirctory.exists());
-		}
+	public void setup() throws Exception {
+	    final BouncyCastleKeyPairGenerator bouncyCastleKeyPairGenerator = new BouncyCastleKeyPairGenerator();
+	    this.keysKeeper = new KeysKeeper(testFolder.getRoot().getCanonicalPath(), bouncyCastleKeyPairGenerator);
 	}
 
 	@Test
 	public void testCreateWriteAndReadBackKey() throws Exception
 	{
-		// Create ServiceKey
-		ServiceKey original = new ServiceKey();
-		original.setCreatedByNetId(System.getProperty("user.name"));
-		original.setDayCreated(new Date());
-		original.setKeyLength(2048);
-		KeyPair keyPair = keysKeeper.generateKeyPair(2048);
-		original.setPrivateKey(keyPair.getPrivate());
-		original.setPublicKey(keyPair.getPublic());
-		original.setServiceName("test.doit.wisc.edu");
-
-		// Write ServiceKey to filesystem
-		assertTrue(keysKeeper.writeServiceKeyToFileSystem(original));
+	    // Create ServiceKey
+	    final KeyPair kp = this.keysKeeper.createServiceKey("example.com", 2048, "username");
+	    assertNotNull(kp);
 
 		// Step 3: Read ServiceKey from filesystem
-		ServiceKey fileKey = keysKeeper.readServiceKeyFromFileSystem(original.getServiceName());
-		assertNotNull(fileKey);
+		ServiceKey foundKey = keysKeeper.getServiceKey("example.com");
+		assertNotNull(foundKey);
 
 		// Compare original ServiceKey content with new ServiceKey read from filesystem
-		assertEquals(original.getCreatedByNetId(), fileKey.getCreatedByNetId());
-		assertTrue(DateUtils.isSameDay(original.getDayCreated(), fileKey.getDayCreated()));
-		assertEquals(original.getKeyLength(), fileKey.getKeyLength());
-		assertTrue(Arrays.equals(original.getPublicKey().getEncoded(), fileKey.getPublicKey().getEncoded()));
-		assertNull(fileKey.getPrivateKey());
-		assertEquals(original.getServiceName(), fileKey.getServiceName());
-	}
-
-	@Test
-	public void testCreateReadAndWriteKeyInMemory() throws Exception
-	{
-		// Create ServiceKey
-		ServiceKey original = new ServiceKey();
-		original.setCreatedByNetId(System.getProperty("user.name"));
-		original.setDayCreated(new Date());
-		original.setKeyLength(2048);
-		KeyPair keyPair = keysKeeper.generateKeyPair(2048);
-		original.setPrivateKey(keyPair.getPrivate());
-		original.setPublicKey(keyPair.getPublic());
-		original.setServiceName("test-memory.doit.wisc.edu");
-
-		assertNotNull(original);
-
-		// Write Service Key to Memory Using InputStream
-		InputStream inputStream = keysKeeper.getKeyAsInputStream(original.getPublicKey());
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		IOUtils.copy(inputStream, outputStream);
-		logger.debug("Writer toString(): {}", outputStream.toString("UTF-8"));
-		assertTrue(Arrays.equals(original.getPublicKey().getEncoded(), outputStream.toByteArray()));
-		final String originalString = new String(original.getPublicKey().getEncoded());
-		final String outputString = new String(outputStream.toByteArray());
-		assertEquals(originalString, outputString);
+		assertEquals("example.com", foundKey.getServiceName());
+		assertEquals("username", foundKey.getCreatedByNetId());
+		assertEquals(2048, foundKey.getKeyLength());
+		//Verify created in same minute
+        assertEquals(DateTime.now().minuteOfHour().roundFloorCopy(), foundKey.getDayCreated().minuteOfHour().roundFloorCopy());
+		assertNotNull(foundKey.getFileEncrypter());
+		assertNotNull(foundKey.getTokenEncrypter());
+		
+		final File keyFile = foundKey.getKeyFile();
+        assertNotNull(keyFile);
+        
+        @SuppressWarnings("resource")
+        PEMParser pemParser = new PEMParser(new FileReader(keyFile));
+        Object object = pemParser.readObject();
+        JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
+        final PublicKey actualPublicKey = converter.getPublicKey((SubjectPublicKeyInfo) object);
+        
+        assertArrayEquals(kp.getPublic().getEncoded(), actualPublicKey.getEncoded());
 	}
 }

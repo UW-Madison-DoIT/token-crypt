@@ -19,94 +19,76 @@
  */
 package edu.wisc.doit.tcrypt.vo;
 
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.Date;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+
+import org.joda.time.DateTime;
+
+import edu.wisc.doit.tcrypt.BouncyCastleFileEncrypter;
+import edu.wisc.doit.tcrypt.BouncyCastleTokenEncrypter;
+import edu.wisc.doit.tcrypt.FileEncrypter;
+import edu.wisc.doit.tcrypt.TokenEncrypter;
 
 public class ServiceKey
 {
-	//variables
-	private String serviceName;
-	private Integer keyLength;
-	private String createdByNetId;
-	private Date dayCreated;
-	private PublicKey publicKey;
-	private PrivateKey privateKey;
+	private final String serviceName;
+	private final int keyLength;
+	private final String createdByNetId;
+	private final DateTime dayCreated;
+	private final File keyFile;
+	private volatile TokenEncrypter tokenEncrypter;
+	private volatile FileEncrypter fileEncrypter;
 
-	/**
-	 * Constructor
-	 */
-	public ServiceKey()
-	{
-		super();
-	}
-	public ServiceKey(String serviceName, Integer keyLength, String createdByNetId, Date dayCreated, PublicKey publicKey, PrivateKey privateKey) {
-		this.serviceName = serviceName;
-		this.keyLength = keyLength;
-		this.createdByNetId = createdByNetId;
-		this.dayCreated = dayCreated;
-		this.publicKey = publicKey;
-		this.privateKey = privateKey;
-	}
+	public ServiceKey(String serviceName, int keyLength, String createdByNetId, DateTime dayCreated, File keyFile) {
+        this.serviceName = serviceName;
+        this.keyLength = keyLength;
+        this.createdByNetId = createdByNetId;
+        this.dayCreated = dayCreated;
+        this.keyFile = keyFile;
+    }
 
-	//Getters/setters
-	public Integer getKeyLength()
-	{
-		return keyLength;
-	}
+    public String getServiceName() {
+        return serviceName;
+    }
 
-	public void setKeyLength(Integer keyLength)
-	{
-		this.keyLength = keyLength;
-	}
+    public int getKeyLength() {
+        return keyLength;
+    }
 
-	public String getServiceName()
-	{
-		return serviceName;
-	}
+    public String getCreatedByNetId() {
+        return createdByNetId;
+    }
 
-	public void setServiceName(String serviceName)
-	{
-		this.serviceName = serviceName;
-	}
+    public DateTime getDayCreated() {
+        return dayCreated;
+    }
 
-	public Date getDayCreated()
-	{
-		return dayCreated;
-	}
+    public File getKeyFile() {
+        return keyFile;
+    }
+    
+    public TokenEncrypter getTokenEncrypter() throws IOException {
+        TokenEncrypter e = tokenEncrypter;
+        if (e == null) {
+            try (final Reader keyFileReader = new BufferedReader(new FileReader(keyFile))) {
+                e = new BouncyCastleTokenEncrypter(keyFileReader);
+            }
+            tokenEncrypter = e;
+        }
+        return e;
+    }
 
-	public void setDayCreated(Date dayCreated)
-	{
-		this.dayCreated = dayCreated;
-	}
-
-	public String getCreatedByNetId()
-	{
-		return createdByNetId;
-	}
-
-	public void setCreatedByNetId(String createdByNetId)
-	{
-		this.createdByNetId = createdByNetId;
-	}
-
-	public PublicKey getPublicKey()
-	{
-		return publicKey;
-	}
-
-	public void setPublicKey(PublicKey publicKey)
-	{
-		this.publicKey = publicKey;
-	}
-
-	public PrivateKey getPrivateKey()
-	{
-		return privateKey;
-	}
-
-	public void setPrivateKey(PrivateKey privateKey)
-	{
-		this.privateKey = privateKey;
-	}
+    public FileEncrypter getFileEncrypter() throws IOException {
+        FileEncrypter e = fileEncrypter;
+        if (e == null) {
+            try (final Reader keyFileReader = new BufferedReader(new FileReader(keyFile))) {
+                e = new BouncyCastleFileEncrypter(keyFileReader);
+            }
+            fileEncrypter = e;
+        }
+        return e;
+    }
 }

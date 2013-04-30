@@ -18,21 +18,7 @@
     </encoder>
   </appender>
   <appender name="N" class="ch.qos.logback.core.helpers.NOPAppender" />
-  <logger name="org.hibernate.engine.internal.Cascade" level="DEBUG">
-    <appender-ref ref="N"/>
-  </logger>
   <root level="TRACE">
     <appender-ref ref="N"/>
   </root>
-   <!-- 
-  <logger name="org.hibernate.SQL" additivity="false" level="DEBUG">
-    <appender-ref ref="C"/>
-  </logger>
-  <logger name="org.hibernate.type" additivity="false" level="TRACE">
-    <appender-ref ref="C"/>
-  </logger>
-  <logger name="org.hibernate.tool.hbm2ddl" additivity="false" level="DEBUG">
-    <appender-ref ref="C"/>
-  </logger>
-  -->
 </configuration>

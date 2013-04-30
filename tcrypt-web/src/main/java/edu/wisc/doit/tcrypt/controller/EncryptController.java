@@ -20,9 +20,8 @@
 package edu.wisc.doit.tcrypt.controller;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -39,22 +38,20 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
-import edu.wisc.doit.tcrypt.BouncyCastleFileEncrypter;
 import edu.wisc.doit.tcrypt.FileEncrypter;
+import edu.wisc.doit.tcrypt.dao.IKeysKeeper;
 import edu.wisc.doit.tcrypt.exception.ServiceErrorException;
 import edu.wisc.doit.tcrypt.exception.ValidationException;
-import edu.wisc.doit.tcrypt.services.TCryptServices;
 import edu.wisc.doit.tcrypt.vo.ServiceKey;
 
 @Controller
 public class EncryptController extends BaseController {
 
-    private final Map<String,FileEncrypter> fileEncrypters = new ConcurrentHashMap<String, FileEncrypter>();
-	private final TCryptServices tcryptServices;
+	private final IKeysKeeper keysKeeper;
 	
 	@Autowired
-	public EncryptController(TCryptServices tcryptServices) {
-		this.tcryptServices = tcryptServices;
+	public EncryptController(IKeysKeeper keysKeeper) {
+		this.keysKeeper = keysKeeper;
 	}
 	
 	//Request actions
@@ -62,7 +59,7 @@ public class EncryptController extends BaseController {
 	@RequestMapping(value = "/encrypt", method = RequestMethod.GET)
 	public ModelAndView encryptTextInit() throws Exception {
 		ModelAndView modelAndView = new ModelAndView("encryptToken");
-		modelAndView.addObject("serviceNames", tcryptServices.getListOfServiceNames());
+		modelAndView.addObject("serviceNames", keysKeeper.getListOfServiceNames());
 		return modelAndView;
 	}
 	
@@ -74,9 +71,11 @@ public class EncryptController extends BaseController {
 	}
 	
 	@RequestMapping(value = "/encryptionServices", method = RequestMethod.GET)
-	public @ResponseBody List<String> getShopInJSON()
+	public @ResponseBody Set<String> getServiceNamesInJSON()
 	{
-		return tcryptServices.getListOfServiceNames();
+		final TreeSet<String> serviceNames = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+		serviceNames.addAll(keysKeeper.getListOfServiceNames());
+        return serviceNames;
 	}
 	
 	@RequestMapping(value = "/encryptFile", method = RequestMethod.POST) 
@@ -136,20 +135,11 @@ public class EncryptController extends BaseController {
 
 
     private FileEncrypter getFileEncrypter (String serviceName) throws ServiceErrorException, IOException {
-        
-        FileEncrypter fileEncrypter = fileEncrypters.get(serviceName);
-        if (fileEncrypter != null) {
-            return fileEncrypter;
-        }
-        
-        ServiceKey sk = tcryptServices.readServiceKeyFromFileSystem(serviceName);
-        if (sk == null || sk.getPublicKey() == null) {
+        ServiceKey sk = keysKeeper.getServiceKey(serviceName);
+        if (sk == null) {
             throw new ServiceErrorException(serviceName, "error.serviceKeyNotFound");
         }
         
-        fileEncrypter = new BouncyCastleFileEncrypter(sk.getPublicKey());
-        fileEncrypters.put(sk.getServiceName(), fileEncrypter);
-
-        return fileEncrypter;
+        return sk.getFileEncrypter();
     }
 }

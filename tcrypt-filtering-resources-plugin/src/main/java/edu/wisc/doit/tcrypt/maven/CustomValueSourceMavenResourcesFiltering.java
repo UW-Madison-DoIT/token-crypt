@@ -101,10 +101,11 @@ public class CustomValueSourceMavenResourcesFiltering extends AbstractLogEnabled
     private MavenFileFilter mavenFileFilter;
 
     @Override
-    public void filterResources(List resources, File outputDirectory, MavenProject mavenProject, String encoding,
-            List fileFilters, List nonFilteredFileExtensions, MavenSession mavenSession) throws MavenFilteringException {
+    public void filterResources( List<Resource> resources, File outputDirectory, MavenProject mavenProject, String encoding,
+            List<String> fileFilters, List<String> nonFilteredFileExtensions, MavenSession mavenSession ) throws MavenFilteringException {
         final MavenResourcesExecution mavenResourcesExecution = new MavenResourcesExecution(resources, outputDirectory,
                 mavenProject, encoding, fileFilters, nonFilteredFileExtensions, mavenSession);
+        
         mavenResourcesExecution.setUseDefaultFilterWrappers(true);
         //    mavenResourcesExecution.setEscapeWindowsPaths( false );
 
@@ -112,15 +113,18 @@ public class CustomValueSourceMavenResourcesFiltering extends AbstractLogEnabled
     }
 
     @Override
-    public void filterResources(List resources, File outputDirectory, String encoding, List filterWrappers,
-            File resourcesBaseDirectory, List nonFilteredFileExtensions) throws MavenFilteringException {
+    public void filterResources( List<Resource> resources, File outputDirectory, String encoding,
+            List<FileUtils.FilterWrapper> filterWrappers, File resourcesBaseDirectory,
+            List<String> nonFilteredFileExtensions ) throws MavenFilteringException {
+        
         final MavenResourcesExecution mavenResourcesExecution = new MavenResourcesExecution(resources, outputDirectory,
                 encoding, filterWrappers, resourcesBaseDirectory, nonFilteredFileExtensions);
+        
         this.filterResources(mavenResourcesExecution);
     }
 
     @Override
-    public boolean filteredFileExtension(String fileName, List userNonFilteredFileExtensions) {
+    public boolean filteredFileExtension( String fileName, List<String> userNonFilteredFileExtensions ) {
         final List<String> nonFilteredFileExtensions = new ArrayList<String>(this.getDefaultNonFilteredFileExtensions());
         if (userNonFilteredFileExtensions != null) {
             nonFilteredFileExtensions.addAll(userNonFilteredFileExtensions);
@@ -135,6 +139,7 @@ public class CustomValueSourceMavenResourcesFiltering extends AbstractLogEnabled
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<String> getDefaultNonFilteredFileExtensions() {
         return this.defaultMavenResourcesFiltering.getDefaultNonFilteredFileExtensions();
     }
@@ -184,8 +189,7 @@ public class CustomValueSourceMavenResourcesFiltering extends AbstractLogEnabled
         final List<FilterWrapper> filterWrappers = Arrays.asList(filterWrapper);
 
         //For each resources directory ...
-        for (final Iterator i = mavenResourcesExecution.getResources().iterator(); i.hasNext();) {
-            final Resource resource = (Resource) i.next();
+        for (final Resource resource : mavenResourcesExecution.getResources()) {
             
             if (!resource.isFiltering()) {
                 //Only bother with filtered resources
@@ -288,10 +292,10 @@ public class CustomValueSourceMavenResourcesFiltering extends AbstractLogEnabled
         return new FileUtils.FilterWrapper() {
             public Reader getReader(Reader reader) {
                 MultiDelimiterStringSearchInterpolator interpolator = new MultiDelimiterStringSearchInterpolator();
-                final LinkedHashSet delimiters = mavenResourcesExecution.getDelimiters();
+                final LinkedHashSet<String> delimiters = mavenResourcesExecution.getDelimiters();
                 interpolator.setDelimiterSpecs(delimiters);
 
-                final List projectStartExpressions = mavenResourcesExecution.getProjectStartExpressions();
+                final List<?> projectStartExpressions = mavenResourcesExecution.getProjectStartExpressions();
                 RecursionInterceptor ri = null;
                 if (projectStartExpressions != null && !projectStartExpressions.isEmpty()) {
                     ri = new PrefixAwareRecursionInterceptor(projectStartExpressions, true);
@@ -369,6 +373,7 @@ public class CustomValueSourceMavenResourcesFiltering extends AbstractLogEnabled
         return destinationFile;
     }
 
+    @SuppressWarnings("unchecked")
     private String[] setupScanner(Resource resource, Scanner scanner) {
         String[] includes = null;
         if (resource.getIncludes() != null && !resource.getIncludes().isEmpty()) {
@@ -387,40 +392,6 @@ public class CustomValueSourceMavenResourcesFiltering extends AbstractLogEnabled
 
         scanner.addDefaultExcludes();
         return includes;
-    }
-
-    private void copyDirectoryLayout(File sourceDirectory, File destinationDirectory, Scanner scanner)
-            throws IOException {
-        if (sourceDirectory == null) {
-            throw new IOException("source directory can't be null.");
-        }
-
-        if (destinationDirectory == null) {
-            throw new IOException("destination directory can't be null.");
-        }
-
-        if (sourceDirectory.equals(destinationDirectory)) {
-            throw new IOException("source and destination are the same directory.");
-        }
-
-        if (!sourceDirectory.exists()) {
-            throw new IOException("Source directory doesn't exists (" + sourceDirectory.getAbsolutePath() + ").");
-        }
-
-        final List<String> includedDirectories = Arrays.asList(scanner.getIncludedDirectories());
-
-        for (final Iterator<String> i = includedDirectories.iterator(); i.hasNext();) {
-            final String name = i.next();
-
-            final File source = new File(sourceDirectory, name);
-
-            if (source.equals(sourceDirectory)) {
-                continue;
-            }
-
-            final File destination = new File(destinationDirectory, name);
-            destination.mkdirs();
-        }
     }
 
     private String getRelativeOutputDirectory(MavenResourcesExecution execution) {

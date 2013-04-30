@@ -19,9 +19,10 @@
  */
 package edu.wisc.doit.tcrypt;
 
-import edu.wisc.doit.tcrypt.controller.DownloadController;
-import edu.wisc.doit.tcrypt.services.TCryptServices;
-import edu.wisc.doit.tcrypt.vo.ServiceKey;
+import static org.junit.Assert.assertEquals;
+
+import java.security.KeyPair;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -29,9 +30,9 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import java.io.Reader;
-import java.security.PublicKey;
-import static org.mockito.Mockito.when;
+
+import edu.wisc.doit.tcrypt.controller.DownloadController;
+import edu.wisc.doit.tcrypt.dao.IKeysKeeper;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DownloadControllerTest
@@ -39,22 +40,21 @@ public class DownloadControllerTest
 	@InjectMocks
 	private DownloadController downloadController;
 	@Mock
-	private TCryptServices tCryptServices;
-	@Mock
-	private ServiceKey serviceKey;
-	@Mock
-	private PublicKey publicKey;
+	private IKeysKeeper keysKeeper;
 	private MockHttpServletRequest request;
 	private MockHttpServletResponse response;
-	private Reader publicKeyReader;
 
 	@Test
 	public void testDownloadAKey() throws Exception
 	{
+	    final TokenKeyPairGenerator keyPairGenerator = new BouncyCastleKeyPairGenerator();
+	    final KeyPair keyPair = keyPairGenerator.generateKeyPair(2048);   
+	    
 		request = new MockHttpServletRequest();
 		response = new MockHttpServletResponse();
-		request.getSession().setAttribute("serviceKey_testkey", serviceKey);
-		when(serviceKey.getPublicKey()).thenReturn(publicKey);
+		request.getSession().setAttribute("serviceKey_testkey", keyPair);
 		downloadController.downloadKey("testkey", "public", request, response);
+		
+		assertEquals(451, response.getContentAsByteArray().length);
 	}
 }

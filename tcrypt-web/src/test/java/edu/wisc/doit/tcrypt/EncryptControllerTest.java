@@ -19,8 +19,7 @@
  */
 package edu.wisc.doit.tcrypt;
 
-import edu.wisc.doit.tcrypt.controller.EncryptController;
-import edu.wisc.doit.tcrypt.services.TCryptServices;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,12 +27,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.web.servlet.ModelAndView;
-import static org.junit.Assert.assertEquals;
+
+import edu.wisc.doit.tcrypt.controller.EncryptController;
+import edu.wisc.doit.tcrypt.dao.IKeysKeeper;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EncryptControllerTest {
 	@InjectMocks private EncryptController encryptController;
-	@Mock private TCryptServices tcryptServices;
+	@Mock private IKeysKeeper keysKeeper;
 	
 	@Test
 	public void shouldHandleSlashHandleMapping() throws Exception{

@@ -19,10 +19,11 @@
  */
 package edu.wisc.doit.tcrypt.controller;
 
-import edu.wisc.doit.tcrypt.exception.ServiceErrorException;
-import edu.wisc.doit.tcrypt.exception.ValidationException;
-import edu.wisc.doit.tcrypt.services.TCryptServices;
-import edu.wisc.doit.tcrypt.vo.ServiceKey;
+import java.security.KeyPair;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -30,19 +31,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import javax.servlet.http.HttpServletRequest;
-import java.security.KeyPair;
-import java.util.Date;
-import java.util.List;
+
+import edu.wisc.doit.tcrypt.dao.IKeysKeeper;
+import edu.wisc.doit.tcrypt.exception.ServiceErrorException;
+import edu.wisc.doit.tcrypt.exception.ValidationException;
 
 @Controller
 public class CreateController extends BaseController {
 
-	private TCryptServices tcryptServices;
+	private final IKeysKeeper keysKeeper;
 	
 	@Autowired
-	public CreateController(TCryptServices tcryptServices) {
-		this.tcryptServices = tcryptServices;
+	public CreateController(IKeysKeeper keysKeeper) {
+		this.keysKeeper = keysKeeper;
 	}
 	
 	@RequestMapping(value = "/create", method = RequestMethod.GET)
@@ -65,20 +66,13 @@ public class CreateController extends BaseController {
 		}
 		
 		try {
-		
-			//Generate keys
-			KeyPair generatedKeyPair = tcryptServices.generateKeyPair(keyLength);
-			if(generatedKeyPair == null) {
-				throw new Exception("Error generating key pair");
-			}
 			String username = request.getRemoteUser() != null ? request.getRemoteUser() : "UNKNOWNUSERNAME";
 			
 			//Create ServiceKey Object and write public key out to FS
-			ServiceKey sk = new ServiceKey(serviceName,keyLength,username,new Date(),generatedKeyPair.getPublic(),generatedKeyPair.getPrivate());
-			tcryptServices.writeServiceKeyToFileSystem(sk);
+			final KeyPair keyPair = keysKeeper.createServiceKey(serviceName, keyLength, username);
 			
 			//Add serviceKey object on session (for download) and put the serviceName in the object list
-			request.getSession().setAttribute("serviceKey_"+sk.getServiceName(), sk);
+			request.getSession().setAttribute("serviceKey_"+serviceName, keyPair);
 			modelAndView.addObject("serviceName", serviceName);
 		} catch (Exception e) {
 			logger.error("An error occurred when creating a service key",e);
@@ -113,7 +107,7 @@ public class CreateController extends BaseController {
 			error = "error.serviceNameUnderscore";
 		} else {
 			//Validate if service exists
-			List<String> serviceNames =  tcryptServices.getListOfServiceNames();
+			final Set<String> serviceNames = keysKeeper.getListOfServiceNames();
 			if(serviceNames.contains(serviceName)) {
 				error = "error.serviceNameExists";
 			}

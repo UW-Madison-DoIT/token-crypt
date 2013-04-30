@@ -19,19 +19,15 @@
  */
 package edu.wisc.doit.tcrypt.dao;
 
-import edu.wisc.doit.tcrypt.vo.ServiceKey;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.Key;
+import java.io.IOException;
 import java.security.KeyPair;
-import java.util.List;
+import java.util.Set;
+
+import edu.wisc.doit.tcrypt.vo.ServiceKey;
 
 public interface IKeysKeeper
 {
-	public List<String> getListOfServiceNames();
-	public KeyPair generateKeyPair(Integer keyLength);
-	public Boolean writeServiceKeyToFileSystem(ServiceKey serviceKey);
-	public ServiceKey readServiceKeyFromFileSystem(String serviceName);
-	public InputStream getKeyAsInputStream(Key key);
-	public Boolean writeKeyToOutputStream(Key key, OutputStream outputStream);
+    Set<String> getListOfServiceNames();
+    KeyPair createServiceKey(String serviceName, int keyLength, String username) throws IOException;
+    ServiceKey getServiceKey(String serviceName);
 }
