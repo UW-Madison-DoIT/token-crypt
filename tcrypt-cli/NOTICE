@@ -16,9 +16,13 @@ specific language governing permissions and limitations
 under the License.
 
 This project includes:
+  Bouncy Castle PKIX, CMS, EAC, TSP, PKCS, OCSP, CMP, and CRMF APIs under Bouncy Castle Licence
   Bouncy Castle Provider under Bouncy Castle Licence
   Command Line Tool for Token Crypto under Apache License Version 2.0
   Common APIs for Token Crypto under Apache License Version 2.0
   Commons CLI under The Apache Software License, Version 2.0
+  Commons Codec under The Apache Software License, Version 2.0
+  Commons Compress under The Apache Software License, Version 2.0
   Commons IO under The Apache Software License, Version 2.0
+  XZ for Java under Public Domain
 

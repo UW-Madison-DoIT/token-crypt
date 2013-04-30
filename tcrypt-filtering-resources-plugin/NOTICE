@@ -16,13 +16,17 @@ specific language governing permissions and limitations
 under the License.
 
 This project includes:
+  Bouncy Castle PKIX, CMS, EAC, TSP, PKCS, OCSP, CMP, and CRMF APIs under Bouncy Castle Licence
   Bouncy Castle Provider under Bouncy Castle Licence
   classworlds under BSD Style License
   Common APIs for Token Crypto under Apache License Version 2.0
   Commons CLI under The Apache Software License, Version 2.0
+  Commons Codec under The Apache Software License, Version 2.0
+  Commons Compress under The Apache Software License, Version 2.0
+  Commons IO under The Apache Software License, Version 2.0
   Default Plexus Container under Apache License, Version 2.0
   Doxia Sink API under Apache License, Version 2.0
-  Hamcrest Core under BSD style
+  Hamcrest Core under New BSD License
   JSch under BSD
   JTidy under Java HTML Tidy License
   JUnit under Common Public License Version 1.0
@@ -55,4 +59,5 @@ This project includes:
   Plexus Interpolation API under The Apache Software License, Version 2.0
   plexus-build-api under Apache License, Version 2.0
   XML Commons External Components XML APIs under The Apache Software License, Version 2.0
+  XZ for Java under Public Domain
 

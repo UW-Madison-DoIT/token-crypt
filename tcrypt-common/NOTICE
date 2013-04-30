@@ -16,8 +16,13 @@ specific language governing permissions and limitations
 under the License.
 
 This project includes:
+  Bouncy Castle PKIX, CMS, EAC, TSP, PKCS, OCSP, CMP, and CRMF APIs under Bouncy Castle Licence
   Bouncy Castle Provider under Bouncy Castle Licence
   Common APIs for Token Crypto under Apache License Version 2.0
-  Hamcrest Core under BSD style
+  Commons Codec under The Apache Software License, Version 2.0
+  Commons Compress under The Apache Software License, Version 2.0
+  Commons IO under The Apache Software License, Version 2.0
+  Hamcrest Core under New BSD License
   JUnit under Common Public License Version 1.0
+  XZ for Java under Public Domain
 
