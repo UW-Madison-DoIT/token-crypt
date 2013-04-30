@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2012, Board of Regents of the University of
-    Wisconsin System. See the NOTICE file distributed with
-    this work for additional information regarding copyright
-    ownership. Board of Regents of the University of Wisconsin
-    System licenses this file to you under the Apache License,
+    Licensed to Jasig under one or more contributor license
+    agreements. See the NOTICE file distributed with this work
+    for additional information regarding copyright ownership.
+    Jasig licenses this file to you under the Apache License,
     Version 2.0 (the "License"); you may not use this file
     except in compliance with the License. You may obtain a
     copy of the License at:
@@ -20,17 +19,63 @@
     under the License.
 
 -->
-<configuration>
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>%d{ISO8601} - [%thread] %-5level %logger [%M:%L] - %msg%n</Pattern>
-        </layout>
+
+<!-- For assistance related to logback-translator or configuration  -->
+<!-- files in general, please contact the logback user mailing list -->
+<!-- at http://www.qos.ch/mailman/listinfo/logback-user             -->
+<!--                                                                -->
+<!-- For professional support please see                            -->
+<!--    http://www.qos.ch/shop/products/professionalSupport         -->
+<!--                                                                -->
+<configuration scan="true" scanPeriod="30 seconds">
+    <contextName>tcrypt</contextName>
+
+  <!-- 
+   | Propagate log levels to java.util.logging 
+   +-->
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+    <resetJUL>true</resetJUL>
+  </contextListener>
+
+  <!-- 
+   | Expose the logback configuration via JMX 
+   +-->
+  <jmxConfigurator />
+
+  <!-- 
+   | Specify a local property that sets up the logging directory
+   +-->
+  <property scope="local" name="LOG_DIR" value="${tcrypt.webapp.root}/../../logs/${CONTEXT_NAME}" />
+
+    <appender name="LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--See http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
+        <!--and http://logback.qos.ch/manual/appenders.html#TimeBasedRollingPolicy-->
+        <!--for further documentation-->
+        <File>${LOG_DIR}/${CONTEXT_NAME}.log</File>
+        <encoder>
+            <pattern>[%d{ISO8601}] %level [%thread] %logger - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/${CONTEXT_NAME}.log.%d{yyyy-MM-dd}</fileNamePattern>
+        </rollingPolicy>
     </appender>
-    <logger name="org.springframework">
-        <level value="DEBUG" />
-    </logger>
+
     <root level="INFO">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="LOG"/>
     </root>
-    
+
+    <logger name="edu.wisc" additivity="false" level="DEBUG">
+        <appender-ref ref="LOG"/>
+    </logger>
+    <logger name="org.jasig.portlet.blackboardvcportlet" additivity="false" level="DEBUG">
+        <appender-ref ref="LOG"/>
+    </logger>
+    <!-- 
+    <logger name="org.apache.http" additivity="false" level="DEBUG">
+        <appender-ref ref="LOG"/>
+    </logger>
+    <logger name="org.springframework.security" additivity="false" level="DEBUG">
+        <appender-ref ref="LOG"/>
+    </logger>
+     -->
 </configuration>
