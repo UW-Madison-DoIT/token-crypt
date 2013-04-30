@@ -40,7 +40,7 @@ import java.util.List;
 @Repository("keysKeeper")
 public class KeysKeeper implements IKeysKeeper
 {
-	private static final Logger logger = LoggerFactory.getLogger(KeysKeeper.class);
+	protected final Logger logger = LoggerFactory.getLogger(KeysKeeper.class);
 	private String directoryname;
 	private TokenKeyPairGenerator keyPairGenerator;
 	private static final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");

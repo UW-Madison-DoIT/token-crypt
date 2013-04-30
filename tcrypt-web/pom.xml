@@ -93,4 +93,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <finalName>tcrypt</finalName>
+  </build>
 </project>

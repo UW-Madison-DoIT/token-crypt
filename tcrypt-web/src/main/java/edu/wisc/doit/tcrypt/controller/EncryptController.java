@@ -19,30 +19,38 @@
  */
 package edu.wisc.doit.tcrypt.controller;
 
-import edu.wisc.doit.tcrypt.BouncyCastleTokenEncrypter;
-import edu.wisc.doit.tcrypt.TokenEncrypter;
-import edu.wisc.doit.tcrypt.exception.ServiceErrorException;
-import edu.wisc.doit.tcrypt.exception.ValidationException;
-import edu.wisc.doit.tcrypt.services.TCryptServices;
-import edu.wisc.doit.tcrypt.vo.EncryptToken;
-import edu.wisc.doit.tcrypt.vo.ServiceKey;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.servlet.http.HttpServletResponse;
+import edu.wisc.doit.tcrypt.BouncyCastleFileEncrypter;
+import edu.wisc.doit.tcrypt.FileEncrypter;
+import edu.wisc.doit.tcrypt.exception.ServiceErrorException;
+import edu.wisc.doit.tcrypt.exception.ValidationException;
+import edu.wisc.doit.tcrypt.services.TCryptServices;
+import edu.wisc.doit.tcrypt.vo.ServiceKey;
 
 @Controller
 public class EncryptController extends BaseController {
 
-	private TCryptServices tcryptServices;
+    private final Map<String,FileEncrypter> fileEncrypters = new ConcurrentHashMap<String, FileEncrypter>();
+	private final TCryptServices tcryptServices;
 	
 	@Autowired
 	public EncryptController(TCryptServices tcryptServices) {
@@ -73,16 +81,23 @@ public class EncryptController extends BaseController {
 	
 	@RequestMapping(value = "/encryptFile", method = RequestMethod.POST) 
 	public ModelAndView encryptFile(@RequestParam("fileToEncrypt") MultipartFile file, @RequestParam("selectedServiceName") String serviceName, HttpServletResponse response) throws Exception {
-		ModelAndView modelAndView = encryptTextInit();
-		modelAndView.addObject("selectedServiceName",serviceName);
+	    if (file.isEmpty()) {
+    		ModelAndView modelAndView = encryptTextInit();
+    		modelAndView.addObject("selectedServiceName",serviceName);
+    		return modelAndView;
+	    }
 		
-		if(!file.isEmpty()) {
-			//TODO TCRYPT-58 encrypt and push back to user
-			//response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + ".enc" + "\"");
-			//tcryptServices.encryptFile(serviceName, file, response.getOutputStream());
-		}
+	    final FileEncrypter fileEncrypter = this.getFileEncrypter(serviceName);
+	    final String filename = FilenameUtils.getName(file.getOriginalFilename());
+	    
+	    response.setHeader("Content-Type", "application/x-tar");
+	    response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + ".tar" + "\"");
+	    
+	    final ServletOutputStream outputStream = response.getOutputStream();
+	    fileEncrypter.encrypt(filename, file.getInputStream(), outputStream);
+	    outputStream.close();
 		
-		return modelAndView;
+	    return null;
 	}
 	
 	//Exception Handlers
@@ -97,7 +112,7 @@ public class EncryptController extends BaseController {
 			throw new Exception(e);
 		}
 		
-		mav.addObject(e.getErrorMessage());
+		mav.addObject(e.getMessage());
 		
 		return mav;
 	}
@@ -112,11 +127,29 @@ public class EncryptController extends BaseController {
 			throw new Exception(e);
 		}
 		
-		mav.addObject("errorMessage",e.getErrorMessage());
+		mav.addObject("errorMessage",e.getMessage());
 		mav.addObject("zero",e.getServiceName());
 		
 		return mav;
 	}
 	
-	
+
+
+    private FileEncrypter getFileEncrypter (String serviceName) throws ServiceErrorException, IOException {
+        
+        FileEncrypter fileEncrypter = fileEncrypters.get(serviceName);
+        if (fileEncrypter != null) {
+            return fileEncrypter;
+        }
+        
+        ServiceKey sk = tcryptServices.readServiceKeyFromFileSystem(serviceName);
+        if (sk == null || sk.getPublicKey() == null) {
+            throw new ServiceErrorException(serviceName, "error.serviceKeyNotFound");
+        }
+        
+        fileEncrypter = new BouncyCastleFileEncrypter(sk.getPublicKey());
+        fileEncrypters.put(sk.getServiceName(), fileEncrypter);
+
+        return fileEncrypter;
+    }
 }

@@ -80,21 +80,21 @@ public class CreateControllerTest {
 		try {
 			createController.createServiceKey("test_with_underscore", 2048, request);
 		} catch (ValidationException e) {
-			assertEquals("error.serviceNameUnderscore",e.getErrorMessage());
+			assertEquals("error.serviceNameUnderscore",e.getMessage());
 		}
 		
 		//test not null
 		try {
 			createController.createServiceKey(null, 2048, request);
 		} catch (ValidationException e) {
-			assertEquals("error.serviceNameRequired",e.getErrorMessage());
+			assertEquals("error.serviceNameRequired",e.getMessage());
 		}
 		
 		//test empty string
 		try {
 			createController.createServiceKey("", 2048, request);
 		} catch (ValidationException e) {
-			assertEquals("error.serviceNameRequired",e.getErrorMessage());
+			assertEquals("error.serviceNameRequired",e.getMessage());
 		}
 	}
 	

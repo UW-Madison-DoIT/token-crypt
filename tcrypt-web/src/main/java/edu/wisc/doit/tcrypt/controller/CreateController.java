@@ -91,7 +91,7 @@ public class CreateController extends BaseController {
 	@ExceptionHandler(ValidationException.class)
 	public ModelAndView handleException(ValidationException e) throws Exception {
 		ModelAndView mav  = createServiceKeyInit();
-		mav.addObject("errorMessage", e.getErrorMessage());		
+		mav.addObject("errorMessage", e.getMessage());		
 		return mav;
 	}
 	
@@ -99,7 +99,7 @@ public class CreateController extends BaseController {
 	public ModelAndView handleException(ServiceErrorException e) throws Exception {
 		ModelAndView mav  = createServiceKeyInit();
 
-		mav.addObject("errorMessage",e.getErrorMessage());
+		mav.addObject("errorMessage",e.getMessage());
 		mav.addObject("zero",e.getServiceName());
 		
 		return mav;
