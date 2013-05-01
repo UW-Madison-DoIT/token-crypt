@@ -9,4 +9,6 @@
 <antlib>
     <taskdef name="decryptFile" classname="edu.wisc.doit.tcrypt.ant.DecryptFileTask"/>
     <taskdef name="encryptFile" classname="edu.wisc.doit.tcrypt.ant.EncryptFileTask"/>
+    <taskdef name="decryptToken" classname="edu.wisc.doit.tcrypt.ant.DecryptTokenTask"/>
+    <taskdef name="encryptToken" classname="edu.wisc.doit.tcrypt.ant.EncryptTokenTask"/>
 </antlib>

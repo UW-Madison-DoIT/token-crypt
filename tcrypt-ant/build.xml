@@ -39,5 +39,11 @@
         <encryptFile publickey="${pk}" srcfile="${src}" destdir="${dest}"/>
     </target>
     
-
+    <target name="encryptToken" description="Encrypt a token, specify -Dpk and -Dtoken for the public key and token.">
+    	<encryptToken publickey="${pk}" token="${token}" />
+    </target>
+    
+    <target name="decryptToken" description="Decrypt a token, specify -Dpk and -Dtoken for the public key and token.">
+        <decryptToken privatekey="${pk}" token="${token}" />
+    </target>
 </project>
