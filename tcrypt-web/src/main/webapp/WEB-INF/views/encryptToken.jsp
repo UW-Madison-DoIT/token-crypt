@@ -239,7 +239,7 @@
 
     <div id="stylizedForm" class="userForms">
         
-        <label>Service Name:</label>
+        <label>Service Name</label>
         <select id="serviceNames" name="serviceNames">
             <option value="">&nbsp;</option>
             <core:forEach var="name" items="${serviceNames}">
@@ -247,8 +247,8 @@
             </core:forEach>
         </select>
         <div id="textEncryption">
-        <label>Text :</label> <input type="text" id="text" name="text" /> 
-        <label>Encrypted Text :</label>
+        <label>Text</label> <input type="text" id="text" name="text" /> 
+        <label>Encrypted Text</label>
         <input type="text" id="encryptedText" />
 		<a href="#" id="copy-encrypted"><img src="${ pageContext.request.contextPath }/images/Clipboard-icon.png" alt="Copy to clipboard"/></a><img class="check2" src="${ pageContext.request.contextPath }/images/checkmark.png" style="display : none" alt='copied' />
 		<script type="text/javascript">
@@ -268,11 +268,10 @@
 		
 		<form name="encryptToken" id="fileEncryptionForm" action="${pageContext.request.contextPath}/apps/encryptFile" autocomplete="off" enctype="multipart/form-data" method="POST"> 
 			<div id="fileEncryption">
-				<label>File :</label>
+				<label>File</label>
 				<input type="file" name="fileToEncrypt" id="fileToEncrypt" onclick="clearAll(true);return true;" />
 			</div>
 			<div>
-			<label>&nbsp;</label>
 			<button onclick="doAjaxPost(); return false;" >Encrypt</button>&nbsp;<a href="#" id="copyshare" title="Share with friends."><img src="${ pageContext.request.contextPath }/images/Link-icon.png" /></a><img class="check" src="${ pageContext.request.contextPath }/images/checkmark.png" style="display : none" alt='copied' />
 			</div>
 			

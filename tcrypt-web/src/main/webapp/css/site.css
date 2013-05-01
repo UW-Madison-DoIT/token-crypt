@@ -20,18 +20,20 @@
 .userForms
 {
     margin:0 auto;
-    width:30em;
     padding:3em;
+}
+
+#stylizedForm
+{
+	float : right;
 }
 
 #stylizedForm label
 {
     display:block;
     font-weight:bold;
-    text-align:right;
     width:10em;
     margin-right: .75em;
-    float:left;
 }
 
 #stylizedForm label.spacer
