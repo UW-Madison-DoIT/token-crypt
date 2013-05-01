@@ -10,6 +10,10 @@
   <packaging>war</packaging>
   <name>Web Application for Token Crypto</name>
   <description>Web Application for generating key pairs and encrypting tokens</description>
+  <properties>
+    <project.build.sourceVersion>1.7</project.build.sourceVersion>
+    <project.build.targetVersion>1.7</project.build.targetVersion>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.parent.groupId}</groupId>

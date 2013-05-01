@@ -50,7 +50,7 @@ import edu.wisc.doit.tcrypt.vo.ServiceKey;
 @Repository("keysKeeper")
 public class KeysKeeper implements IKeysKeeper
 {
-    private static final Pattern KEY_NAME_PATTERN = Pattern.compile("^([^_]+)_([^_]+)_(\\d{14})_(\\d+)_([^\\.]+)\\.pem$");
+    private static final Pattern KEY_NAME_PATTERN = Pattern.compile("^([^_]+)_([^_]+)_(\\d{14})_(\\d+)_public\\.pem$");
     private static final DateTimeFormatter KEY_CREATED_FORMATTER = DateTimeFormat.forPattern("yyyyMMddHHmmss");
     
 	protected final Logger logger = LoggerFactory.getLogger(KeysKeeper.class);
@@ -136,16 +136,16 @@ public class KeysKeeper implements IKeysKeeper
         	        final DateTime dayCreated = KEY_CREATED_FORMATTER.parseDateTime(dayCreatedStr);
         	        final int keyLength = Integer.parseInt(keyNameMatcher.group(4));
         	        
-        	        //TODO use an enum to verify this is "public"?
-    //    	        final String keyType = keyNameMatcher.group(5);
-        	        
         	        final ServiceKey serviceKey = new ServiceKey(serviceName, keyLength, createdByNetId, dayCreated, keyFile);
         	        this.keysCache.put(serviceName, serviceKey);
     	        }
     	    }
     	    
     	    //Remove any keys that have been deleted from the file system
-    	    this.keysCache.keySet().removeAll(oldKeys);
+    	    if (!oldKeys.isEmpty()) {
+    	        logger.info("Removed old service keys: {}", oldKeys);
+    	        this.keysCache.keySet().removeAll(oldKeys);
+    	    }
     	    
     	    logger.info("Scanned {}, keysCache contains {} keys", directory, this.keysCache.size());
         }

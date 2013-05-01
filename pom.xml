@@ -25,8 +25,8 @@
     <url>https://github.com/UW-Madison-DoIT/token-crypt</url>
   </scm>
   <properties>
-    <project.build.sourceVersion>1.7</project.build.sourceVersion>
-    <project.build.targetVersion>1.7</project.build.targetVersion>
+    <project.build.sourceVersion>1.6</project.build.sourceVersion>
+    <project.build.targetVersion>1.6</project.build.targetVersion>
   </properties>
   <dependencyManagement>
     <dependencies>
