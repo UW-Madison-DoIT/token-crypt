@@ -13,8 +13,9 @@
   <name>Token Crypto Parent</name>
   <description>Projects for managing encrypted tokens</description>
   <modules>
-    <module>tcrypt-filtering-resources-plugin</module>
     <module>tcrypt-common</module>
+    <module>tcrypt-filtering-resources-plugin</module>
+    <module>tcrypt-ant</module>
     <module>tcrypt-cli</module>
     <module>tcrypt-web</module>
   </modules>
@@ -30,6 +31,11 @@
   </properties>
   <dependencyManagement>
     <dependencies>
+      <dependency>
+          <groupId>org.apache.ant</groupId>
+          <artifactId>ant</artifactId>
+          <version>1.9.0</version>
+      </dependency>
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
