@@ -20,13 +20,16 @@
 -->
 
 <project name="tcrypt-ant-tests" basedir=".">
+	
+	<path id="tcryptAntClasspath">
+        <fileset dir="${basedir}/target/">
+            <include name="tcrypt-ant-*.jar"/>
+        </fileset>
+    </path>
+	
 
     <taskdef resource="edu/wisc/doit/tcrypt/ant/antlib.xml">
-        <classpath>
-        	<fileset dir="${basedir}/target/">
-    	        <include name="tcrypt-ant-*.jar"/>
-    	    </fileset>
-        </classpath>
+        <classpath refid="tcryptAntClasspath" />
     </taskdef>
 	
 	<target name="decryptFile" description="Decrypt a file, specify -Dpk and -Dsrc for the private key and source file. Optional -Ddest for destination directory">
@@ -43,7 +46,20 @@
     	<encryptToken publickey="${pk}" token="${token}" />
     </target>
     
-    <target name="decryptToken" description="Decrypt a token, specify -Dpk and -Dtoken for the public key and token.">
+    <target name="decryptToken" description="Decrypt a token, specify -Dpk and -Dtoken for the private key and token.">
         <decryptToken privatekey="${pk}" token="${token}" />
+    </target>
+    
+    <target name="decryptTokens" description="Decrypt tokens in files in a directory, specify -Dpk -Dsrc -Ddest for the private key and source and dest.">
+    	<copy todir="${dest}">
+    	    <fileset dir="${src}" includes="**/*"/>
+    	    <filterchain>
+    	        <filterreader classname="edu.wisc.doit.tcrypt.ant.filter.DecryptReplaceTokens">
+    	        	<classpath refid="tcryptAntClasspath" />
+    	            <param name="privateKey" value="${pk}"/>
+    	        	<param name="ignoreErrors" value="true"/>
+	            </filterreader>
+    	    </filterchain>
+    	</copy>
     </target>
 </project>
