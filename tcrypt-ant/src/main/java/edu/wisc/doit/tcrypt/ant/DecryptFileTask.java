@@ -5,12 +5,12 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.tools.ant.BuildException;
@@ -75,10 +75,10 @@ public class DecryptFileTask extends AbstractFileTask {
         
         final File outputFile = getOutputFile();
         
-        TarArchiveInputStream encryptedFileInputStream = null;
+        InputStream encryptedFileInputStream = null;
         OutputStream decryptedFileOutputStream = null;
         try {
-            encryptedFileInputStream = new TarArchiveInputStream(new BufferedInputStream(this.srcFile.getInputStream()), FileEncrypter.ENCODING);
+            encryptedFileInputStream = new BufferedInputStream(this.srcFile.getInputStream());
             decryptedFileOutputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
             
             this.log("Decrypting '" + this.srcFile + "' to '" + outputFile + "'");

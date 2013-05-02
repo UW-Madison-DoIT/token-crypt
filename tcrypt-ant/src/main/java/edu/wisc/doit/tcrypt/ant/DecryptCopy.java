@@ -7,9 +7,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.io.Reader;
 import java.util.Vector;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -111,8 +114,21 @@ public class DecryptCopy extends Copy {
         }
 
         public InputStream getInputStream() throws IOException {
-            //TODO decrypt
-            return new FileInputStream(this.file);
+            final TarArchiveInputStream encryptedInput = new TarArchiveInputStream(new FileInputStream(this.file));
+            
+            this.fileDecrypter.decrypt(encryptedInput, pipedOutputStream);
+            
+            return new PipedInputStream(pipedOutputStream) {
+                @Override
+                public void close() throws IOException {
+                    try {
+                        super.close();
+                    }
+                    finally {
+                        encryptedInput.close();
+                    }
+                }
+            };
         }
 
         public OutputStream getOutputStream() throws IOException {

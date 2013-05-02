@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Rule;
@@ -55,7 +54,7 @@ public class BouncyCastleFileEncrypterDecrypterIT {
         
         final InputStream encTestFileInStream = new FileInputStream(encryptedFile);
         final ByteArrayOutputStream testFileOutStream = new ByteArrayOutputStream();
-        fileDecrypter.decrypt(new TarArchiveInputStream(encTestFileInStream), testFileOutStream);
+        fileDecrypter.decrypt(encTestFileInStream, testFileOutStream);
         final String actual = new String(testFileOutStream.toByteArray(), Charset.defaultCharset()).trim();
 
         

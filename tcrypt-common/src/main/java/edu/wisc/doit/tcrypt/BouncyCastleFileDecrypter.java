@@ -20,6 +20,7 @@
 package edu.wisc.doit.tcrypt;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.security.KeyPair;
@@ -77,13 +78,15 @@ public class BouncyCastleFileDecrypter extends AbstractPublicKeyDecrypter implem
     }
 
     @Override
-    public void decrypt(TarArchiveInputStream inputStream, OutputStream outputStream) throws InvalidCipherTextException, IOException, DecoderException {
+    public void decrypt(InputStream inputStream, OutputStream outputStream) throws InvalidCipherTextException, IOException, DecoderException {
+        final TarArchiveInputStream tarInputStream = new TarArchiveInputStream(inputStream, FileEncrypter.ENCODING);
+        
         //Read the cipher parameters from the tar file
-        final Tuple<CipherParameters, String> keyData = this.getCipherParameters(inputStream);
+        final Tuple<CipherParameters, String> keyData = this.getCipherParameters(tarInputStream);
         final CipherParameters key = keyData.v1;
 
         //Advance to the next entry in the tar file
-        inputStream.getNextTarEntry();
+        tarInputStream.getNextTarEntry();
 
         //Get the block cipher used for decrypting
         final BufferedBlockCipher cipher = getDecryptBlockCipher(key);
@@ -93,7 +96,7 @@ public class BouncyCastleFileDecrypter extends AbstractPublicKeyDecrypter implem
         
         //Do a streaming decryption of the file output
         final CipherOutputStream cipherOutputStream = new CipherOutputStream(new TeeOutputStream(outputStream, digestOutputStream), cipher);
-        IOUtils.copy(inputStream, cipherOutputStream);
+        IOUtils.copy(tarInputStream, cipherOutputStream);
         cipherOutputStream.close();
         
         final byte[] hashBytes = digestOutputStream.getDigest();

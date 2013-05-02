@@ -20,10 +20,10 @@
 package edu.wisc.doit.tcrypt;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
 /**
@@ -39,6 +39,6 @@ public interface FileDecrypter {
      * @param inputStream the TAR file containing the encrypted data
      * @param outputStream the output stream to write the decrypted file to
      */
-    void decrypt(TarArchiveInputStream inputStream, OutputStream outputStream) throws InvalidCipherTextException, IOException, DecoderException;
+    void decrypt(InputStream inputStream, OutputStream outputStream) throws InvalidCipherTextException, IOException, DecoderException;
 
 }

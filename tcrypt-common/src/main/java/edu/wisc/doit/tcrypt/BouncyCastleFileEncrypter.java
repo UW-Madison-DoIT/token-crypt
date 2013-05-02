@@ -80,7 +80,7 @@ public class BouncyCastleFileEncrypter extends AbstractPublicKeyEncrypter implem
         final TarArchiveOutputStream tarArchiveOutputStream = new TarArchiveOutputStream(outputStream, ENCODING);
         
         //Generate cipher parameters and key file
-        final ParametersWithIV cipherParameters = generateKeyfile(tarArchiveOutputStream);
+        final ParametersWithIV cipherParameters = generateParameters(tarArchiveOutputStream);
         //Create the cipher
         final BufferedBlockCipher cipher = this.getEncryptBlockCipher(cipherParameters);
         
@@ -130,7 +130,7 @@ public class BouncyCastleFileEncrypter extends AbstractPublicKeyEncrypter implem
         }
     }
     
-    protected ParametersWithIV generateKeyfile(TarArchiveOutputStream tarArchiveOutputStream) throws InvalidCipherTextException, IOException {
+    protected ParametersWithIV generateParameters(TarArchiveOutputStream tarArchiveOutputStream) throws InvalidCipherTextException, IOException {
         //Generate a random password
         final byte[] passwordBytes = new byte[PASSWORD_LENGTH];
         SECURE_RANDOM.nextBytes(passwordBytes);
