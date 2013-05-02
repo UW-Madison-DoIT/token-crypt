@@ -37,6 +37,23 @@ public class BouncyCastleFileEncrypterDecrypterTest {
     }
     
     @Test
+    public void testExistingFileDecryptionInputStream() throws Exception {
+        final InputStream encTestFileInStream = this.getClass().getResourceAsStream("/testFile.txt.tar");
+        final InputStream decFileInStream = fileDecrypter.decrypt(encTestFileInStream);
+        
+        final ByteArrayOutputStream testFileOutStream = new ByteArrayOutputStream();
+        IOUtils.copy(decFileInStream, testFileOutStream);
+        decFileInStream.close();
+        
+        final String actual = new String(testFileOutStream.toByteArray(), Charset.defaultCharset()).trim();
+        
+        final InputStream testFileInStream = this.getClass().getResourceAsStream("/testFile.txt");
+        final String expected = IOUtils.toString(testFileInStream).trim();
+        
+        assertEquals(expected, actual);
+    }
+    
+    @Test
     public void testFileEncryptDecrypt() throws Exception {
         InputStream testFileInStream = this.getClass().getResourceAsStream("/testFile.txt");
         final ByteArrayOutputStream testFileBuffer = new ByteArrayOutputStream();

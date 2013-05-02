@@ -40,5 +40,13 @@ public interface FileDecrypter {
      * @param outputStream the output stream to write the decrypted file to
      */
     void decrypt(InputStream inputStream, OutputStream outputStream) throws InvalidCipherTextException, IOException, DecoderException;
+    
+    /**
+     * Adds a wrapper to the specified InputStream to decrypt it on the fly
+     * 
+     * @param inputStream the TAR file containing the encrypted data
+     * @return An InputStream that returns the decrypted data
+     */
+    InputStream decrypt(InputStream inputStream) throws InvalidCipherTextException, IOException, DecoderException;
 
 }

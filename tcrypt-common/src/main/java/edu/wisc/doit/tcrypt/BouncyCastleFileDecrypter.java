@@ -19,6 +19,7 @@
  */
 package edu.wisc.doit.tcrypt;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,12 +33,17 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.CloseShieldInputStream;
 import org.apache.commons.io.output.TeeOutputStream;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
+import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.bouncycastle.crypto.digests.GeneralDigest;
+import org.bouncycastle.crypto.io.CipherInputStream;
 import org.bouncycastle.crypto.io.CipherOutputStream;
+import org.bouncycastle.crypto.io.DigestInputStream;
 import org.bouncycastle.crypto.io.DigestOutputStream;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.KeyParameter;
@@ -81,14 +87,10 @@ public class BouncyCastleFileDecrypter extends AbstractPublicKeyDecrypter implem
     public void decrypt(InputStream inputStream, OutputStream outputStream) throws InvalidCipherTextException, IOException, DecoderException {
         final TarArchiveInputStream tarInputStream = new TarArchiveInputStream(inputStream, FileEncrypter.ENCODING);
         
-        //Read the cipher parameters from the tar file
-        final CipherParameters key = this.getCipherParameters(tarInputStream);
+        final BufferedBlockCipher cipher = createCipher(tarInputStream);
 
         //Advance to the next entry in the tar file
         tarInputStream.getNextTarEntry();
-
-        //Get the block cipher used for decrypting
-        final BufferedBlockCipher cipher = getDecryptBlockCipher(key);
 
         //Create digest output stream used to generate digest while decrypting
         final DigestOutputStream digestOutputStream = new DigestOutputStream(this.createDigester());
@@ -100,6 +102,40 @@ public class BouncyCastleFileDecrypter extends AbstractPublicKeyDecrypter implem
         
         //Capture the hash of the decrypted output
         final byte[] hashBytes = digestOutputStream.getDigest();
+        verifyOutputHash(tarInputStream, hashBytes);
+    }
+    
+    @Override
+    public InputStream decrypt(InputStream inputStream) throws InvalidCipherTextException, IOException, DecoderException {
+        final TarArchiveInputStream tarInputStream = new TarArchiveInputStream(inputStream, FileEncrypter.ENCODING);
+        
+        final BufferedBlockCipher cipher = createCipher(tarInputStream);
+
+        //Advance to the next entry in the tar file
+        tarInputStream.getNextTarEntry();
+        
+        //Protect the underlying TAR stream from being closed by the cipher stream
+        final CloseShieldInputStream is = new CloseShieldInputStream(tarInputStream);
+        
+        //Setup the decrypting cipher stream
+        final CipherInputStream stream = new CipherInputStream(is, cipher);
+        
+        //Generate a digest of the decrypted data
+        final GeneralDigest digest = this.createDigester();
+        final DigestInputStream digestInputStream = new DigestInputStream(stream, digest);
+        
+        return new DecryptingInputStream(digestInputStream, tarInputStream, digest);
+    }
+
+    protected BufferedBlockCipher createCipher(final TarArchiveInputStream tarInputStream) throws IOException, InvalidCipherTextException, DecoderException {
+        //Read the cipher parameters from the tar file
+        final CipherParameters key = this.getCipherParameters(tarInputStream);
+
+        //Get the block cipher used for decrypting
+        return getDecryptBlockCipher(key);
+    }
+
+    protected void verifyOutputHash(final TarArchiveInputStream tarInputStream, final byte[] hashBytes) throws InvalidCipherTextException, IOException {
         final String actualHash = new String(Base64.encodeBase64(hashBytes), FileEncrypter.CHARSET);
         
         //Get the expected hash and verify
@@ -108,7 +144,7 @@ public class BouncyCastleFileDecrypter extends AbstractPublicKeyDecrypter implem
             throw new IllegalArgumentException("Hash " + actualHash + " doesn't match expected hash " + expectedHash + " for decrypted file. The data written to the OutputStream should be discarded.");
         }
     }
-    
+
     protected String getExpectedHash(TarArchiveInputStream inputStream) throws InvalidCipherTextException, IOException {
         return readAndDecrypt(inputStream, FileEncrypter.HASHFILE_ENC_NAME).trim();
     }
@@ -154,5 +190,33 @@ public class BouncyCastleFileDecrypter extends AbstractPublicKeyDecrypter implem
         final AsymmetricBlockCipher decryptCipher = this.getDecryptCipher();
         final byte[] keyFileBytes = decryptCipher.processBlock(encKeyFileBytes, 0, encKeyFileBytes.length);
         return new String(keyFileBytes, FileEncrypter.CHARSET);
+    }
+    
+    private final class DecryptingInputStream extends FilterInputStream {
+        private final TarArchiveInputStream tarInputStream;
+        private final Digest digest;
+        
+        private DecryptingInputStream(InputStream is, TarArchiveInputStream tarInputStream, Digest digest) {
+            super(is);
+            
+            this.tarInputStream = tarInputStream;
+            this.digest = digest;
+        }
+
+        @Override
+        public void close() throws IOException {
+            //Complete the decryption
+            super.close();
+            
+            //Verify the decrypted output
+            byte[] hashBytes = new byte[digest.getDigestSize()];
+            digest.doFinal(hashBytes, 0);
+            try {
+                verifyOutputHash(tarInputStream, hashBytes);
+            }
+            catch (InvalidCipherTextException e) {
+                throw new IOException(e);
+            }
+        }
     }
 }
