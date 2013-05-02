@@ -19,8 +19,7 @@
  */
 package edu.wisc.doit.tcrypt;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,9 +31,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.CountingOutputStream;
+import org.apache.commons.io.output.CloseShieldOutputStream;
 import org.apache.commons.io.output.TeeOutputStream;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
@@ -76,61 +74,49 @@ public class BouncyCastleFileEncrypter extends AbstractPublicKeyEncrypter implem
     }
 
     @Override
-    public void encrypt(String fileName, InputStream inputStream, OutputStream outputStream) throws InvalidCipherTextException, IOException {
+    public void encrypt(String fileName, int size, InputStream inputStream, OutputStream outputStream) throws InvalidCipherTextException, IOException {
         final TarArchiveOutputStream tarArchiveOutputStream = new TarArchiveOutputStream(outputStream, ENCODING);
         
         //Generate cipher parameters and key file
-        final ParametersWithIV cipherParameters = generateParameters(tarArchiveOutputStream);
+        final ParametersWithIV cipherParameters = generateParameters();
+        
+        //Write out the key file
+        this.writeKeyfile(tarArchiveOutputStream, cipherParameters);
+        
         //Create the cipher
         final BufferedBlockCipher cipher = this.getEncryptBlockCipher(cipherParameters);
         
-        final File tempEncFile = File.createTempFile("BCFileEncrypter.", ENC_SUFFIX);
-        final int size;
-        final String actualHash;
-        try {
-            //Do streaming encryption to temp file
-            final CountingOutputStream tempFileCountingStream = new CountingOutputStream(new FileOutputStream(tempEncFile));
-            try {
-                //Setup cipher output stream
-                final CipherOutputStream cipherOutputStream = new CipherOutputStream(tempFileCountingStream, cipher);
-                
-                //Setup digester
-                final DigestOutputStream digestOutputStream = new DigestOutputStream(this.createDigester());
-                
-                IOUtils.copy(inputStream, new TeeOutputStream(cipherOutputStream, digestOutputStream));
-                cipherOutputStream.close();
-                
-                //Capture the hash code of the encrypted file
-                digestOutputStream.close();
-                final byte[] hashBytes = digestOutputStream.getDigest();
-                actualHash = new String(Base64.encodeBase64(hashBytes), FileEncrypter.CHARSET);
-            }
-            finally {
-                IOUtils.closeQuietly(tempFileCountingStream);
-            }
-
-            //Get number of bytes written
-            size = tempFileCountingStream.getCount();
-
-            //Write out the key file
-            this.writeKeyfile(tarArchiveOutputStream, cipherParameters, actualHash);
-    
-            //Add the TAR entry and calculate the output size based on the input size
-            final TarArchiveEntry encfileEntry = new TarArchiveEntry(fileName + ENC_SUFFIX);
-            encfileEntry.setSize(size);
-            tarArchiveOutputStream.putArchiveEntry(encfileEntry);
-            FileUtils.copyFile(tempEncFile, tarArchiveOutputStream);
-            tarArchiveOutputStream.closeArchiveEntry();
-            
-            //Close the TAR stream, nothing else shoulde be written to it
-            tarArchiveOutputStream.close();
-        }
-        finally {
-            FileUtils.deleteQuietly(tempEncFile);
-        }
+        //Add the TAR entry and calculate the output size based on the input size
+        final TarArchiveEntry encfileEntry = new TarArchiveEntry(fileName + ENC_SUFFIX);
+        final int outputSize = cipher.getOutputSize(size);
+        encfileEntry.setSize(outputSize);
+        tarArchiveOutputStream.putArchiveEntry(encfileEntry);
+        
+        
+        //Setup cipher output stream, has to protect from close as the cipher stream must close but the tar cannot get closed yet
+        final CipherOutputStream cipherOutputStream = new CipherOutputStream(new CloseShieldOutputStream(tarArchiveOutputStream), cipher);
+        
+        //Setup digester
+        final DigestOutputStream digestOutputStream = new DigestOutputStream(this.createDigester());
+        
+        //Perform streaming encryption and hashing of the file
+        IOUtils.copy(new BufferedInputStream(inputStream), new TeeOutputStream(cipherOutputStream, digestOutputStream));
+        cipherOutputStream.close();
+        
+        tarArchiveOutputStream.closeArchiveEntry();
+        
+        //Capture the hash code of the encrypted file
+        digestOutputStream.close();
+        final byte[] hashBytes = digestOutputStream.getDigest();
+        final String actualHash = new String(Base64.encodeBase64(hashBytes), FileEncrypter.CHARSET);
+        
+        this.writeHashfile(tarArchiveOutputStream, actualHash);
+        
+        //Close the TAR stream, nothing else should be written to it
+        tarArchiveOutputStream.close();
     }
     
-    protected ParametersWithIV generateParameters(TarArchiveOutputStream tarArchiveOutputStream) throws InvalidCipherTextException, IOException {
+    protected ParametersWithIV generateParameters() throws InvalidCipherTextException, IOException {
         //Generate a random password
         final byte[] passwordBytes = new byte[PASSWORD_LENGTH];
         SECURE_RANDOM.nextBytes(passwordBytes);
@@ -147,7 +133,7 @@ public class BouncyCastleFileEncrypter extends AbstractPublicKeyEncrypter implem
         return (ParametersWithIV) generator.generateDerivedParameters(KEY_LENGTH, IV_LENGTH);
     }
     
-    protected void writeKeyfile(TarArchiveOutputStream tarArchiveOutputStream, ParametersWithIV cipherParameters, String hash) throws IOException, InvalidCipherTextException {
+    protected void writeKeyfile(TarArchiveOutputStream tarArchiveOutputStream, ParametersWithIV cipherParameters) throws IOException, InvalidCipherTextException {
         final KeyParameter keyParameter = (KeyParameter)cipherParameters.getParameters();
 
         final byte[] keyBytes = keyParameter.getKey();
@@ -161,21 +147,31 @@ public class BouncyCastleFileEncrypter extends AbstractPublicKeyEncrypter implem
                 .append(keyHexChars)
                 .append(KEYFILE_LINE_SEPERATOR)
                 .append(ivHexChars)
-                .append(KEYFILE_LINE_SEPERATOR)
-                .append(hash)
                 .toString();
-        final byte[] keyfileBytes = keyfileString.getBytes(CHARSET);
         
-        //Encrypt keyfile
+        encryptAndWrite(tarArchiveOutputStream, keyfileString, KEYFILE_ENC_NAME);
+    }
+    
+    protected void writeHashfile(TarArchiveOutputStream tarArchiveOutputStream, String hash) throws IOException, InvalidCipherTextException {
+        encryptAndWrite(tarArchiveOutputStream, hash, HASHFILE_ENC_NAME);
+    }
+
+    /**
+     * Encrypts and encodes the string and writes it to the tar output stream with the specified file name
+     */
+    protected void encryptAndWrite(TarArchiveOutputStream tarArchiveOutputStream, String contents, String fileName) throws InvalidCipherTextException, IOException {
+        final byte[] contentBytes = contents.getBytes(CHARSET);
+        
+        //Encrypt contents
         final AsymmetricBlockCipher encryptCipher = this.getEncryptCipher();
-        final byte[] encryptedKeyfileBytes = encryptCipher.processBlock(keyfileBytes, 0, keyfileBytes.length);
-        final byte[] encryptedKeyfileBase64Bytes = Base64.encodeBase64(encryptedKeyfileBytes);
+        final byte[] encryptedContentBytes = encryptCipher.processBlock(contentBytes, 0, contentBytes.length);
+        final byte[] encryptedContentBase64Bytes = Base64.encodeBase64(encryptedContentBytes);
         
-        //Write encrypted keyfile to tar output stream
-        final TarArchiveEntry keyfileEntry = new TarArchiveEntry(KEYFILE_ENC_NAME);
-        keyfileEntry.setSize(encryptedKeyfileBase64Bytes.length);
-        tarArchiveOutputStream.putArchiveEntry(keyfileEntry);
-        tarArchiveOutputStream.write(encryptedKeyfileBase64Bytes);
+        //Write encrypted contents to tar output stream
+        final TarArchiveEntry contentEntry = new TarArchiveEntry(fileName);
+        contentEntry.setSize(encryptedContentBase64Bytes.length);
+        tarArchiveOutputStream.putArchiveEntry(contentEntry);
+        tarArchiveOutputStream.write(encryptedContentBase64Bytes);
         tarArchiveOutputStream.closeArchiveEntry();
     }
 }

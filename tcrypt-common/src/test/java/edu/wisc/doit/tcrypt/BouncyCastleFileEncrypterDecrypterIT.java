@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,6 +47,12 @@ public class BouncyCastleFileEncrypterDecrypterIT {
         
         final Process p = pb.start();
         final int ret = p.waitFor();
+        if (ret != 0) {
+            final String pOut = IOUtils.toString(p.getInputStream(), TokenEncrypter.CHARSET).trim();
+            System.out.println(pOut);
+            final String pErr = IOUtils.toString(p.getErrorStream(), TokenEncrypter.CHARSET).trim();
+            System.out.println(pErr);
+        }
         assertEquals(0, ret);
         
         
@@ -71,7 +78,7 @@ public class BouncyCastleFileEncrypterDecrypterIT {
         InputStream testFileInStream = new FileInputStream(testFile);
         
         final File encFile = this.testFolder.newFile("testFile.txt.tar");
-        this.fileEncrypter.encrypt("testFile.txt", testFileInStream, new FileOutputStream(encFile));
+        this.fileEncrypter.encrypt("testFile.txt", (int)testFile.length(), testFileInStream, new FileOutputStream(encFile));
         
         
         //Decrypt with OpenSSL
@@ -84,6 +91,12 @@ public class BouncyCastleFileEncrypterDecrypterIT {
         
         final Process p = pb.start();
         final int ret = p.waitFor();
+        if (ret != 0) {
+            final String pOut = IOUtils.toString(p.getInputStream(), TokenEncrypter.CHARSET).trim();
+            System.out.println(pOut);
+            final String pErr = IOUtils.toString(p.getErrorStream(), TokenEncrypter.CHARSET).trim();
+            System.out.println(pErr);
+        }
         assertEquals(0, ret);
         
         

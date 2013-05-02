@@ -62,6 +62,12 @@ public class TokenEncryptDecryptIT {
         
         final Process p = pb.start();
         final int ret = p.waitFor();
+        if (ret != 0) {
+            final String pOut = IOUtils.toString(p.getInputStream(), TokenEncrypter.CHARSET).trim();
+            System.out.println(pOut);
+            final String pErr = IOUtils.toString(p.getErrorStream(), TokenEncrypter.CHARSET).trim();
+            System.out.println(pErr);
+        }
         assertEquals(0, ret);
         
         final String encrypted = IOUtils.toString(p.getInputStream(), TokenEncrypter.CHARSET).trim();
@@ -89,6 +95,12 @@ public class TokenEncryptDecryptIT {
         
         final Process p = pb.start();
         final int ret = p.waitFor();
+        if (ret != 0) {
+            final String pOut = IOUtils.toString(p.getInputStream(), TokenEncrypter.CHARSET).trim();
+            System.out.println(pOut);
+            final String pErr = IOUtils.toString(p.getErrorStream(), TokenEncrypter.CHARSET).trim();
+            System.out.println(pErr);
+        }
         assertEquals(0, ret);
         
         final String actual = IOUtils.toString(p.getInputStream(), TokenEncrypter.CHARSET).trim();

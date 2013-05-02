@@ -38,6 +38,7 @@ public interface FileEncrypter {
     
     static final String ENC_SUFFIX = ".enc";
     static final String KEYFILE_ENC_NAME = "keyfile" + ENC_SUFFIX;
+    static final String HASHFILE_ENC_NAME = "hashfile" + ENC_SUFFIX;
     
     static final char KEYFILE_LINE_SEPERATOR = '\n';
 
@@ -50,6 +51,6 @@ public interface FileEncrypter {
      * @param inputStream Input stream to read the file from
      * @param outputStream Output stream to write the TAR file to
      */
-    void encrypt(String fileName, InputStream inputStream, OutputStream outputStream) throws InvalidCipherTextException, IOException;
+    void encrypt(String fileName, int size, InputStream inputStream, OutputStream outputStream) throws InvalidCipherTextException, IOException;
 
 }

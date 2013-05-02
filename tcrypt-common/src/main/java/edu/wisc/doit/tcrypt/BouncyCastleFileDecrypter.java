@@ -82,8 +82,7 @@ public class BouncyCastleFileDecrypter extends AbstractPublicKeyDecrypter implem
         final TarArchiveInputStream tarInputStream = new TarArchiveInputStream(inputStream, FileEncrypter.ENCODING);
         
         //Read the cipher parameters from the tar file
-        final Tuple<CipherParameters, String> keyData = this.getCipherParameters(tarInputStream);
-        final CipherParameters key = keyData.v1;
+        final CipherParameters key = this.getCipherParameters(tarInputStream);
 
         //Advance to the next entry in the tar file
         tarInputStream.getNextTarEntry();
@@ -99,22 +98,47 @@ public class BouncyCastleFileDecrypter extends AbstractPublicKeyDecrypter implem
         IOUtils.copy(tarInputStream, cipherOutputStream);
         cipherOutputStream.close();
         
+        //Capture the hash of the decrypted output
         final byte[] hashBytes = digestOutputStream.getDigest();
         final String actualHash = new String(Base64.encodeBase64(hashBytes), FileEncrypter.CHARSET);
         
-        if (!keyData.v2.equals(actualHash)) {
-            throw new IllegalArgumentException("Hash " + actualHash + " doesn't match expected hash " + keyData.v2 + " for decrypted file");
+        //Get the expected hash and verify
+        final String expectedHash = this.getExpectedHash(tarInputStream);
+        if (!expectedHash.equals(actualHash)) {
+            throw new IllegalArgumentException("Hash " + actualHash + " doesn't match expected hash " + expectedHash + " for decrypted file. The data written to the OutputStream should be discarded.");
         }
     }
+    
+    protected String getExpectedHash(TarArchiveInputStream inputStream) throws InvalidCipherTextException, IOException {
+        return readAndDecrypt(inputStream, FileEncrypter.HASHFILE_ENC_NAME).trim();
+    }
 
-    protected Tuple<CipherParameters, String> getCipherParameters(TarArchiveInputStream inputStream) throws IOException, InvalidCipherTextException, DecoderException {
+    protected CipherParameters getCipherParameters(TarArchiveInputStream inputStream) throws IOException, InvalidCipherTextException, DecoderException {
+        final String keyFileStr = readAndDecrypt(inputStream, FileEncrypter.KEYFILE_ENC_NAME);
+
+        //Split the keyfile
+        final String[] keyFileParts = KEYFILE_SEPERATOR_PATTERN.split(keyFileStr);
+        if (keyFileParts.length != 2) {
+            throw new IllegalArgumentException(FileEncrypter.KEYFILE_ENC_NAME + " must have exactly two lines, this one has: " + keyFileParts.length);
+        }
+        
+        //line 0 is the secretKey, 1 is the initVector, 2 is the file md5
+        final byte[] secretKey = Hex.decodeHex(keyFileParts[0].toCharArray());
+        final byte[] initVector = Hex.decodeHex(keyFileParts[1].toCharArray());
+        
+        //Create the key parameters
+        final KeyParameter keyParam = new KeyParameter(secretKey);
+        return new ParametersWithIV(keyParam, initVector);
+    }
+
+    protected String readAndDecrypt(TarArchiveInputStream inputStream, final String fileName) throws IOException, InvalidCipherTextException {
         //Read keyfile.enc from the TAR  
         final TarArchiveEntry keyFileEntry = inputStream.getNextTarEntry();
         
         //Verify file name
         final String keyFileName = keyFileEntry.getName();
-        if (!FileEncrypter.KEYFILE_ENC_NAME.equals(keyFileName)) {
-            throw new IllegalArgumentException("The first entry in the TAR must be name: " + FileEncrypter.KEYFILE_ENC_NAME);
+        if (!fileName.equals(keyFileName)) {
+            throw new IllegalArgumentException("The first entry in the TAR must be name: " + fileName);
         }
         
         //Verify file size
@@ -129,21 +153,6 @@ public class BouncyCastleFileDecrypter extends AbstractPublicKeyDecrypter implem
         //Decrypt the keyfile into UTF-8 String
         final AsymmetricBlockCipher decryptCipher = this.getDecryptCipher();
         final byte[] keyFileBytes = decryptCipher.processBlock(encKeyFileBytes, 0, encKeyFileBytes.length);
-        final String keyFileStr = new String(keyFileBytes, FileEncrypter.CHARSET);
-
-        //Split the keyfile
-        final String[] keyFileParts = KEYFILE_SEPERATOR_PATTERN.split(keyFileStr);
-        if (keyFileParts.length != 3) {
-            throw new IllegalArgumentException(FileEncrypter.KEYFILE_ENC_NAME + " must have exactly three lines, this one has: " + keyFileParts.length);
-        }
-        
-        //line 0 is the secretKey, 1 is the initVector, 2 is the file md5
-        final byte[] secretKey = Hex.decodeHex(keyFileParts[0].toCharArray());
-        final byte[] initVector = Hex.decodeHex(keyFileParts[1].toCharArray());
-        final String expectedHash = keyFileParts[2];
-        
-        //Create the key parameters
-        final KeyParameter keyParam = new KeyParameter(secretKey);
-        return new Tuple<CipherParameters, String>(new ParametersWithIV(keyParam, initVector), expectedHash);
+        return new String(keyFileBytes, FileEncrypter.CHARSET);
     }
 }
