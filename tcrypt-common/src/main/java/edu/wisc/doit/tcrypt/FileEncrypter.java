@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
+import org.apache.commons.codec.DecoderException;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
 /**
@@ -52,5 +53,13 @@ public interface FileEncrypter {
      * @param outputStream Output stream to write the TAR file to
      */
     void encrypt(String fileName, int size, InputStream inputStream, OutputStream outputStream) throws InvalidCipherTextException, IOException;
+    
+    /**
+     * Adds a wrapper to the specified OutputStream to encrypt it on the fly
+     * 
+     * @param outputStream the stream the data to encrypt is written to
+     * @return An OutputStream that the encrypted tar file is written to
+     */
+    OutputStream encrypt(String fileName, int size, OutputStream outputStream) throws InvalidCipherTextException, IOException, DecoderException;
 
 }

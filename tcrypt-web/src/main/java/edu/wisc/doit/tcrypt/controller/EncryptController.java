@@ -20,6 +20,7 @@
 package edu.wisc.doit.tcrypt.controller;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -91,10 +92,13 @@ public class EncryptController extends BaseController {
 	    
 	    response.setHeader("Content-Type", "application/x-tar");
 	    response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + ".tar" + "\"");
-	    
-	    final ServletOutputStream outputStream = response.getOutputStream();
-	    fileEncrypter.encrypt(filename, file.getInputStream(), outputStream);
-	    outputStream.close();
+
+	    final long size = file.getSize();
+	    try (   final InputStream inputStream = file.getInputStream();
+	            final ServletOutputStream outputStream = response.getOutputStream()) {
+
+	        fileEncrypter.encrypt(filename, (int)size, inputStream, outputStream);
+	    }
 		
 	    return null;
 	}

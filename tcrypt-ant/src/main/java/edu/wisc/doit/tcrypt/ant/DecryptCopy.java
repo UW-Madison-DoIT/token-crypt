@@ -7,12 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.io.Reader;
 import java.util.Vector;
 
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.codec.DecoderException;
 import org.apache.commons.io.IOUtils;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -21,12 +19,23 @@ import org.apache.tools.ant.types.FilterSetCollection;
 import org.apache.tools.ant.types.Resource;
 import org.apache.tools.ant.types.resources.FileResource;
 import org.apache.tools.ant.util.FileUtils;
+import org.apache.tools.ant.util.GlobPatternMapper;
 import org.apache.tools.ant.util.ResourceUtils;
+import org.bouncycastle.crypto.InvalidCipherTextException;
 
 import edu.wisc.doit.tcrypt.BouncyCastleFileDecrypter;
 import edu.wisc.doit.tcrypt.FileDecrypter;
 import edu.wisc.doit.tcrypt.FileEncrypter;
 
+/**
+ * Extends the base {@link Copy} task to provide on the fly decryption of files. The
+ * decryption is hooked into the process fairly early on so filtering and other transformations
+ * that copy can do should all operate on the decrypted version of the file.
+ * <br>
+ * Defaults to removing the .tar extension from decrypted files
+ * 
+ * @author Eric Dalquist
+ */
 public class DecryptCopy extends Copy {
     private Resource privateKey;
     private FileDecrypter fileDecrypter;
@@ -40,6 +49,12 @@ public class DecryptCopy extends Copy {
 
     public DecryptCopy() {
         this.fileUtils = new DecryptFileUtils();
+        
+        //Setup adding .tar to file names
+        final GlobPatternMapper fileNameMapper = new GlobPatternMapper();
+        fileNameMapper.setFrom("*.tar");
+        fileNameMapper.setTo("*");
+        this.add(fileNameMapper);
     }
     
     private FileDecrypter getFileDecrypter() {
@@ -71,9 +86,9 @@ public class DecryptCopy extends Copy {
                 Project project, boolean force) throws IOException {
             
             final FileDecrypter fd = getFileDecrypter();
-            //TODO swap out source resource for decrypter
-            
-            ResourceUtils.copyResource(new DecryptingResource(fd, sourceFile),
+
+            //Swap out the standard FileResource for a DecryptingFileResource
+            ResourceUtils.copyResource(new DecryptingFileResource(fd, sourceFile),
                     new FileResource(destFile),
                     filters, filterChains, overwrite,
                     preserveLastModified, append, inputEncoding,
@@ -81,12 +96,12 @@ public class DecryptCopy extends Copy {
         }
     }
     
-    private final class DecryptingResource extends Resource {
+    private final class DecryptingFileResource extends Resource {
         private final FileDecrypter fileDecrypter;
         private final File file;
         private final File baseDir;
         
-        public DecryptingResource(FileDecrypter fileDecrypter, File file) {
+        public DecryptingFileResource(FileDecrypter fileDecrypter, File file) {
             this.fileDecrypter = fileDecrypter;
             this.file = file;
             this.baseDir = file.getParentFile();
@@ -114,25 +129,19 @@ public class DecryptCopy extends Copy {
         }
 
         public InputStream getInputStream() throws IOException {
-            final TarArchiveInputStream encryptedInput = new TarArchiveInputStream(new FileInputStream(this.file));
-            
-            this.fileDecrypter.decrypt(encryptedInput, pipedOutputStream);
-            
-            return new PipedInputStream(pipedOutputStream) {
-                @Override
-                public void close() throws IOException {
-                    try {
-                        super.close();
-                    }
-                    finally {
-                        encryptedInput.close();
-                    }
-                }
-            };
+            try {
+                return this.fileDecrypter.decrypt(new BufferedInputStream(new FileInputStream(this.file)));
+            }
+            catch (InvalidCipherTextException e) {
+                throw new BuildException("Invalid key '" + privateKey +  "' for: " + this.file, e);
+            }
+            catch (DecoderException e) {
+                throw new BuildException("Invalid key '" + privateKey +  "' for: " + this.file, e);
+            }
         }
 
         public OutputStream getOutputStream() throws IOException {
-            throw new UnsupportedOperationException("DecryptingResource is read only");
+            throw new UnsupportedOperationException("DecryptingFileResource is read only");
         }
 
         public String toString() {

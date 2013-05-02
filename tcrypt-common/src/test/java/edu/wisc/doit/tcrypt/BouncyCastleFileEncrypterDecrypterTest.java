@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 import org.apache.commons.io.IOUtils;
@@ -62,6 +63,30 @@ public class BouncyCastleFileEncrypterDecrypterTest {
         
         final ByteArrayOutputStream encTestFileOutStream = new ByteArrayOutputStream();
         this.fileEncrypter.encrypt("testFile.txt", testFileBytes.length, new ByteArrayInputStream(testFileBytes), encTestFileOutStream);
+        
+        final ByteArrayOutputStream decTestFileOutStream = new ByteArrayOutputStream();
+        this.fileDecrypter.decrypt(new ByteArrayInputStream(encTestFileOutStream.toByteArray()), decTestFileOutStream);
+        
+        
+        testFileInStream = this.getClass().getResourceAsStream("/testFile.txt");
+        final String expected = IOUtils.toString(testFileInStream);
+        final String actual = IOUtils.toString(new ByteArrayInputStream(decTestFileOutStream.toByteArray()));
+
+        assertEquals(expected, actual);
+    }
+    
+    @Test
+    public void testFileEncryptOutputStreamDecrypt() throws Exception {
+        InputStream testFileInStream = this.getClass().getResourceAsStream("/testFile.txt");
+        final ByteArrayOutputStream testFileBuffer = new ByteArrayOutputStream();
+        IOUtils.copy(testFileInStream, testFileBuffer);
+        final byte[] testFileBytes = testFileBuffer.toByteArray();
+        
+        final ByteArrayOutputStream encTestFileOutStream = new ByteArrayOutputStream();
+        final OutputStream encryptingOutputStream = this.fileEncrypter.encrypt("testFile.txt", testFileBytes.length, encTestFileOutStream);
+        IOUtils.write(testFileBytes, encryptingOutputStream);
+        encryptingOutputStream.close();
+        
         
         final ByteArrayOutputStream decTestFileOutStream = new ByteArrayOutputStream();
         this.fileDecrypter.decrypt(new ByteArrayInputStream(encTestFileOutStream.toByteArray()), decTestFileOutStream);

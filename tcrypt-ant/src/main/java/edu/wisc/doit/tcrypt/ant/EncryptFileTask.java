@@ -82,7 +82,8 @@ public class EncryptFileTask extends AbstractFileTask {
             this.log("Encrypting '" + this.srcFile + "' to '" + outputFile + "'");
             
             final String fileName = FilenameUtils.getName(this.srcFile.getName());
-            fileEncrypter.encrypt(fileName, srcFileInputStream, encryptedFileOutputStream);
+            final long size = this.srcFile.getSize();
+            fileEncrypter.encrypt(fileName, (int)size, srcFileInputStream, encryptedFileOutputStream);
         }
         catch (IOException e) {
             throw new BuildException("Failed to encrypt file from '" + this.srcFile + "' to '" + outputFile + "'", e);

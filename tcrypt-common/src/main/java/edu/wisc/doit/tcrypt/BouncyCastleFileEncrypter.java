@@ -20,6 +20,7 @@
 package edu.wisc.doit.tcrypt;
 
 import java.io.BufferedInputStream;
+import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,6 +28,7 @@ import java.io.Reader;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 
+import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -37,8 +39,10 @@ import org.apache.commons.io.output.TeeOutputStream;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.BufferedBlockCipher;
+import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.PBEParametersGenerator;
+import org.bouncycastle.crypto.digests.GeneralDigest;
 import org.bouncycastle.crypto.generators.OpenSSLPBEParametersGenerator;
 import org.bouncycastle.crypto.io.CipherOutputStream;
 import org.bouncycastle.crypto.io.DigestOutputStream;
@@ -77,21 +81,9 @@ public class BouncyCastleFileEncrypter extends AbstractPublicKeyEncrypter implem
     public void encrypt(String fileName, int size, InputStream inputStream, OutputStream outputStream) throws InvalidCipherTextException, IOException {
         final TarArchiveOutputStream tarArchiveOutputStream = new TarArchiveOutputStream(outputStream, ENCODING);
         
-        //Generate cipher parameters and key file
-        final ParametersWithIV cipherParameters = generateParameters();
+        final BufferedBlockCipher cipher = createCipher(tarArchiveOutputStream);
         
-        //Write out the key file
-        this.writeKeyfile(tarArchiveOutputStream, cipherParameters);
-        
-        //Create the cipher
-        final BufferedBlockCipher cipher = this.getEncryptBlockCipher(cipherParameters);
-        
-        //Add the TAR entry and calculate the output size based on the input size
-        final TarArchiveEntry encfileEntry = new TarArchiveEntry(fileName + ENC_SUFFIX);
-        final int outputSize = cipher.getOutputSize(size);
-        encfileEntry.setSize(outputSize);
-        tarArchiveOutputStream.putArchiveEntry(encfileEntry);
-        
+        startEncryptedFile(fileName, size, tarArchiveOutputStream, cipher);
         
         //Setup cipher output stream, has to protect from close as the cipher stream must close but the tar cannot get closed yet
         final CipherOutputStream cipherOutputStream = new CipherOutputStream(new CloseShieldOutputStream(tarArchiveOutputStream), cipher);
@@ -108,12 +100,53 @@ public class BouncyCastleFileEncrypter extends AbstractPublicKeyEncrypter implem
         //Capture the hash code of the encrypted file
         digestOutputStream.close();
         final byte[] hashBytes = digestOutputStream.getDigest();
-        final String actualHash = new String(Base64.encodeBase64(hashBytes), FileEncrypter.CHARSET);
         
-        this.writeHashfile(tarArchiveOutputStream, actualHash);
+        this.writeHashfile(tarArchiveOutputStream, hashBytes);
         
         //Close the TAR stream, nothing else should be written to it
         tarArchiveOutputStream.close();
+    }
+    
+    @Override
+    public OutputStream encrypt(String fileName, int size, OutputStream outputStream) throws InvalidCipherTextException, IOException, DecoderException {
+        final TarArchiveOutputStream tarOutputStream = new TarArchiveOutputStream(outputStream, ENCODING);
+        
+        final BufferedBlockCipher cipher = createCipher(tarOutputStream);
+
+        startEncryptedFile(fileName, size, tarOutputStream, cipher);
+        
+        //Protect the underlying TAR stream from being closed by the cipher stream
+        final CloseShieldOutputStream closeShieldTarStream = new CloseShieldOutputStream(tarOutputStream);
+
+        //Setup the encrypting cipher stream
+        final CipherOutputStream chipherStream = new CipherOutputStream(closeShieldTarStream, cipher);
+
+        //Generate a digest of the pre-encryption data
+        final GeneralDigest digest = this.createDigester();
+        final DigestOutputStream digestOutputStream = new DigestOutputStream(digest);
+
+        //Write data to both the digester and cipher
+        final TeeOutputStream teeStream = new TeeOutputStream(digestOutputStream, chipherStream);
+        return new EncryptingOutputStream(teeStream, tarOutputStream, digest);
+    }
+
+    protected void startEncryptedFile(String fileName, int size, final TarArchiveOutputStream tarArchiveOutputStream, final BufferedBlockCipher cipher) throws IOException {
+        //Add the TAR entry and calculate the output size based on the input size
+        final TarArchiveEntry encfileEntry = new TarArchiveEntry(fileName + ENC_SUFFIX);
+        final int outputSize = cipher.getOutputSize(size);
+        encfileEntry.setSize(outputSize);
+        tarArchiveOutputStream.putArchiveEntry(encfileEntry);
+    }
+
+    protected BufferedBlockCipher createCipher(final TarArchiveOutputStream tarArchiveOutputStream) throws InvalidCipherTextException, IOException {
+        //Generate cipher parameters and key file
+        final ParametersWithIV cipherParameters = generateParameters();
+        
+        //Write out the key file
+        this.writeKeyfile(tarArchiveOutputStream, cipherParameters);
+        
+        //Create the cipher
+        return this.getEncryptBlockCipher(cipherParameters);
     }
     
     protected ParametersWithIV generateParameters() throws InvalidCipherTextException, IOException {
@@ -152,7 +185,8 @@ public class BouncyCastleFileEncrypter extends AbstractPublicKeyEncrypter implem
         encryptAndWrite(tarArchiveOutputStream, keyfileString, KEYFILE_ENC_NAME);
     }
     
-    protected void writeHashfile(TarArchiveOutputStream tarArchiveOutputStream, String hash) throws IOException, InvalidCipherTextException {
+    protected void writeHashfile(TarArchiveOutputStream tarArchiveOutputStream, byte[] hashBytes) throws IOException, InvalidCipherTextException {
+        final String hash = new String(Base64.encodeBase64(hashBytes), FileEncrypter.CHARSET);
         encryptAndWrite(tarArchiveOutputStream, hash, HASHFILE_ENC_NAME);
     }
 
@@ -173,5 +207,39 @@ public class BouncyCastleFileEncrypter extends AbstractPublicKeyEncrypter implem
         tarArchiveOutputStream.putArchiveEntry(contentEntry);
         tarArchiveOutputStream.write(encryptedContentBase64Bytes);
         tarArchiveOutputStream.closeArchiveEntry();
+    }
+    
+    private final class EncryptingOutputStream extends FilterOutputStream {
+        private final TarArchiveOutputStream tarOutputStream;
+        private final Digest digest;
+        
+        private EncryptingOutputStream(OutputStream is, TarArchiveOutputStream tarOutputStream, Digest digest) {
+            super(is);
+            
+            this.tarOutputStream = tarOutputStream;
+            this.digest = digest;
+        }
+
+        @Override
+        public void close() throws IOException {
+            //Complete the encryption
+            super.close();
+            
+            //Close the tar entry
+            tarOutputStream.closeArchiveEntry();
+            
+            //Write the hash of the plain file
+            byte[] hashBytes = new byte[digest.getDigestSize()];
+            digest.doFinal(hashBytes, 0);
+            try {
+                writeHashfile(tarOutputStream, hashBytes);
+            }
+            catch (InvalidCipherTextException e) {
+                throw new IOException(e);
+            }
+            
+            //Close the TAR stream, nothing else should be written to it
+            tarOutputStream.close();
+        }
     }
 }
