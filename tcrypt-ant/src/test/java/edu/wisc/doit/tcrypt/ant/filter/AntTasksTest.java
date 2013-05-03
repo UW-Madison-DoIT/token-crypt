@@ -86,8 +86,7 @@ public class AntTasksTest extends BuildFileTest {
         this.project.setProperty("src", sourceDir.getAbsolutePath());
         this.project.setProperty("dest", destDir.getAbsolutePath());
         
-        this.expectLogContaining("decryptTokens", 
-                "Copying 2 files to /var/folders/fb/");
+        this.expectLogContaining("decryptTokens", "Copying 2 files to ");
         
         final File expectedDir = getResourceFile("/token_filtering_expected/test.properties").getParentFile();
         
