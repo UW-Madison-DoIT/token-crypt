@@ -19,7 +19,6 @@
  */
 package edu.wisc.doit.tcrypt;
 
-import java.io.BufferedInputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,7 +78,7 @@ public class BouncyCastleFileEncrypter extends AbstractPublicKeyEncrypter implem
 
     @Override
     public void encrypt(String fileName, int size, InputStream inputStream, OutputStream outputStream) throws InvalidCipherTextException, IOException {
-        final TarArchiveOutputStream tarArchiveOutputStream = new TarArchiveOutputStream(outputStream, ENCODING);
+        final TarArchiveOutputStream tarArchiveOutputStream = new TarArchiveOutputStream(outputStream, 512, ENCODING);
         
         final BufferedBlockCipher cipher = createCipher(tarArchiveOutputStream);
         
@@ -92,7 +91,7 @@ public class BouncyCastleFileEncrypter extends AbstractPublicKeyEncrypter implem
         final DigestOutputStream digestOutputStream = new DigestOutputStream(this.createDigester());
         
         //Perform streaming encryption and hashing of the file
-        IOUtils.copy(new BufferedInputStream(inputStream), new TeeOutputStream(cipherOutputStream, digestOutputStream));
+        IOUtils.copy(inputStream, new TeeOutputStream(cipherOutputStream, digestOutputStream));
         cipherOutputStream.close();
         
         tarArchiveOutputStream.closeArchiveEntry();
