@@ -4,7 +4,7 @@
   <parent>
     <artifactId>tcrypt-parent</artifactId>
     <groupId>edu.wisc.doit.tcrypt</groupId>
-    <version>1.0.8</version>
+    <version>1.0.9-SNAPSHOT</version>
   </parent>
   <artifactId>tcrypt-web</artifactId>
   <packaging>war</packaging>
