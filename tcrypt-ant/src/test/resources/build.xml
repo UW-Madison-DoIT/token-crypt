@@ -20,46 +20,42 @@
 -->
 
 <project name="tcrypt-ant-tests" basedir=".">
-	
-	<path id="tcryptAntClasspath">
-        <fileset dir="${basedir}/target/">
-            <include name="tcrypt-ant-*.jar"/>
-        </fileset>
-    </path>
-	
-
-    <taskdef resource="edu/wisc/doit/tcrypt/ant/antlib.xml">
-        <classpath refid="tcryptAntClasspath" />
-    </taskdef>
-	
-	<target name="decryptFile" description="Decrypt a file, specify -Dpk and -Dsrc for the private key and source file. Optional -Ddest for destination directory">
-		<property name="dest" value="${basedir}" />
-		<decryptFile privatekey="${pk}" srcfile="${src}" destdir="${dest}"/>
+    <taskdef resource="edu/wisc/doit/tcrypt/ant/antlib.xml" />
+    
+    <target name="encryptToken">
+        <encryptToken publickey="${pk}" token="${token}" />
     </target>
     
-    <target name="encryptFile" description="Encrypt a file, specify -Dpk and -Dsrc for the public key and source file. Optional -Ddest for destination directory">
-        <property name="dest" value="${basedir}" />
-        <encryptFile publickey="${pk}" srcfile="${src}" destdir="${dest}"/>
-    </target>
-    
-    <target name="encryptToken" description="Encrypt a token, specify -Dpk and -Dtoken for the public key and token.">
-    	<encryptToken publickey="${pk}" token="${token}" />
-    </target>
-    
-    <target name="decryptToken" description="Decrypt a token, specify -Dpk and -Dtoken for the private key and token.">
+    <target name="decryptToken">
         <decryptToken privatekey="${pk}" token="${token}" />
     </target>
     
-    <target name="decryptTokens" description="Decrypt tokens in files in a directory, specify -Dpk -Dsrc -Ddest for the private key and source and dest.">
-    	<copy todir="${dest}">
-    	    <fileset dir="${src}" includes="**/*"/>
-    	    <filterchain>
-    	        <filterreader classname="edu.wisc.doit.tcrypt.ant.filter.DecryptReplaceTokens">
-    	        	<classpath refid="tcryptAntClasspath" />
-    	            <param name="privateKey" value="${pk}"/>
-    	        	<param name="ignoreErrors" value="true"/>
-	            </filterreader>
-    	    </filterchain>
-    	</copy>
+    <target name="decryptTokens">
+        <copy todir="${dest}">
+            <fileset dir="${src}" includes="**/*"/>
+            <filterchain>
+                <filterreader classname="edu.wisc.doit.tcrypt.ant.filter.DecryptReplaceTokens">
+                    <param name="privateKey" value="${pk}"/>
+                    <param name="ignoreErrors" value="true"/>
+                </filterreader>
+            </filterchain>
+        </copy>
+    </target>
+    
+    <target name="encryptFile">
+        <encryptFile publickey="${pk}" srcfile="${src}" destdir="${dest}"/>
+    </target>
+	
+	<target name="decryptFile">
+		<decryptFile privatekey="${pk}" srcfile="${src}" destdir="${dest}"/>
+    </target>
+    
+    <target name="encDecCopy">
+        <encryptCopy todir="${tempDir}" publicKey="${pubKey}">
+            <fileset dir="${src}" includes="**/*"/>
+    	</encryptCopy>
+        <decryptCopy todir="${dest}" privateKey="${privKey}">
+            <fileset dir="${tempDir}" includes="**/*"/>
+    	</decryptCopy>
     </target>
 </project>

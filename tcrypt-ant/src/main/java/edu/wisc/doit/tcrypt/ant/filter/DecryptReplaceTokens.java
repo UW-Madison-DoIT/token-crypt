@@ -113,7 +113,7 @@ public class DecryptReplaceTokens extends AbstractReplaceTokens {
             throw new TokenReplacmentFailureException(e);
         }
         catch (InvalidCipherTextException e) {
-            throw new IllegalArgumentException("Failed to decrypte '" + token + "' using private key: " + this.privateKeyFile, e);
+            throw new TokenReplacmentFailureException("Failed to decrypt '" + token + "' using private key: " + this.privateKeyFile, e);
         }
     }
 }
