@@ -4,11 +4,11 @@
   <parent>
     <artifactId>tcrypt-parent</artifactId>
     <groupId>edu.wisc.doit.tcrypt</groupId>
-    <version>1.0.8-SNAPSHOT</version>
+    <version>1.0.8</version>
   </parent>
   <artifactId>tcrypt-common</artifactId>
   <name>Common APIs for Token Crypto</name>
-  <description></description>
+  <description />
   <dependencies>
     <dependency>
       <groupId>commons-codec</groupId>

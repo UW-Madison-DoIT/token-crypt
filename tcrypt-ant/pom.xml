@@ -4,7 +4,7 @@
   <parent>
     <artifactId>tcrypt-parent</artifactId>
     <groupId>edu.wisc.doit.tcrypt</groupId>
-    <version>1.0.8-SNAPSHOT</version>
+    <version>1.0.8</version>
   </parent>
   <artifactId>tcrypt-ant</artifactId>
   <name>Ant Plugin for TCrypt</name>
