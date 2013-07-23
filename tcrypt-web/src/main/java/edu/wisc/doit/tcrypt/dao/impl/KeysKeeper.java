@@ -54,7 +54,7 @@ public class KeysKeeper implements IKeysKeeper
     private static final DateTimeFormatter KEY_CREATED_FORMATTER = DateTimeFormat.forPattern("yyyyMMddHHmmss");
     
 	protected final Logger logger = LoggerFactory.getLogger(KeysKeeper.class);
-	private final Map<String, ServiceKey> keysCache = new ConcurrentHashMap<>();
+	private final Map<String, ServiceKey> keysCache = new ConcurrentHashMap<String, ServiceKey>();
 	private final TokenKeyPairGenerator keyPairGenerator;
 	private final File directory;
 	
@@ -115,7 +115,7 @@ public class KeysKeeper implements IKeysKeeper
                 }
             });
     	    
-    	    final Set<String> oldKeys = new HashSet<>(this.keysCache.keySet());
+    	    final Set<String> oldKeys = new HashSet<String>(this.keysCache.keySet());
     	    
     	    for (final File keyFile : keyfiles) {
     	        final String keyName = keyFile.getName();

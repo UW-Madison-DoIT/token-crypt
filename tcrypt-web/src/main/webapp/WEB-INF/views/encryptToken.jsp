@@ -186,7 +186,7 @@
 			        $.ajax({
 			          type: "POST",
 			          url: "${pageContext.request.contextPath}/apps/encryptAjax",
-			          data: "serviceKeyName=" + serviceName + "&unencryptedText=" + text,
+			          data: "serviceKeyName=" + serviceName + "&unencryptedText=" + encodeURIComponent(text),
 			          success: function(response){
 			            $('#encryptedText').val(response.encryptedText);
 			          },
