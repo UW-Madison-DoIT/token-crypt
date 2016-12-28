@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>shared-tools-public-parent</artifactId>
-    <groupId>edu.wisc.doit.code</groupId>
-    <version>7</version>
+    <groupId>edu.wisc.doit</groupId>
+    <artifactId>libs-parent</artifactId>
+    <version>1</version>
   </parent>
   <groupId>edu.wisc.doit.tcrypt</groupId>
   <artifactId>tcrypt-parent</artifactId>
@@ -179,6 +179,10 @@
     </dependencies>
   </dependencyManagement>
   <repositories>
+    <repository>
+      <id>myuw-releases</id>
+      <url>https://artifacts.doit.wisc.edu/artifactory/libs-release-local/</url>
+    </repository>
     <repository>
       <id>code.doit-uw-releases</id>
       <url>https://code.doit.wisc.edu/maven/content/repositories/public-releases/</url>
