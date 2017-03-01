@@ -183,9 +183,5 @@
       <id>myuw-releases</id>
       <url>https://artifacts.doit.wisc.edu/artifactory/libs-release-local/</url>
     </repository>
-    <repository>
-      <id>code.doit-uw-releases</id>
-      <url>https://code.doit.wisc.edu/maven/content/repositories/public-releases/</url>
-    </repository>
   </repositories>
 </project>
