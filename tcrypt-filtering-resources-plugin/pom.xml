@@ -4,7 +4,7 @@
   <parent>
     <artifactId>tcrypt-parent</artifactId>
     <groupId>edu.wisc.doit.tcrypt</groupId>
-    <version>1.0.10</version>
+    <version>1.0.11-SNAPSHOT</version>
   </parent>
   <artifactId>tcrypt-filtering-resources-plugin</artifactId>
   <name>Maven Resource Filtering Token Crypto Plugin</name>

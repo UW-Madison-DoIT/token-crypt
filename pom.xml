@@ -8,7 +8,7 @@
   </parent>
   <groupId>edu.wisc.doit.tcrypt</groupId>
   <artifactId>tcrypt-parent</artifactId>
-  <version>1.0.10</version>
+  <version>1.0.11-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Token Crypto Parent</name>
   <description>Projects for managing encrypted tokens</description>
@@ -22,7 +22,7 @@
   <scm>
     <connection>scm:git:git://github.com/UW-Madison-DoIT/token-crypt.git</connection>
     <developerConnection>scm:git:git@github.com:UW-Madison-DoIT/token-crypt.git</developerConnection>
-    <tag>tcrypt-parent-1.0.10</tag>
+    <tag>HEAD</tag>
     <url>https://github.com/UW-Madison-DoIT/token-crypt</url>
   </scm>
   <properties>
