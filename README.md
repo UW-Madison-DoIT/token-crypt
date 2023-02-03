@@ -1,5 +1,9 @@
 # Token Crypt
 
+ARCHIVE. UW-Madison moved continued maintenance of this software product to a private repository at <https://git.doit.wisc.edu/wps/myuw-service/myuw-legacy/token-crypt>.
+
+-----
+
 ## Installation Instructions
 
 1. Set Local Path For Keys Storage
